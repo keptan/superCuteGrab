@@ -13,6 +13,8 @@ int main(int argc, char *const argv[])
 
 	test.readTags();
 	test.printTags();
+	test.addTag("helloWorld");
+	test.printTags();
 	
 	return 0;
 

@@ -27,7 +27,7 @@ namespace cute
 
 			std::vector<std::string> getTags();
 
-			//int addTag(std::string);
+			void addTag(std::string);
 			//int addTag(std::vector<std::string>);
 
 
