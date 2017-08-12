@@ -1,6 +1,9 @@
 #include <iostream>
 #include "image.h"
 #include "metaData.h"
+#include <experimental/filesystem>
+
+namespace fs = std::experimental::filesystem;
 
 int main(int argc, char *const argv[])
 {
@@ -8,16 +11,24 @@ int main(int argc, char *const argv[])
 		std::cout<< "Usage: " << argv[0] << " file\n";
 		return 1;
 	}
-	cute::Image test(argv[1]);
-	//cute::MetaData test(argv[1]);
 
-/*	test.readTags();
-	test.printTags();
-	test.addTag("helloWorld");
-	test.printTags();
 
-*/
-	test.getHash();
+	for(auto& p: fs::recursive_directory_iterator(argv[1])){
+
+		cute::MetaData loop(p.path());
+		loop.readTags();
+
+
+		if(	loop.hasTag(argv[2])){
+
+			std::cout<<"FOUND TAG! "<<argv[1]<<" in directory "<<p.path()<<'\n';
+		}
+
+		else
+			std::cout<<"scanned file\n";
+
+	}
+
 
 
 	

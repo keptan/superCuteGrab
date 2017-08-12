@@ -53,6 +53,16 @@ namespace cute
 	}
 
 
+	bool MetaData :: hasTag(std::string s)
+	{
+		if (tags.empty())
+			return false;
+
+		if (std::find(tags.begin(), tags.end(), s) != tags.end())
+			return true;
+
+	}
+
 
 
 };

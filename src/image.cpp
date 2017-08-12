@@ -28,10 +28,7 @@ namespace cute
 	{
 
 		hash = hashFile(path.string().c_str());
-		
 		std::cout<<hash<<'\n';
-
-
 
 	}
 

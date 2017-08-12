@@ -22,6 +22,7 @@ namespace cute
 
 			MetaData(std::string p);
 			bool hasTags;
+			bool hasTag(std::string);
 			void printTags();
 			void readTags();
 
