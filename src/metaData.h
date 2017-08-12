@@ -17,6 +17,7 @@ namespace cute
 
 		protected :
 			std::vector<std::string>tags;
+			struct EqIgnoreCase;
 			
 		public :
 

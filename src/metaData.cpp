@@ -7,6 +7,7 @@
 
 namespace cute
 {
+
 	MetaData :: MetaData(std::string p): Image(p)
 	{
 
@@ -53,6 +54,7 @@ namespace cute
 	}
 
 
+
 	bool MetaData :: hasTag(std::string s)
 	{
 		if (tags.empty())
@@ -61,7 +63,11 @@ namespace cute
 		if (std::find(tags.begin(), tags.end(), s) != tags.end())
 			return true;
 
+		for(auto  & t : tags)
+			return s.compare(0,s.size(),t);
 	}
+
+
 
 
 
