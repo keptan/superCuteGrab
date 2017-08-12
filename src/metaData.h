@@ -1,5 +1,5 @@
 #ifndef METADATA_H
-#define METADATA_h
+#define METADATA_H
 
 #include <exiv2/exiv2.hpp>
 #include "image.h"
@@ -21,7 +21,7 @@ namespace cute
 			
 		public :
 
-			MetaData(std::string p);
+			MetaData(std::string);
 			bool hasTags;
 			bool hasTag(std::string);
 			void printTags();

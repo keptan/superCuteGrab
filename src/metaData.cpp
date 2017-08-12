@@ -8,11 +8,9 @@
 namespace cute
 {
 
-	MetaData :: MetaData(std::string p): Image(p)
-	{
-
-	}
-
+	MetaData :: MetaData(std::string p)
+		: Image(p)
+	{}
 
 	void MetaData :: readTags()
 	{
