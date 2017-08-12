@@ -8,13 +8,18 @@ int main(int argc, char *const argv[])
 		std::cout<< "Usage: " << argv[0] << " file\n";
 		return 1;
 	}
-	//cute::Image test(argv[1]);
-	cute::MetaData test(argv[1]);
+	cute::Image test(argv[1]);
+	//cute::MetaData test(argv[1]);
 
-	test.readTags();
+/*	test.readTags();
 	test.printTags();
 	test.addTag("helloWorld");
 	test.printTags();
+
+*/
+	test.getHash();
+
+
 	
 	return 0;
 
