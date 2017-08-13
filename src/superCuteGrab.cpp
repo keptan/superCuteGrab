@@ -64,6 +64,46 @@ int directoryScan(std::string p, std::string t)
 
 }
 
+int booruWriteScan(std::string p)
+{
+	for(auto& p: fs::recursive_directory_iterator(p)){
+
+		if (p.path().extension() == ".jpg" || p.path().extension()  == ".png"){
+
+
+
+
+		cute::MetaData file(p.path());
+		file.readTags();
+
+		if(!file.tagged()){
+
+
+		cute::BooruInterface danSearch(file.getHash());
+
+		danSearch.getDoc();
+		if(danSearch.readTags()){
+
+		std::cout << "writing tags to " << p.path << std::endl;
+
+		file.addTag("MD5:" + file.getHash());
+
+		for (auto element : danSearch.getTags()){
+			file.addTag(element);
+		}
+
+		file.writeTags();
+		}
+		}
+			
+	}
+
+	}
+	return 0;
+
+
+}
+
 int scanPreviouslyTagged(std::string p)
 {
 	for(auto& p: fs::recursive_directory_iterator(p)){
@@ -121,30 +161,8 @@ int booruScan(std::string p)
 int main(int argc, char *const argv[])
 {
 	scanPreviouslyTagged(argv[1]);
+	booruWriteScan(argv[1]);
 	
-/*	cute::MetaData file(argv[1]);
-	file.readTags();
-	file.clearTags();
-
-	cute::BooruInterface danSearch(file.getHash());
-
-	danSearch.getDoc();
-	danSearch.readTags();
-
-	file.addTag("MD5:" + file.getHash());
-
-	for (auto element : danSearch.getTags()){
-		file.addTag(element);
-
-
-	}
-
-	std::cout<<std::endl;
-
-
-	file.writeTags();
-
-*/
 
 
 

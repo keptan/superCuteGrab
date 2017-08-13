@@ -79,8 +79,10 @@ namespace cute
 		if (std::find(tags.begin(), tags.end(), s) != tags.end())
 			return true;
 
-		for(auto  & t : tags)
-			return s.compare(0,s.size(),t);
+		for(auto &t : tags){
+			if(s.compare(0,s.size(),t))
+				return true;
+		}
 	}
 
 	bool MetaData :: tagged()
