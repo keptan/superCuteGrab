@@ -79,6 +79,12 @@ bool BooruInterface :: readTags()
 
 	}
 
+std::vector<std::string>  BooruInterface :: getTags()
+{
+
+	return docTags;
+}
+
 		
 	void BooruInterface :: printTags()
 	{
