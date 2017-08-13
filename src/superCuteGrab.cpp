@@ -1,4 +1,5 @@
 #include <iostream>
+#include "booruInterface.h"
 #include "image.h"
 #include "metaData.h"
 #include <experimental/filesystem>

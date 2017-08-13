@@ -4,7 +4,7 @@
 #include <curl/curl.h>
 #include <string>
 #include <vector>
-#include "tinyxml.h"
+#include <json/json.h>
 
 
 namespace cute
@@ -13,21 +13,22 @@ namespace cute
 	{
 		protected :
 			std::string loc;
-			std::string post;
-			TixmlDocument doc;
+			std::string md5;
+			std::string doc;
+
 			std::vector<std::string> docTags;
-			
+
+			size_t curl_write (void *ptr, size_t size, size_t nmemb, void *stream);
+
 		public :
 
-			BooruInterface(std::string)
+			BooruInterface(std::string m);
 			
 
 			void getDoc();
-
 			void readTags();
 			void printTags();
 
-			std::string getMd5();
 			std::vector<std::string> getTags();
 			
 	};
