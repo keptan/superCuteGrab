@@ -2,6 +2,9 @@
 #include "booruInterface.h"
 #include "image.h"
 #include "metaData.h"
+#include "trueskill/mathexpr.h"
+#include "trueskill/trueskill.h"
+
 #include <experimental/filesystem>
 
 namespace fs = std::experimental::filesystem;
@@ -64,6 +67,37 @@ int booruScan(std::string p)
 
 int main(int argc, char *const argv[])
 {
+	mathexpr_sanity_check();
+
+	Player* player1 = new Player();
+	player1->mu = 25.0;
+	player1->sigma = 25.0/3.0;
+
+	Player* player2 = new Player();
+	player2->mu = 25.0;
+	player2->sigma = 25.0/3.0;
+
+	std::vector<Player*> players;
+	players.push_back(player1);
+	players.push_back(player2);
+
+	player1->rank = 2;
+	player2->rank = 2;
+
+	TrueSkill ts;
+for(int i = 0; i<25;i++){
+	ts.adjust_players(players);
+
+
+  std::cout << "player1: " << player1->mu << " | " << player1->sigma << std::endl;
+  std::cout << "player2: " << player2->mu<< " | " << player2->sigma <<  std::endl;
+}
+
+
+
+
+
+	
 
 /*	cute::Image file(argv[1]);
 	//std::cout << file.getHash() << std::endl;
@@ -77,7 +111,7 @@ int main(int argc, char *const argv[])
 	//danSearch.printTags();
 */
 
-	booruScan(argv[1]);
+//	booruScan(argv[1]);
 
 
 	
