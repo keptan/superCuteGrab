@@ -32,6 +32,8 @@ int directoryScan(std::string p, std::string t)
 
 int booruScan(std::string p)
 {
+	int i = 0;
+
 	for(auto& p: fs::recursive_directory_iterator(p)){
 
 		if (p.path().extension() == ".jpg" || p.path().extension()  == ".png"){
@@ -46,12 +48,15 @@ int booruScan(std::string p)
 		if(	interface.readTags()){
 
 			std::cout<<"FOUND TAGS! "<<" in directory "<<p.path()<<'\n';
-		}
+			i++;
+		}else
+			std::cout<<"file scanned"<<std::endl;
 
 		
 	}
 
 	}
+	std::cout<<std::endl<<"total found: "<<i<<std::endl;
 	return 0;
 
 
