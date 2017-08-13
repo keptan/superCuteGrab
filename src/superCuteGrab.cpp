@@ -108,7 +108,7 @@ int main(int argc, char *const argv[])
 	danSearch.getDoc();
 	danSearch.readTags();
 
-	file.addTag("MD5:" + file.gethash());
+	file.addTag("MD5:" + file.getHash());
 
 	for (auto element : danSearch.getTags()){
 		file.addTag(element);
