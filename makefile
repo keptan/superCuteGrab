@@ -3,12 +3,14 @@ CFLAG= -c  -I./include
 
 all: superCuteGrab
 
-superCuteGrab: superCuteGrab.o image.o metaData.o
+superCuteGrab: superCuteGrab.o image.o metaData.o booruInterface.o
 	$(CC) ./src/obj/superCuteGrab.o ./src/obj/image.o ./src/obj/metaData.o -lexiv2 -lstdc++fs -lcrypto -lssl  -o cuteGrab
 
 superCuteGrab.o: ./src/superCuteGrab.cpp
 	$(CC) $(CFLAG)  -c ./src/superCuteGrab.cpp -o ./src/obj/superCuteGrab.o  -lcrypto -lssl
 
+booruInterface.o:
+	$(CC) $(CFLAG) -c ./src/booruInterface.cpp -o ./src/obj/booruInterface.o -lcurl -ljsoncpp
 
 metaData.o: ./src/metaData.cpp
 	$(CC) $(CFLAG) -c ./src/metaData.cpp -o ./src/obj/metaData.o -lcrypto -lssl
