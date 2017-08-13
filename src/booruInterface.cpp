@@ -23,7 +23,7 @@ size_t BooruInterface :: handle_impl(char* data, size_t size, size_t nmemb)
     doc.append(data, size * nmemb);
     return size * nmemb;
 }
-void BooruInterface :: getDoc()
+bool BooruInterface :: getDoc()
 	{
 		CURL *curl;
 		struct curl_slist *headers=NULL;
@@ -49,7 +49,7 @@ void BooruInterface :: getDoc()
 		curl_easy_cleanup(curl);
 	}
 
-void BooruInterface :: readTags()
+bool BooruInterface :: readTags()
 	{
 		Json::Value jsonData;
 		Json::Reader jsonReader;
@@ -58,11 +58,15 @@ void BooruInterface :: readTags()
 
 		if (jsonReader.parse(doc,jsonData))
 		{
+			if (!jsonData[0].isMember("tag_string")){
+				return false;
+			}
+
 			tagString = jsonData[0]["tag_string"].asString();
 		}
 		else
 		{
-			return;
+			return false;
 		}
 
 		std::string splitBuf;
@@ -70,6 +74,8 @@ void BooruInterface :: readTags()
 
 		while(ss >> splitBuf)
 			docTags.push_back(splitBuf);
+
+		return true;
 
 	}
 

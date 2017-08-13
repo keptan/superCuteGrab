@@ -26,8 +26,8 @@ namespace cute
 			BooruInterface(std::string m);
 			
 
-			void getDoc();
-			void readTags();
+			bool getDoc();
+			bool readTags();
 			void printTags();
 
 			std::vector<std::string> getTags();

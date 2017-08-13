@@ -6,23 +6,6 @@
 
 namespace fs = std::experimental::filesystem;
 
-int main(int argc, char *const argv[])
-{
-
-	cute::Image file(argv[1]);
-	//std::cout << file.getHash() << std::endl;
-
-	cute::BooruInterface danSearch(file.getHash());
-
-	danSearch.getDoc();
-	danSearch.readTags();
-	danSearch.printTags();
-
-
-	
-	return 0;
-
-}
 
 int directoryScan(std::string p, std::string t)
 {
@@ -39,6 +22,31 @@ int directoryScan(std::string p, std::string t)
 
 			std::cout<<"FOUND TAG! "<<t<<" in directory "<<p.path()<<'\n';
 		}
+		
+	}
+
+	}
+	return 0;
+
+}
+
+int booruScan(std::string p)
+{
+	for(auto& p: fs::recursive_directory_iterator(p)){
+
+		if (p.path().extension() == ".jpg" || p.path().extension()  == ".png"){
+
+
+		cute::Image loop(p.path());
+		cute::BooruInterface interface(loop.getHash());
+
+		interface.getDoc();
+
+
+		if(	interface.readTags()){
+
+			std::cout<<"FOUND TAGS! "<<" in directory "<<p.path()<<'\n';
+		}
 
 		
 	}
@@ -48,4 +56,30 @@ int directoryScan(std::string p, std::string t)
 
 
 }
+
+int main(int argc, char *const argv[])
+{
+
+/*	cute::Image file(argv[1]);
+	//std::cout << file.getHash() << std::endl;
+
+	cute::BooruInterface danSearch(file.getHash());
+
+	danSearch.getDoc();
+	if(danSearch.readTags())
+		std::cout<<"tag found!"<<std::endl;
+
+	//danSearch.printTags();
+*/
+
+	booruScan(argv[1]);
+
+
+	
+	return 0;
+}
+
+
+
+
 
