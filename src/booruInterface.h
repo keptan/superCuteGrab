@@ -18,7 +18,8 @@ namespace cute
 
 			std::vector<std::string> docTags;
 
-			size_t curl_write (void *ptr, size_t size, size_t nmemb, void *stream);
+			static size_t handle(char * data, size_t size, size_t nmemb, void * p);
+			size_t handle_impl(char * data, size_t size, size_t nmemb);
 
 		public :
 

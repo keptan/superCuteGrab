@@ -13,15 +13,16 @@ namespace cute
 	{}
 
 
- size_t BooruInterface ::  curl_write (void *ptr, size_t size, size_t nmemb, void *stream)
-	{
-		doc.append((char*)ptr,size*nmemb);
-		return size*nmemb;
-	}
+size_t BooruInterface :: handle(char * data, size_t size, size_t nmemb, void * p)
+{
+    return static_cast<BooruInterface*>(p)->handle_impl(data, size, nmemb);
+}
 
-
-
-
+size_t BooruInterface :: handle_impl(char* data, size_t size, size_t nmemb)
+{
+    doc.append(data, size * nmemb);
+    return size * nmemb;
+}
 void BooruInterface :: getDoc()
 	{
 		CURL *curl;
@@ -41,7 +42,9 @@ void BooruInterface :: getDoc()
 		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 		curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION,&BooruInterface :: curl_write);
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION,&BooruInterface::handle);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
+
 		curl_easy_perform(curl);
 		curl_easy_cleanup(curl);
 	}
