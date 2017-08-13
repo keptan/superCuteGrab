@@ -18,7 +18,7 @@ namespace cute
             Image(std::string p);
             fs::path fileName();
             fs::path filePath();
-			void getHash();
+			std::string getHash();
 
 		
 

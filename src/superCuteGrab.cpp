@@ -8,13 +8,25 @@ namespace fs = std::experimental::filesystem;
 
 int main(int argc, char *const argv[])
 {
-	if(argc != 3) {
-		std::cout<< "Usage: " << argv[0] << " file\n";
-		return 1;
-	}
+
+	cute::Image file(argv[1]);
+	//std::cout << file.getHash() << std::endl;
+
+	cute::BooruInterface danSearch(file.getHash());
+
+	danSearch.getDoc();
+	danSearch.readTags();
+	danSearch.printTags();
 
 
-	for(auto& p: fs::recursive_directory_iterator(argv[1])){
+	
+	return 0;
+
+}
+
+int directoryScan(std::string p, std::string t)
+{
+	for(auto& p: fs::recursive_directory_iterator(p)){
 
 		if (p.path().extension() == ".jpg" || p.path().extension()  == ".png"){
 
@@ -23,20 +35,17 @@ int main(int argc, char *const argv[])
 		loop.readTags();
 
 
-		if(	loop.hasTag(argv[2])){
+		if(	loop.hasTag(t)){
 
-			std::cout<<"FOUND TAG! "<<argv[1]<<" in directory "<<p.path()<<'\n';
+			std::cout<<"FOUND TAG! "<<t<<" in directory "<<p.path()<<'\n';
 		}
 
 		
 	}
 
 	}
-
-
-
-	
 	return 0;
+
 
 }
 
