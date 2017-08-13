@@ -24,7 +24,6 @@ namespace cute
 		tags.clear();
 		for (Exiv2::IptcData::const_iterator i = iptcData.begin(); i != end; ++i){
 			tags.push_back( i->toString());
-			std::cout<<i->toString()<<'\n';
 
 		}
 
@@ -82,6 +81,19 @@ namespace cute
 
 		for(auto  & t : tags)
 			return s.compare(0,s.size(),t);
+	}
+
+	bool MetaData :: tagged()
+	{
+		std::string s = "MD5";
+	
+		if (tags.empty())
+			return false;
+
+		for(auto &t : tags){
+			if(s.compare(0,s.size(),t))
+				return true;
+		}
 	}
 
 

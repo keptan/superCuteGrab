@@ -64,6 +64,28 @@ int directoryScan(std::string p, std::string t)
 
 }
 
+int scanPreviouslyTagged(std::string p)
+{
+	for(auto& p: fs::recursive_directory_iterator(p)){
+
+		if (p.path().extension() == ".jpg" || p.path().extension()  == ".png"){
+
+
+		cute::MetaData loop(p.path());
+		loop.readTags();
+
+
+		if(	loop.tagged()){
+
+			std::cout<<"found tagged" << " in directory "<<p.path()<<'\n';
+		}
+		
+	}
+
+	}
+	return 0;
+}
+
 int booruScan(std::string p)
 {
 	int i = 0;
@@ -98,8 +120,9 @@ int booruScan(std::string p)
 
 int main(int argc, char *const argv[])
 {
-
-	cute::MetaData file(argv[1]);
+	scanPreviouslyTagged(argv[1]);
+	
+/*	cute::MetaData file(argv[1]);
 	file.readTags();
 	file.clearTags();
 
@@ -120,6 +143,8 @@ int main(int argc, char *const argv[])
 
 
 	file.writeTags();
+
+*/
 
 
 
