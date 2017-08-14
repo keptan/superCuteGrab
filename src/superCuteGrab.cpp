@@ -117,7 +117,8 @@ int booruWriteScan(std::string p)
 	for( auto n :interfaces){
 
 		if(n->readTags()){
-			std::cout<<"found tags in this one\n";
+			std::cout<<"found tags in a thread\n";
+
 		}
 
 
