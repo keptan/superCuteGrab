@@ -1,5 +1,5 @@
 CC=g++
-CFLAG= -c  -I./include 
+CFLAG= -c  -I ./lib 
 TSLIB= -pthread #-lmongoclient -L lib -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt
 TSOB= ./src/obj/mathexpr.o ./src/obj/trueskill.o ./src/obj/ndtri.o src/obj/pdf.o ./src/obj/ndtr.o ./src/obj/const.o
 TSOBN= mathexpr.o trueskill.o ndtri.o pdf.o ndtr.o const.o
@@ -27,19 +27,19 @@ fileMd5.o:
 
 	
 trueskill.o:
-	$(CC) $(CFLAG) -c ./src/trueskill/trueskill.cpp -o ./src/obj/trueskill.o
+	$(CC) $(CFLAG) -c ./lib/trueskill/trueskill.cpp -o ./src/obj/trueskill.o
 	
 mathexpr.o:
-	$(CC) $(CFLAG) -c ./src/trueskill/mathexpr.cpp -o ./src/obj/mathexpr.o
+	$(CC) $(CFLAG) -c ./lib/trueskill/mathexpr.cpp -o ./src/obj/mathexpr.o
 
 ndtri.o:
-	$(CC) $(CFLAG) -c ./src/trueskill/ndtri.cpp -o ./src/obj/ndtri.o
+	$(CC) $(CFLAG) -c ./lib/trueskill/ndtri.cpp -o ./src/obj/ndtri.o
 	
 pdf.o:
-	$(CC) $(CFLAG) -c ./src/trueskill/pdf.cpp -o ./src/obj/pdf.o
+	$(CC) $(CFLAG) -c ./lib/trueskill/pdf.cpp -o ./src/obj/pdf.o
 	
 ndtr.o:
-	$(CC) $(CFLAG) -c ./src/trueskill/ndtr.cpp -o ./src/obj/ndtr.o
+	$(CC) $(CFLAG) -c ./lib/trueskill/ndtr.cpp -o ./src/obj/ndtr.o
 	
 const.o:
-	$(CC) $(CFLAG) -c ./src/trueskill/const.cpp -o ./src/obj/const.o	
+	$(CC) $(CFLAG) -c ./lib/trueskill/const.cpp -o ./src/obj/const.o	
