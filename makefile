@@ -7,7 +7,7 @@ TSOBN= mathexpr.o trueskill.o ndtri.o pdf.o ndtr.o const.o
 all: superCuteGrab
 
 superCuteGrab: superCuteGrab.o image.o metaData.o booruInterface.o  $(TSOBN)
-	$(CC) ./src/obj/superCuteGrab.o ./src/obj/image.o ./src/obj/metaData.o ./src/obj/booruInterface.o $(TSOB) -lcurl -ljsoncpp -lexiv2 -lstdc++fs -lcrypto -lssl $(TSLIB)  -o cuteGrab
+	$(CC) ./src/obj/superCuteGrab.o ./src/obj/image.o ./src/obj/metaData.o ./src/obj/booruInterface.o $(TSOB)  -lcurl -ljsoncpp -lexiv2 -lstdc++fs -lcrypto -lssl $(TSLIB)  -o cuteGrab
 
 superCuteGrab.o: ./src/superCuteGrab.cpp
 	$(CC) $(CFLAG)  -c ./src/superCuteGrab.cpp -o ./src/obj/superCuteGrab.o  -lcrypto -lssl

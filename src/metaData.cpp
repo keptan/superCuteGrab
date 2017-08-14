@@ -5,6 +5,10 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include <sys/types.h>
+#include <sys/stat.h>
+
+#include <unistd.h>
 
 namespace cute
 {
@@ -50,6 +54,9 @@ namespace cute
 
 	void MetaData :: writeTags()
 	{	
+
+		struct stat attrib;
+		stat(Image::filePath().string().c_str(),&attrib);
 		Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(Image::filePath());
 		image.get();
 		image->readMetadata();

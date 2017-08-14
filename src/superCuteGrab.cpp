@@ -6,9 +6,16 @@
 #include "trueskill/trueskill.h"
 
 #include <experimental/filesystem>
+#include <vector>
+#include <thread>
+
 
 namespace fs = std::experimental::filesystem;
 
+void runDoc(cute::BooruInterface *in)
+{
+	in->getDoc();
+}
 
 int rankTest()
 {
@@ -73,6 +80,51 @@ int booruWriteScan(std::string p)
 	int w = 0;
 	std::cout<<'\n';
 
+
+	std::vector<cute::MetaData *> files;
+	std::vector<cute::BooruInterface *> interfaces;
+	std::vector<std::thread *> threads;
+
+
+	for(auto& p: fs::recursive_directory_iterator(p)){
+
+		i++;
+
+		std::string e = p.path().extension();
+
+		if (e == ".jpg" || e == ".png" ||e == "jpeg"){
+
+			files.push_back(new cute::MetaData(p.path()));
+			std::cout<< "\r" << "scanning files ...."<< w << " written out of " << i ; 
+
+			files.back()->readTags();
+
+			if(!files.back()->tagged()){
+
+				interfaces.push_back(new cute::BooruInterface(files.back()->getHash()));
+
+				threads.push_back(new std::thread(runDoc,interfaces.back()));
+			}
+		}
+	}
+
+	for( auto n :threads)
+		n->join();
+
+
+
+	std::cout<<"\nthreads done\n";
+	for( auto n :interfaces){
+
+		if(n->readTags()){
+			std::cout<<"found tags in this one\n";
+		}
+
+
+	}
+
+
+	/*
 	for(auto& p: fs::recursive_directory_iterator(p)){
 
 
@@ -112,6 +164,7 @@ int booruWriteScan(std::string p)
 	}
 
 	}
+	*/
 	std::cout<<std::endl;
 	return 0;
 
