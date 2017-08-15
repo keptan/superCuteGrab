@@ -91,7 +91,7 @@ int booruWriteScan(std::string p)
 	std::vector<std::future<int> > results;
 
 
-	ThreadPool pool(32);
+	ThreadPool pool(64);
 
 
 	for(auto& p: fs::recursive_directory_iterator(p)){
@@ -131,8 +131,15 @@ int booruWriteScan(std::string p)
 		}
 	}
 
+	int it = 0;
+	std::cout<<'\n';
+	std::cout<<"\r"<<"receiving curl threads "<< it++ << '/' << numThreads;
+
 	for(auto && results: results){
 		results.get();
+		std::cout<<"\r"<<"receiving curl threads "<< it++ << '/' << numThreads;
+
+	}
 
 
 
