@@ -39,6 +39,8 @@ std::string hashFile(const char* path)
 	}
 	
 	s = hashOut;
+
+	fclose(fileIn);
 	
 	return s;
 

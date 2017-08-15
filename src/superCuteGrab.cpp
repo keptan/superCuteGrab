@@ -91,7 +91,7 @@ int booruWriteScan(std::string p)
 	std::vector<std::future<int> > results;
 
 
-	ThreadPool pool(164);
+	ThreadPool pool(32);
 
 
 	for(auto& p: fs::recursive_directory_iterator(p)){
@@ -103,7 +103,7 @@ int booruWriteScan(std::string p)
 		if (e == ".jpg" || e == ".png" ||e == "jpeg"){
 
 			files.push_back(new cute::MetaData(p.path()));
-			std::cout<< "\r" << "scanning files ...."<< w << " written out of " << i ; 
+			std::cout<< "\r" << "scanning files ...."<< w << " already tagged out of " << i ; 
 
 			files.back()->readTags();
 
@@ -125,11 +125,15 @@ int booruWriteScan(std::string p)
 			
 
 			}
+			else{
+				w++;
+			}
 		}
 	}
 
-	for(auto && results: results)
+	for(auto && results: results){
 		results.get();
+
 
 
 	std::cout<<"\nthreads done, tagged: ";

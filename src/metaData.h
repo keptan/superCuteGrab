@@ -26,7 +26,7 @@ namespace cute
 			bool tagged();
 
 			void printTags();
-			void readTags();
+			int readTags();
 
 			std::vector<std::string> getTags();
 

@@ -19,8 +19,9 @@ namespace cute
 		: Image(p)
 	{}
 
-	void MetaData :: readTags()
+	int MetaData :: readTags()
 	{
+		try {
 		Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(Image::filePath());
 		image.get();
 		image->readMetadata();
@@ -31,6 +32,14 @@ namespace cute
 		for (Exiv2::IptcData::const_iterator i = iptcData.begin(); i != end; ++i){
 			tags.push_back( i->toString());
 
+		}
+
+		image->io().close();
+		return 0;
+		}
+		catch(Exiv2::AnyError& e)
+		{
+			return 1;
 		}
 
 	}
