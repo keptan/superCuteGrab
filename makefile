@@ -43,3 +43,5 @@ ndtr.o:
 	
 const.o:
 	$(CC) $(CFLAG) -c ./lib/trueskill/const.cpp -o ./src/obj/const.o	
+
+

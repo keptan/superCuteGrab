@@ -4,6 +4,7 @@
 #include "metaData.h"
 #include "trueskill/mathexpr.h"
 #include "trueskill/trueskill.h"
+#include "threadPool/threadPool.h"
 
 #include <experimental/filesystem>
 #include <vector>
@@ -78,12 +79,18 @@ int booruWriteScan(std::string p)
 
 	int i = 0;
 	int w = 0;
+	int numThreads =0;
 	std::cout<<'\n';
 
 
 	std::vector<cute::MetaData *> files;
 	std::vector<cute::BooruInterface *> interfaces;
 	std::vector<std::thread *> threads;
+
+	std::vector<std::future<int> > results;
+
+
+	ThreadPool pool(164);
 
 
 	for(auto& p: fs::recursive_directory_iterator(p)){
@@ -103,14 +110,25 @@ int booruWriteScan(std::string p)
 
 				interfaces.push_back(new cute::BooruInterface(files.back()->getHash()));
 
-				threads.push_back(new std::thread(runDoc,interfaces.back()));
+				//threads.push_back(new std::thread(runDoc,interfaces.back()));
+				//
+				
+				results.emplace_back(pool.enqueue([&]{
+
+						runDoc(interfaces.back());
+						return 1;
+				}));
+
+				numThreads++;
+
+			
+
 			}
 		}
 	}
 
-	for( auto n :threads)
-		n->join();
-
+	for(auto && results: results)
+		results.get();
 
 
 	std::cout<<"\nthreads done\n";
