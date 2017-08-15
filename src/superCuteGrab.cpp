@@ -79,6 +79,7 @@ int booruWriteScan(std::string p)
 
 	int i = 0;
 	int w = 0;
+	int f = 0;
 	int numThreads =0;
 	std::cout<<'\n';
 
@@ -131,59 +132,21 @@ int booruWriteScan(std::string p)
 		results.get();
 
 
-	std::cout<<"\nthreads done\n";
+	std::cout<<"\nthreads done, tagged: ";
 	for( auto n :interfaces){
 
 		if(n->readTags()){
-			std::cout<<"found tags in a thread\n";
+			f++;
 
 		}
 
 
 	}
 
-
-	/*
-	for(auto& p: fs::recursive_directory_iterator(p)){
+	std::cout<<f<<" images";
 
 
-		i++;
 
-		std::string e = p.path().extension();
-
-		if (e == ".jpg" || e == ".png" ||e == "jpeg"){
-
-		cute::MetaData file(p.path());
-		std::cout<< "\r" << "scanning files ...."<< w << " written out of " << i ; 
-		std::cout.flush();
-
-		file.readTags();
-
-		if(!file.tagged()){
-
-
-		cute::BooruInterface danSearch(file.getHash());
-
-
-		danSearch.getDoc();
-		if(danSearch.readTags()){
-
-
-		file.addTag("MD5:" + file.getHash());
-
-		for (auto element : danSearch.getTags()){
-			file.addTag(element);
-		}
-
-		w++;
-		file.writeTags();
-		}
-		}
-			
-	}
-
-	}
-	*/
 	std::cout<<std::endl;
 	return 0;
 

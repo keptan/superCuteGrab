@@ -5,10 +5,12 @@
 #include <vector>
 #include <iostream>
 #include <string>
+
 #include <sys/types.h>
 #include <sys/stat.h>
-
 #include <unistd.h>
+#include <utime.h>
+#include <time.h>
 
 namespace cute
 {
@@ -54,9 +56,20 @@ namespace cute
 
 	void MetaData :: writeTags()
 	{	
-
+		time_t mtime;
 		struct stat attrib;
+		struct utimbuf new_times;
+
+		mtime = attrib.st_mtime;
+
+		new_times.modtime = attrib.st_mtime;
+		new_times.actime = time(NULL);
+
+		
+
 		stat(Image::filePath().string().c_str(),&attrib);
+
+
 		Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(Image::filePath());
 		image.get();
 		image->readMetadata();
@@ -73,6 +86,11 @@ namespace cute
 
 		image->setIptcData(iptcData);
 		image->writeMetadata(); //replace with modifying tag list vector and write with seperate method
+
+		utime(Image::filePath().string().c_str(),&new_times);
+
+
+		
 
 	}
 
