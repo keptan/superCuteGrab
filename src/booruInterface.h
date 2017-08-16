@@ -5,9 +5,11 @@
 #include <string>
 #include <vector>
 #include <json/json.h>
+#include <mutex>
 
 #include "metaData.h"
 #include "image.h"
+
 
 namespace cute
 {
@@ -25,12 +27,14 @@ namespace cute
 		public :
 			
 			BooruInterface(std::string m);
+			std::mutex isGetting;
 
 			bool getDoc();
 			bool readDocTags();
 			void  printDocTags();
 
 			void writeDocTags();
+
 
 			std::vector<std::string> getDocTags();
 

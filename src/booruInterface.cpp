@@ -7,6 +7,7 @@
 #include "image.h"
 #include <json/json.h>
 #include <iostream>
+#include <mutex>
 
 namespace cute
 {
@@ -27,6 +28,7 @@ namespace cute
 
 	bool BooruInterface :: getDoc()
 	{
+		isGetting.lock();
 		CURL *curl;
 		struct curl_slist *headers=NULL;
 
@@ -49,6 +51,7 @@ namespace cute
 
 		curl_easy_perform(curl);
 		curl_easy_cleanup(curl);
+		isGetting.unlock();
 	}
 
 	bool BooruInterface :: readDocTags()

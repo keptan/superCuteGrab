@@ -8,14 +8,32 @@
 
 #include <experimental/filesystem>
 #include <vector>
+#include <mutex>
 #include <thread>
 
+
+static std::mutex m;
+static int threadsDone = 0;
+static int totalThreads =0;
+static int numThreads = 0;
 
 namespace fs = std::experimental::filesystem;
 
 void runDoc(cute::BooruInterface *in)
 {
+	m.lock();
+	numThreads++;
+	totalThreads++;
+	m.unlock();
+
 	in->getDoc();
+
+	m.lock();
+	threadsDone++;
+	numThreads--;
+	std::cout<<"receiving curl threads "<< threadsDone << '/' << numThreads << " lifetime threads: " << totalThreads<<"                        "<<'\r';
+	m.unlock();
+
 }
 
 int rankTest()
@@ -80,7 +98,6 @@ int booruWriteScan(std::string p)
 	int i = 0;
 	int w = 0;
 	int f = 0;
-	int numThreads =0;
 	std::cout<<'\n';
 
 
@@ -104,7 +121,6 @@ int booruWriteScan(std::string p)
 
 
 			interfaces.push_back(new cute::BooruInterface(p.path()));
-			std::cout<< "\r" << "scanning files ...."<< w << " already tagged out of " << i ; 
 
 			interfaces.back()->readTags();
 
@@ -121,7 +137,6 @@ int booruWriteScan(std::string p)
 						return 1;
 				}));
 
-				numThreads++;
 
 			
 
@@ -132,19 +147,10 @@ int booruWriteScan(std::string p)
 		}
 	}
 
-	int superMax = 0;
-
-	std::future_status status;
-
-	std::cout<<'\n';
-	std::cout<<"receiving curl threads "<< superMax << '/' << numThreads;
 
 
 	for(auto && result: results){
 		result.get();
-		superMax++;
-		std::cout<<'\r'<<"receiving curl threads "<< superMax << '/' << numThreads;
-
 	}
 
 
@@ -154,7 +160,7 @@ int booruWriteScan(std::string p)
 
 		if(n->readDocTags()){
 			f++;
-			std::cout<<n->fileName();
+			std::cout<<n->fileName()<<' ';
 			n->printDocTags();
 			std::cout<<"...\n";
 
