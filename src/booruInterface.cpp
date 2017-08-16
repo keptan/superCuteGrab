@@ -3,27 +3,29 @@
 #include <sstream>
 #include <vector>
 #include "booruInterface.h"
+#include "metaData.h"
+#include "image.h"
 #include <json/json.h>
 #include <iostream>
 
 namespace cute
 {
-	BooruInterface :: BooruInterface(std::string m) 
-		: md5(m),doc("")
+	BooruInterface :: BooruInterface(std::string m)
+		: MetaData(m),doc("")
 	{}
 
+	size_t BooruInterface :: handle(char * data, size_t size, size_t nmemb, void * p)
+	{
+		return static_cast<BooruInterface*>(p)->handle_impl(data, size, nmemb);
+	}
 
-size_t BooruInterface :: handle(char * data, size_t size, size_t nmemb, void * p)
-{
-    return static_cast<BooruInterface*>(p)->handle_impl(data, size, nmemb);
-}
+	size_t BooruInterface :: handle_impl(char* data, size_t size, size_t nmemb)
+	{
+		doc.append(data, size * nmemb);
+		return size * nmemb;
+	}
 
-size_t BooruInterface :: handle_impl(char* data, size_t size, size_t nmemb)
-{
-    doc.append(data, size * nmemb);
-    return size * nmemb;
-}
-bool BooruInterface :: getDoc()
+	bool BooruInterface :: getDoc()
 	{
 		CURL *curl;
 		struct curl_slist *headers=NULL;
@@ -34,11 +36,11 @@ bool BooruInterface :: getDoc()
 
 		curl = curl_easy_init();
 
-		loc = "http://danbooru.donmai.us/posts.json?tags=md5:";
-		loc.append(md5);
+		url = "http://danbooru.donmai.us/posts.json?tags=md5:";
+		url.append(Image::getHash());
 
 		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-		curl_easy_setopt(curl, CURLOPT_URL, loc.c_str());
+		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 		curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
@@ -49,7 +51,7 @@ bool BooruInterface :: getDoc()
 		curl_easy_cleanup(curl);
 	}
 
-bool BooruInterface :: readTags()
+	bool BooruInterface :: readDocTags()
 	{
 		Json::Value jsonData;
 		Json::Reader jsonReader;
@@ -75,21 +77,40 @@ bool BooruInterface :: readTags()
 		while(ss >> splitBuf)
 			docTags.push_back(splitBuf);
 
+
+
 		return true;
 
 	}
 
-std::vector<std::string>  BooruInterface :: getTags()
-{
-
-	return docTags;
-}
-
-		
-	void BooruInterface :: printTags()
+	std::vector<std::string>  BooruInterface :: getDocTags()
 	{
-		for(auto i : docTags)
-			std::cout<<i<<'\n';
+		return docTags;
+	}
+
+	void BooruInterface :: writeDocTags()
+	{
+		MetaData::addTag("MD5"+Image::getHash());
+		for(auto s : docTags)
+			MetaData::addTag(s);
+
+		MetaData::writeTags();
+
+		}
+
+
+
+
+	void BooruInterface :: printDocTags()
+	{
+		int n = 0;
+		for(auto i : docTags){
+			std::cout<<i<<' ';
+			n++;
+			if (n>4)
+				break;
+		}
+
 		
 	}	
 

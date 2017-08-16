@@ -11,7 +11,7 @@ namespace fs = std::experimental::filesystem;
 namespace cute
 {
     Image :: Image(std::string p)
-       : path(p)
+       : path(p),hash("")
     {}
 
     fs::path Image :: fileName()
@@ -27,6 +27,7 @@ namespace cute
 	std::string Image :: getHash()
 	{
 
+		if(!(hash==""));
 		hash = hashFile(path.string().c_str());
 		return hash;
 

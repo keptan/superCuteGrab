@@ -84,7 +84,7 @@ int booruWriteScan(std::string p)
 	std::cout<<'\n';
 
 
-	std::vector<cute::MetaData *> files;
+	//std::vector<cute::MetaData *> files;
 	std::vector<cute::BooruInterface *> interfaces;
 	std::vector<std::thread *> threads;
 
@@ -102,14 +102,15 @@ int booruWriteScan(std::string p)
 
 		if (e == ".jpg" || e == ".png" ||e == "jpeg"){
 
-			files.push_back(new cute::MetaData(p.path()));
+
+			interfaces.push_back(new cute::BooruInterface(p.path()));
 			std::cout<< "\r" << "scanning files ...."<< w << " already tagged out of " << i ; 
 
-			files.back()->readTags();
+			interfaces.back()->readTags();
 
-			if(!files.back()->tagged()){
 
-				interfaces.push_back(new cute::BooruInterface(files.back()->getHash()));
+			if(!interfaces.back()->tagged()){
+
 
 				//threads.push_back(new std::thread(runDoc,interfaces.back()));
 				//
@@ -131,23 +132,31 @@ int booruWriteScan(std::string p)
 		}
 	}
 
-	int it = 0;
-	std::cout<<'\n';
-	std::cout<<"\r"<<"receiving curl threads "<< it++ << '/' << numThreads;
+	int superMax = 0;
 
-	for(auto && results: results){
-		results.get();
-		std::cout<<"\r"<<"receiving curl threads "<< it++ << '/' << numThreads;
+	std::future_status status;
+
+	std::cout<<'\n';
+	std::cout<<"receiving curl threads "<< superMax << '/' << numThreads;
+
+
+	for(auto && result: results){
+		result.get();
+		superMax++;
+		std::cout<<'\r'<<"receiving curl threads "<< superMax << '/' << numThreads;
 
 	}
 
 
 
-	std::cout<<"\nthreads done, tagged: ";
+	std::cout<<"\nthreads done, tagged: \n";
 	for( auto n :interfaces){
 
-		if(n->readTags()){
+		if(n->readDocTags()){
 			f++;
+			std::cout<<n->fileName();
+			n->printDocTags();
+			std::cout<<"...\n";
 
 		}
 

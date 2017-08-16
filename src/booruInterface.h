@@ -1,4 +1,4 @@
-#ifndef BOORUINTERFACE_H
+#ifndef BOORUITNERFACE_H
 #define BOORUINTERFACE_H
 
 #include <curl/curl.h>
@@ -6,14 +6,15 @@
 #include <vector>
 #include <json/json.h>
 
+#include "metaData.h"
+#include "image.h"
 
 namespace cute
 {
-	class BooruInterface
+	class BooruInterface : public MetaData
 	{
 		protected :
-			std::string loc;
-			std::string md5;
+			std::string url;
 			std::string doc;
 
 			std::vector<std::string> docTags;
@@ -22,19 +23,20 @@ namespace cute
 			size_t handle_impl(char * data, size_t size, size_t nmemb);
 
 		public :
-
-			BooruInterface(std::string m);
 			
+			BooruInterface(std::string m);
 
 			bool getDoc();
-			bool readTags();
-			void printTags();
+			bool readDocTags();
+			void  printDocTags();
 
-			std::vector<std::string> getTags();
-			
+			void writeDocTags();
+
+			std::vector<std::string> getDocTags();
+
 	};
 };
 
-
-
 #endif
+			
+
