@@ -27,7 +27,7 @@ namespace cute
 	std::string Image :: getHash()
 	{
 
-		if(!(hash==""));
+		if((hash==""));
 		hash = hashFile(path.string().c_str());
 		return hash;
 

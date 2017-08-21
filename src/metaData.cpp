@@ -121,16 +121,19 @@ namespace cute
 
 	bool MetaData :: tagged()
 	{
-		std::string s = "MD5";
+		std::string s = "MD5:";
 	
 		if (tags.empty())
 			return false;
 
-		for(auto &t : tags){
-			if(s.compare(0,s.size(),t))
+		for(auto &t : tags)
+			if(s == t.substr(0,s.size()))
 				return true;
+	
+
+			return false;
+
 		}
-	}
 
 
 

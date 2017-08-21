@@ -18,6 +18,7 @@ namespace cute
 		protected :
 			std::string url;
 			std::string doc;
+			long http_code;
 
 			std::vector<std::string> docTags;
 
@@ -27,13 +28,15 @@ namespace cute
 		public :
 			
 			BooruInterface(std::string m);
-			std::mutex isGetting;
 
 			bool getDoc();
-			bool readDocTags();
+			int readDocTags();
 			void  printDocTags();
+			void printUrl();
 
 			void writeDocTags();
+
+			void printDoc();
 
 
 			std::vector<std::string> getDocTags();

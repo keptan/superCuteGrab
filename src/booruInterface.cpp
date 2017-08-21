@@ -28,9 +28,11 @@ namespace cute
 
 	bool BooruInterface :: getDoc()
 	{
-		isGetting.lock();
 		CURL *curl;
+		CURLcode res;
 		struct curl_slist *headers=NULL;
+
+		doc = "";
 
 		curl_slist_append(headers, "Accept: application/json");
 		curl_slist_append(headers, "Content-Type: application/json");
@@ -49,29 +51,43 @@ namespace cute
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION,&BooruInterface::handle);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
 
-		curl_easy_perform(curl);
+		http_code = 0;
+		res = curl_easy_perform(curl);
+
+		curl_easy_getinfo(curl,CURLINFO_RESPONSE_CODE, &http_code);
+
+
 		curl_easy_cleanup(curl);
-		isGetting.unlock();
 	}
 
-	bool BooruInterface :: readDocTags()
+
+	int BooruInterface :: readDocTags()
 	{
 		Json::Value jsonData;
 		Json::Reader jsonReader;
 
 		std::string tagString;
 
+		if (doc == "[][]")
+			return -1;
+
+		if( doc == "[]")
+			return 1;
+
+		if(doc == "")
+			return -1;
+
 		if (jsonReader.parse(doc,jsonData))
+
 		{
-			if (!jsonData[0].isMember("tag_string")){
-				return false;
-			}
+			if (!jsonData[0].isMember("tag_string"))
+					return -1;
 
 			tagString = jsonData[0]["tag_string"].asString();
 		}
 		else
 		{
-			return false;
+					return -1;
 		}
 
 		std::string splitBuf;
@@ -82,7 +98,7 @@ namespace cute
 
 
 
-		return true;
+		return 0;
 
 	}
 
@@ -116,6 +132,19 @@ namespace cute
 
 		
 	}	
+
+	void BooruInterface :: printDoc()
+	{
+		std::cout<<"\nDOCK START" << Image::fileName() <<" \n";
+		std::cout<<http_code<<'\n';
+		std::cout<<doc;
+		std::cout<<"\nDOCK END";
+	}
+
+	void BooruInterface :: printUrl()
+	{
+		std::cout<<url<<std::endl;
+	}
 
 };
 

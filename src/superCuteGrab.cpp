@@ -10,6 +10,7 @@
 #include <vector>
 #include <mutex>
 #include <thread>
+#include <chrono>
 
 
 static std::mutex m;
@@ -19,7 +20,7 @@ static int numThreads = 0;
 
 namespace fs = std::experimental::filesystem;
 
-void runDoc(cute::BooruInterface *in)
+void runDoc(cute::BooruInterface *in,int depth)
 {
 	m.lock();
 	numThreads++;
@@ -28,11 +29,21 @@ void runDoc(cute::BooruInterface *in)
 
 	in->getDoc();
 
+	
+	if(in->readDocTags() == -1 && depth < 3){
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+		runDoc(in,depth+1);
+	}
+
 	m.lock();
 	threadsDone++;
 	numThreads--;
 	std::cout<<"receiving curl threads "<< threadsDone << '/' << numThreads << " lifetime threads: " << totalThreads<<"                        "<<'\r';
 	m.unlock();
+
+	return;
+
+
 
 }
 
@@ -40,30 +51,88 @@ int rankTest()
 {
 	mathexpr_sanity_check();
 
+	std::vector<Player*> image1;
+	std::vector<Player*> image2;
+
+
 	Player* player1 = new Player();
-	player1->mu = 25.0;
-	player1->sigma = 25.0/3.0;
+	player1->mu = 35.0;
+	player1->sigma = 3.0;
+
+	Player* player1a = new Player();
+	player1a->mu = 35.0;
+	player1a->sigma = 3.0;
+
+	Player* player1b = new Player();
+	player1b->mu = 25.0;
+	player1b->sigma = 2.0;
+
+	Player* player1c = new Player();
+	player1c->mu = 25.0;
+	player1c->sigma = 1;
+
+	image1.push_back(player1);
+	image1.push_back(player1b);
+	image1.push_back(player1c);
+	image1.push_back(player1a);
+
 
 	Player* player2 = new Player();
-	player2->mu = 25.0;
-	player2->sigma = 25.0/3.0;
+	player2->mu = 35.0;
+	player2->sigma = 1.1;
+
+	Player* player2a = new Player();
+	player2a->mu = 15.0;
+	player2a->sigma = 1.1;
+
+	image2.push_back(player2);
+	image2.push_back(player2a);
+
+	while(image2.size() < image1.size()){
+		image2.push_back(new Player());
+		image2.back()->mu =( player2->mu+player2a->mu) /2;
+		image2.back()->sigma = (player2->sigma+player2a->sigma)/2;
+
+	}
+
+
 
 	std::vector<Player*> players;
-	players.push_back(player1);
-	players.push_back(player2);
+	for(auto & n : image1){
+		players.push_back(n);
+		players.back()->rank = 2;
 
-	player1->rank = 2;
-	player2->rank = 2;
+	}
+
+	for(auto & n : image2){
+		players.push_back(n);
+
+		players.back()->rank = 1;
+
+	}
+
+
+
+
+
+
+
 
 	TrueSkill ts;
-for(int i = 0; i<25;i++){
+for(int i = 0; i<20;i++){
 	ts.adjust_players(players);
 
 
   std::cout << "player1: " << player1->mu << " | " << player1->sigma << std::endl;
-  std::cout << "player2: " << player2->mu<< " | " << player2->sigma <<  std::endl;
 
+  std::cout << "player1a: " << player1a->mu << " | " << player1a->sigma << std::endl;
 
+  std::cout << "player2: " << player2->mu << " | " << player2->sigma << std::endl;
+
+  std::cout << "player2a: " << player2a->mu << " | " << player2a->sigma << std::endl;
+
+  //fill the team with average of current players to avoid player count weighting
+  //add to the mu the more tags present
 
 }
 }
@@ -108,7 +177,7 @@ int booruWriteScan(std::string p)
 	std::vector<std::future<int> > results;
 
 
-	ThreadPool pool(64);
+	ThreadPool pool(24);
 
 
 	for(auto& p: fs::recursive_directory_iterator(p)){
@@ -133,7 +202,7 @@ int booruWriteScan(std::string p)
 				
 				results.emplace_back(pool.enqueue([&]{
 
-						runDoc(interfaces.back());
+						runDoc(interfaces.back(),0);
 						return 1;
 				}));
 
@@ -158,7 +227,7 @@ int booruWriteScan(std::string p)
 	std::cout<<"\nthreads done, tagged: \n";
 	for( auto n :interfaces){
 
-		if(n->readDocTags()){
+		if(!(n->readDocTags())){
 			f++;
 			std::cout<<n->fileName()<<' ';
 			n->printDocTags();
@@ -235,7 +304,11 @@ int booruScan(std::string p)
 
 int main(int argc, char *const argv[])
 {
-	booruWriteScan(argv[1]);
+//	booruWriteScan(argv[1]);
+	rankTest();
+
+
+
 	
 
 
