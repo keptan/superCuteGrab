@@ -27,9 +27,16 @@ void skillTest(std::string p)
 	if(sb.hasTag("cuteTag")){
 		std::cout<<"has cuteTag"<<std::endl;
 		std::cout<<"getting tag"<<std::endl;
-		sb.getTag("cuteTag");
-		std::cout<<"accessing tag";
-		std::cout<<"cutetag mu"<<sb.getTag("cuteTag")->getMu()<<std::endl;
+		cute::SkillDatum datum = sb.getTag("cuteTag");
+		std::cout<<"accessing tag: ";
+		std::cout<<datum.getName()<<' '<<datum.getMu()<<std::endl;
+		datum.setMu(200);
+		sb.setTag(datum);
+		datum = sb.getTag("cuteTag");
+	std::cout<<"accessing tag: ";
+		std::cout<<datum.getName()<<' '<<datum.getMu()<<std::endl;
+
+
 
 
 

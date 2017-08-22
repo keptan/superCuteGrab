@@ -3,16 +3,15 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <memory>
 
 #include "skillBase.h"
 
 namespace cute
 {
-	
 	SkillDatum :: SkillDatum(std::string n,int m = 100, int s = 33, int c = 0)
 		:tagName(n),tagMu(m),tagSigma(s),tagCount(c)
 	{}
-
 	
 	std::string SkillDatum :: getName()
 	{
@@ -49,9 +48,13 @@ namespace cute
 		tagCount += 1;
 	}
 
+}
+namespace cute
+{
 	SkillBase :: SkillBase(std::string l)
 	{
 		db.open(l);
+		readFile();
 	}
 
 	bool SkillBase :: hasTag(std::string n)
@@ -60,65 +63,92 @@ namespace cute
 		db.seekg(0,std::ios::beg);
 
 		std::istringstream is;
-		for (auto s : localTags)
-			if(s.getName() == n)
-				return true;
-
-		std::string line;
-		while(getline(db,line)){
-			if(line.find(n) != std::string::npos)
-				return true;
-		}
-
-		return false;
-	}
-
-	bool SkillBase :: hasTagLocal(std::string n)
-	{	
-		for (auto s : localTags)
+		for(auto s: localTags)
 			if(s.getName() == n)
 				return true;
 
 		return false;
 	}
-
-	SkillDatum* SkillBase :: getTag(std::string n)
+	
+	bool SkillBase :: readFile()
 	{
 		db.clear();
 		db.seekg(0,std::ios::beg);
 
+		std::string n;
 		std::string line;
-		std::string name;
-		int mu, sigma, count;
+		int m,s,c;
 
 		while(getline(db,line)){
-				if(line.find(n) != std::string::npos){
+				std::istringstream is(line);
 
-					std::istringstream is(line);
+				is >> n >> m >> s >> c;
 
+				SkillDatum sd(n,m,s,c);
+				localTags.push_back(sd);
+		}
+	}
 
-					is >> name >> mu >> sigma >> count;
+	SkillDatum SkillBase :: getTag(std::string n)
+	{
+			for(auto s: localTags)
+				if(s.getName() == n)
+					return s;
 
-					SkillDatum sd(name,mu,sigma,count);
-					localTags.push_back(sd);
-					return &localTags.back();
-				}
+			localTags.push_back(SkillDatum(n));
+			return localTags.back();
+	}
 
+	bool SkillBase :: setTag(SkillDatum sd)
+	{
+		for(auto &s: localTags)
+			if(s.getName() == sd.getName()){
+				std::cout<<"match found\n";
+				s = sd;
+				return true;
 			}
-			return NULL;
+
+		return false;
 	}
 }
+namespace cute
+{
+
+	SkillHandle :: SkillHandle(std::vector<std::string> p1, p2, SkillBase* sb)
+		:base(sb)
+	{
+
+		int i =0;
+		int team1mu;
+		int team2mu;
+
+		for(auto s: p1){
+			team1.push_back(base->getTag(s));
+			i++;
+			team1mu + team1.back.getMu();
+
+		}
+		team1mu /= i;
+		i =0;
+
+		for(auto s: p2){
+			team2.push_back(base->getTag(s));
+			i++;
+			team2mu + team2.back.getMu();
+
+		}
+		team2mu /= i;
+		i =0;
+
+		while(team1.size() < team2.size())
+			team1.push_back(new SkillDatum("meta",team1mu,team1mu/3,0));
+
+		while(team1.size() > team2.size())
+			team2.push_back(new SkillDatum("meta",team2mu,team2mu/3,0));
+
+	}
 
 
 
 
-
-
-
-
-
-		
-
-		
-	
-	//return a SkilLDatum instead and then can assign locally
+}

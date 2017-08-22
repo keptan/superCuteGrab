@@ -44,7 +44,6 @@ namespace cute
 
 	}
 
-
 	void MetaData :: printTags()
 	{
 		for (auto & n : tags)
@@ -103,8 +102,6 @@ namespace cute
 
 	}
 
-
-
 	bool MetaData :: hasTag(std::string s)
 	{
 		if (tags.empty())
@@ -134,10 +131,6 @@ namespace cute
 			return false;
 
 		}
-
-
-
-
 
 };
 
