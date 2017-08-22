@@ -5,6 +5,7 @@
 #include "trueskill/mathexpr.h"
 #include "trueskill/trueskill.h"
 #include "threadPool/threadPool.h"
+#include "skillBase.h"
 
 #include <experimental/filesystem>
 #include <vector>
@@ -19,6 +20,27 @@ static int totalThreads =0;
 static int numThreads = 0;
 
 namespace fs = std::experimental::filesystem;
+
+void skillTest(std::string p)
+{
+	cute::SkillBase sb(p);
+	if(sb.hasTag("cuteTag")){
+		std::cout<<"has cuteTag"<<std::endl;
+		std::cout<<"getting tag"<<std::endl;
+		sb.getTag("cuteTag");
+		std::cout<<"accessing tag";
+		std::cout<<"cutetag mu"<<sb.getTag("cuteTag")->getMu()<<std::endl;
+
+
+
+	}
+
+
+
+	if(sb.hasTag("fgfgfTag"))
+		std::cout<<"has fgfgTag";
+
+}
 
 void runDoc(cute::BooruInterface *in,int depth)
 {
@@ -305,7 +327,8 @@ int booruScan(std::string p)
 int main(int argc, char *const argv[])
 {
 //	booruWriteScan(argv[1]);
-	rankTest();
+	skillTest(argv[1]);
+//	rankTest();
 
 
 

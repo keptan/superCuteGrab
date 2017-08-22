@@ -6,8 +6,8 @@ TSOBN= mathexpr.o trueskill.o ndtri.o pdf.o ndtr.o const.o
 
 all: superCuteGrab
 
-superCuteGrab: superCuteGrab.o image.o metaData.o booruInterface.o  $(TSOBN)
-	$(CC) ./src/obj/superCuteGrab.o ./src/obj/image.o ./src/obj/metaData.o ./src/obj/booruInterface.o $(TSOB)  -lcurl -ljsoncpp -lexiv2 -lstdc++fs -lcrypto -lssl $(TSLIB)  -o cuteGrab -g
+superCuteGrab: superCuteGrab.o image.o metaData.o booruInterface.o skillBase.o  $(TSOBN)
+	$(CC) ./src/obj/superCuteGrab.o ./src/obj/image.o ./src/obj/metaData.o ./src/obj/booruInterface.o ./src/obj/skillBase.o $(TSOB)  -lcurl -ljsoncpp -lexiv2 -lstdc++fs -lcrypto -lssl $(TSLIB)  -o cuteGrab -g
 
 superCuteGrab.o: ./src/superCuteGrab.cpp
 	$(CC) $(CFLAG)  -c ./src/superCuteGrab.cpp -o ./src/obj/superCuteGrab.o  -lcrypto -lssl -g
@@ -20,6 +20,9 @@ metaData.o: ./src/metaData.cpp
 
 image.o: ./src/image.cpp fileMd5.o
 	$(CC) $(CFLAG)  -c ./src/image.cpp  -o ./src/obj/image.o -lexiv2 -lstdc++fs -lcrypto -lssl -g
+
+skillBase.o: ./src/skillBase.cpp
+	$(CC) $(CFLAG) -c ./src/skillBase.cpp -o ./src/obj/skillBase.o
 
 fileMd5.o:
 	$(CC) $(CFLAG)  -c ./src/fileMd5.h -o ./src/obj/fileMd5.o -lcrypto -lssl -g

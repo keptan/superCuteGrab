@@ -6,14 +6,15 @@
 
 #include <vector>
 #include <string>
+#include <fstream>
+#include <iostream>
+
+
 
 namespace cute
 {
 	class MetaData : public Image
 	{
-		protected :
-
-			int writeToFile();
 
 		protected :
 			std::vector<std::string>tags;
