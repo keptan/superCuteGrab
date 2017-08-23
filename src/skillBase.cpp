@@ -145,25 +145,25 @@ namespace cute
 	{
 
 		int i =0;
-		int team1mu;
-		int team2mu;
+		int team1mu = 0;
+		int team2mu = 0;
 
 		for(auto s: p1){
 			team1.push_back(base->getTag(s));
 			i++;
-			team1mu + team1.back().getMu();
+			team1mu += team1.back().getMu();
 
 		}
-		team1mu /= i;
+		team1mu = team1mu / i;
 		i =0;
 
 		for(auto s: p2){
 			team2.push_back(base->getTag(s));
 			i++;
-			team2mu + team2.back().getMu();
+			team2mu += team2.back().getMu();
 
 		}
-		team2mu /= i;
+		team2mu = team2mu / i;
 		i =0;
 
 		while(team1.size() < team2.size()){
@@ -184,14 +184,14 @@ namespace cute
 		for(auto &i : team1){
 			i.rank = 1;
 			i.iterateCount();
-			players.push_back(*i);
+			players.push_back(&i);
 		}
 
 		for(auto &i : team2){
 			i.rank = 2;
 			i.iterateCount();
+			players.push_back(&i);
 
-			players.push_back(*i);
 		}
 
 	TrueSkill ts;

@@ -402,6 +402,7 @@ Constants::Constants() {
   this->GAMMA = INITIAL_SIGMA / 100.0;
 }
 
+
 void TrueSkill::adjust_players(std::vector<Player*> players) {
   Constants constants;
 
