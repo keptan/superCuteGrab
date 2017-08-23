@@ -5,12 +5,14 @@
 #include <vector>
 #include <memory>
 
+
+#include "trueskill/trueskill.h"
 #include "skillBase.h"
 
 namespace cute
 {
-	SkillDatum :: SkillDatum(std::string n,int m = 100, int s = 33, int c = 0)
-		:tagName(n),tagMu(m),tagSigma(s),tagCount(c)
+	SkillDatum :: SkillDatum(std::string n,double m, double s, double c )
+		:Player(m,s),tagName(n),count(c)
 	{}
 	
 	std::string SkillDatum :: getName()
@@ -20,64 +22,74 @@ namespace cute
 
 	int SkillDatum :: getMu()
 	{
-		return tagMu;
+		return mu;
 	}
 
 	int SkillDatum :: getSigma()
 	{
-		return tagSigma;
+		return sigma;
 	}
 
 	int SkillDatum :: getCount()
 	{
-		return tagCount;
+		return count;
 	}
 
-	void SkillDatum :: setMu(int m)
+	void SkillDatum :: setMu(double  m)
 	{
-		tagMu = m;
+		mu = m;
 	}
 
-	void SkillDatum :: setSigma(int s)
+	void SkillDatum :: setSigma(double s)
 	{
-		tagSigma = s;
+		sigma = s;
 	}
 
 	void SkillDatum :: iterateCount()
 	{
-		tagCount += 1;
+		count += 1;
 	}
 
 }
 namespace cute
 {
-	SkillBase :: SkillBase(std::string l)
+	SkillBase :: SkillBase(std::string l):loc(l)
 	{
-		db.open(l);
 		readFile();
 	}
 
 	bool SkillBase :: hasTag(std::string n)
 	{
+	std::fstream db;
+		db.open(loc);
+
+
 		db.clear();
 		db.seekg(0,std::ios::beg);
 
 		std::istringstream is;
 		for(auto s: localTags)
-			if(s.getName() == n)
+			if(s.getName() == n){
+				db.close();
 				return true;
+			}
 
+		db.close();
 		return false;
 	}
 	
 	bool SkillBase :: readFile()
 	{
+		std::fstream db;
+		db.open(loc);
+
 		db.clear();
 		db.seekg(0,std::ios::beg);
 
 		std::string n;
 		std::string line;
-		int m,s,c;
+		double m,s;
+		int c;
 
 		while(getline(db,line)){
 				std::istringstream is(line);
@@ -87,6 +99,8 @@ namespace cute
 				SkillDatum sd(n,m,s,c);
 				localTags.push_back(sd);
 		}
+
+		db.close();
 	}
 
 	SkillDatum SkillBase :: getTag(std::string n)
@@ -103,18 +117,30 @@ namespace cute
 	{
 		for(auto &s: localTags)
 			if(s.getName() == sd.getName()){
-				std::cout<<"match found\n";
 				s = sd;
 				return true;
 			}
 
-		return false;
+		localTags.push_back(sd);
+		return true;
+
+	}
+
+	void SkillBase :: writeFile()
+	{
+
+		std::ofstream db(loc);
+		for(auto sd: localTags)
+			db << sd.getName() << ' ' << sd.getMu() << ' ' << sd.getSigma() << ' ' << sd.getCount() << '\n';
+
+		db.close();
+
 	}
 }
 namespace cute
 {
 
-	SkillHandle :: SkillHandle(std::vector<std::string> p1, p2, SkillBase* sb)
+	SkillHandle :: SkillHandle(std::vector<std::string> p1, std::vector<std::string> p2, SkillBase* sb)
 		:base(sb)
 	{
 
@@ -125,7 +151,7 @@ namespace cute
 		for(auto s: p1){
 			team1.push_back(base->getTag(s));
 			i++;
-			team1mu + team1.back.getMu();
+			team1mu + team1.back().getMu();
 
 		}
 		team1mu /= i;
@@ -134,17 +160,52 @@ namespace cute
 		for(auto s: p2){
 			team2.push_back(base->getTag(s));
 			i++;
-			team2mu + team2.back.getMu();
+			team2mu + team2.back().getMu();
 
 		}
 		team2mu /= i;
 		i =0;
 
-		while(team1.size() < team2.size())
-			team1.push_back(new SkillDatum("meta",team1mu,team1mu/3,0));
+		while(team1.size() < team2.size()){
+			SkillDatum sd("meta",team1mu,team1mu/3,0);
+			team1.push_back(sd);
+		}
 
-		while(team1.size() > team2.size())
-			team2.push_back(new SkillDatum("meta",team2mu,team2mu/3,0));
+		while(team1.size() > team2.size()){
+	SkillDatum sd("meta",team2mu,team2mu/3,0);
+			team2.push_back(sd);
+		}
+
+	}
+
+	void SkillHandle :: run()
+	{
+		std::vector<Player*> players;
+		for(auto &i : team1){
+			i.rank = 1;
+			i.iterateCount();
+			players.push_back(*i);
+		}
+
+		for(auto &i : team2){
+			i.rank = 2;
+			i.iterateCount();
+
+			players.push_back(*i);
+		}
+
+	TrueSkill ts;
+	ts.adjust_players(players);
+
+	}
+
+	void SkillHandle :: setTags()
+	{
+		for(auto t : team1)
+			base->setTag(t);
+
+		for(auto t : team2)
+			base->setTag(t);
 
 	}
 

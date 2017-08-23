@@ -23,31 +23,58 @@ namespace fs = std::experimental::filesystem;
 
 void skillTest(std::string p)
 {
-	cute::SkillBase sb(p);
-	if(sb.hasTag("cuteTag")){
-		std::cout<<"has cuteTag"<<std::endl;
-		std::cout<<"getting tag"<<std::endl;
-		cute::SkillDatum datum = sb.getTag("cuteTag");
-		std::cout<<"accessing tag: ";
-		std::cout<<datum.getName()<<' '<<datum.getMu()<<std::endl;
-		datum.setMu(200);
-		sb.setTag(datum);
-		datum = sb.getTag("cuteTag");
-	std::cout<<"accessing tag: ";
-		std::cout<<datum.getName()<<' '<<datum.getMu()<<std::endl;
+
+	cute::SkillBase sb("dataBase");
+	int found = 0;
+	std::vector<std::string> p1;
+	std::vector<std::string> p2;
+
+	for(auto& p: fs::recursive_directory_iterator(p)){
+
+		if (p.path().extension() == ".jpg" || p.path().extension()  == ".png"){
 
 
+		cute::MetaData loop(p.path());
+		loop.readTags();
 
 
+		if(	loop.tagged()){
 
+			std::cout<<"found tagged" << " in directory "<<p.path()<<'\n';
+			if(found == 0)
+			p1 = loop.getTags();
+			else
+			p2 = loop.getTags();
+
+
+			found++;
+			if (found > 1)
+				break;
+			}
+		}
+		
 	}
 
+	std::cout<<"creating skillhandle\n";
+	cute::SkillHandle sh(p1,p2,&sb);
+	std::cout<<"running skillhandle\n";
+	sh.run();
+	std::cout<<"setting tags\n";
+	sh.setTags();
+
+	std::cout<<"writing to file\n";
+	sb.writeFile();
 
 
-	if(sb.hasTag("fgfgfTag"))
-		std::cout<<"has fgfgTag";
+
+
+
+
 
 }
+
+
+
 
 void runDoc(cute::BooruInterface *in,int depth)
 {

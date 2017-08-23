@@ -132,6 +132,11 @@ namespace cute
 
 		}
 
+	std::vector<std::string> MetaData :: getTags()
+	{
+		return tags;
+	}
+
 };
 
 

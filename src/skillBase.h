@@ -6,28 +6,27 @@
 #include <fstream>
 #include <vector>
 #include <list>
+#include "trueskill/trueskill.h"
 #include <memory>
 
 namespace cute
 {
-	class SkillDatum
+	class SkillDatum :  public  Player
 	{
 		private :
 			std::string tagName;
-			int tagMu;
-			int tagSigma;
-			int tagCount;
+			int count;
 
 		public :
-			SkillDatum(std::string n,int m , int s , int c );
+			SkillDatum(std::string n,double m = 100, double s = 33, double c = 0);
 			
 			int getMu();
 			int getSigma();
 			int getCount();
 			std::string getName();
 
-			void setMu(int m);
-			void setSigma(int s);
+			void setMu(double m);
+			void setSigma(double s);
 			void iterateCount();
 
 	};
@@ -35,7 +34,7 @@ namespace cute
 	class SkillBase
 	{
 		private :
-			std::fstream db;
+			std::string loc;
 			std::list<SkillDatum> localTags;
 
 		public :
@@ -44,6 +43,7 @@ namespace cute
 			bool hasTag(std::string n);
 			SkillDatum getTag(std::string);
 			bool setTag(SkillDatum sd);
+			void writeFile();
 
 			bool readFile();
 				
@@ -60,7 +60,7 @@ namespace cute
 			void prepareTeams();
 
 		public:
-			SkillHandle(std::vector<std::string> p1, p2,SkillBase* sb);
+			SkillHandle(std::vector<std::string> p1, std::vector<std::string> p2,SkillBase* sb);
 			void run();
 			void setTags();
 	};

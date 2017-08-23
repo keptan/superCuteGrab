@@ -30,7 +30,7 @@ fileMd5.o:
 
 	
 trueskill.o:
-	$(CC) $(CFLAG) -c ./lib/trueskill/trueskill.cpp -o ./src/obj/trueskill.o -g
+	$(CC) $(CFLAG) -c ./lib/trueskill/trueskill.cpp -o ./src/obj/trueskill.o -g -I ./src
 	
 mathexpr.o:
 	$(CC) $(CFLAG) -c ./lib/trueskill/mathexpr.cpp -o ./src/obj/mathexpr.o -g

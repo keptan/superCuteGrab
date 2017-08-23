@@ -11,6 +11,9 @@ public:
   double mu;
   double sigma;
   int rank;
+
+  Player(double m, double s);
+  Player();
 };
 
 class Gaussian {

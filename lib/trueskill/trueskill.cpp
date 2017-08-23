@@ -8,6 +8,11 @@
 
 int GMID = 0;
 
+Player :: Player(double m, double s)
+	:mu(m),sigma(s)
+	{}
+Player :: Player()
+	{}
 static double Vwin(double t, double e) {
   return pdf(t - e) / cdf(t - e);
 }
