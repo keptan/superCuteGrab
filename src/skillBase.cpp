@@ -69,6 +69,17 @@ namespace cute
 		id = i;
 	}
 
+	bool SkillDatum :: isDup()
+	{
+		return dup;
+	}
+
+	void SkillDatum :: setDup(bool d)
+	{
+		dup = d;
+	}
+
+
 }
 namespace cute
 {
@@ -165,25 +176,42 @@ namespace cute
 	{
 
 		int i =0;
+		int x =0;
 		int team1mu = 0;
 		int team2mu = 0;
+		int team3mu = 0;
+
+		std::vector<std::string> p3;
 
 		for(auto s: p1){
+			if (std::find(p2.begin(), p2.end(),s) != p2.end()){
+				x++;
+				team3.push_back(base->getTag(s));
+				team3.back().setDup(true);
+				team3mu += team3.back().getMu();
+				std::cout<<"dup tag" << s<< std::endl;
+
+				}
+			else{
+				
+
 			team1.push_back(base->getTag(s));
 			i++;
 			team1mu += team1.back().getMu();
-
+			}
 
 		}
 		team1mu = team1mu / i;
+		team3mu = team3mu / x;
 		i =0;
 
 		for(auto s: p2){
+
+			if (std::find(p1.begin(), p1.end(),s) == p1.end()){
 			team2.push_back(base->getTag(s));
 			i++;
 			team2mu += team2.back().getMu();
-
-
+		}
 		}
 		team2mu = team2mu / i;
 		i =0;
@@ -197,6 +225,12 @@ namespace cute
 		while(team1.size() > team2.size()){
 	SkillDatum sd("meta",team2mu,team2mu/3,0);
 			team2.push_back(sd);
+
+		}
+
+		while(team1.size() > team3.size()){
+	SkillDatum sd("meta",team3mu,team3mu/3,0);
+			team3.push_back(sd);
 
 		}
 
@@ -238,6 +272,17 @@ void addPlayer( double mu, double sigma, double team, double weight, double iden
 
 		}
 
+
+	for(auto &i : team3){
+			i.setTeam(3);
+			i.setId(skillId++);
+			i.iterateCount();
+			i.iterateCount();
+
+			iplayers.push_back(&i);
+
+		}
+
 		for(auto p : iplayers)
 			addPlayer(p->getMu(),p->getSigma(),p->getTeam(),1,p->getId());
 
@@ -245,9 +290,10 @@ void addPlayer( double mu, double sigma, double team, double weight, double iden
 
 	std::vector< int > ranks;
 	ranks.push_back(0);
+	ranks.push_back(2);
 	ranks.push_back(1);
 
-	int teams = 2;
+	int teams = 3;
 
 
 	rate(players,ranks,teams);
@@ -274,6 +320,8 @@ void addPlayer( double mu, double sigma, double team, double weight, double iden
 			base->setTag(t);
 
 		for(auto t : team2)
+			base->setTag(t);
+		for(auto t : team3)
 			base->setTag(t);
 
 	}

@@ -22,6 +22,7 @@ namespace cute
 			double mu;
 			double sigma;
 			double rank;
+			bool dup;
 
 			std::vector<double> codOut;
 
@@ -40,6 +41,8 @@ namespace cute
 			void setSigma(double s);
 			void iterateCount();
 			void setId(int i);
+			bool  isDup();
+			void setDup(bool d);
 
 
 
@@ -72,6 +75,7 @@ namespace cute
 		private:
 			std::vector<SkillDatum> team1;
 			std::vector<SkillDatum> team2;
+			std::vector<SkillDatum> team3;
 			SkillBase* base;
 
 
