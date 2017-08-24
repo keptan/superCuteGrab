@@ -2,8 +2,6 @@
 #include "booruInterface.h"
 #include "image.h"
 #include "metaData.h"
-#include "trueskill/mathexpr.h"
-#include "trueskill/trueskill.h"
 #include "threadPool/threadPool.h"
 #include "skillBase.h"
 
@@ -103,9 +101,10 @@ void runDoc(cute::BooruInterface *in,int depth)
 
 }
 
+/*
+
 int rankTest()
 {
-	mathexpr_sanity_check();
 
 	std::vector<Player*> image1;
 	std::vector<Player*> image2;
@@ -172,26 +171,12 @@ int rankTest()
 
 
 
-
-
-	TrueSkill ts;
-for(int i = 0; i<20;i++){
-	ts.adjust_players(players);
-
-
-  std::cout << "player1: " << player1->mu << " | " << player1->sigma << std::endl;
-
-  std::cout << "player1a: " << player1a->mu << " | " << player1a->sigma << std::endl;
-
-  std::cout << "player2: " << player2->mu << " | " << player2->sigma << std::endl;
-
-  std::cout << "player2a: " << player2a->mu << " | " << player2a->sigma << std::endl;
-
   //fill the team with average of current players to avoid player count weighting
   //add to the mu the more tags present
 
 }
 }
+*/
 int directoryScan(std::string p, std::string t)
 {
 	for(auto& p: fs::recursive_directory_iterator(p)){

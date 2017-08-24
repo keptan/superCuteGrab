@@ -6,13 +6,13 @@
 #include <memory>
 
 
-#include "trueskill/trueskill.h"
+#include "cskill/trueskill.h"
 #include "skillBase.h"
 
 namespace cute
 {
 	SkillDatum :: SkillDatum(std::string n,double m, double s, double c )
-		:Player(m,s),tagName(n),count(c)
+		:mu(m),sigma(s),tagName(n),count(c)
 	{}
 	
 	std::string SkillDatum :: getName()
@@ -20,12 +20,12 @@ namespace cute
 		return tagName;
 	}
 
-	int SkillDatum :: getMu()
+	double SkillDatum :: getMu()
 	{
 		return mu;
 	}
 
-	int SkillDatum :: getSigma()
+	double SkillDatum :: getSigma()
 	{
 		return sigma;
 	}
@@ -33,6 +33,15 @@ namespace cute
 	int SkillDatum :: getCount()
 	{
 		return count;
+	}
+	int SkillDatum :: getTeam()
+	{
+		return team;
+	}
+
+	void SkillDatum :: setTeam(int t)
+	{
+		team = t;
 	}
 
 	void SkillDatum :: setMu(double  m)
@@ -48,6 +57,16 @@ namespace cute
 	void SkillDatum :: iterateCount()
 	{
 		count += 1;
+	}
+
+	int SkillDatum :: getId()
+	{
+		return id;
+	}
+
+	void SkillDatum :: setId(int i)
+	{
+		id = i;
 	}
 
 }
@@ -130,8 +149,9 @@ namespace cute
 	{
 
 		std::ofstream db(loc);
-		for(auto sd: localTags)
+		for(auto sd: localTags){
 			db << sd.getName() << ' ' << sd.getMu() << ' ' << sd.getSigma() << ' ' << sd.getCount() << '\n';
+		}
 
 		db.close();
 
@@ -153,6 +173,7 @@ namespace cute
 			i++;
 			team1mu += team1.back().getMu();
 
+
 		}
 		team1mu = team1mu / i;
 		i =0;
@@ -162,6 +183,7 @@ namespace cute
 			i++;
 			team2mu += team2.back().getMu();
 
+
 		}
 		team2mu = team2mu / i;
 		i =0;
@@ -169,33 +191,80 @@ namespace cute
 		while(team1.size() < team2.size()){
 			SkillDatum sd("meta",team1mu,team1mu/3,0);
 			team1.push_back(sd);
+
 		}
 
 		while(team1.size() > team2.size()){
 	SkillDatum sd("meta",team2mu,team2mu/3,0);
 			team2.push_back(sd);
+
 		}
 
 	}
 
+static std::vector< std::vector< double > > players;
+void addPlayer( double mu, double sigma, double team, double weight, double identifier )
+{
+	unsigned int n = players.size();
+
+	players.resize( n + 1 );
+	players[ n ].resize( 5 );
+	players[ n ][ 0 ] = mu;
+	players[ n ][ 1 ] = sigma;
+	players[ n ][ 2 ] = team;
+	players[ n ][ 3 ] = weight;
+	players[ n ][ 4 ] = identifier;
+}
+
 	void SkillHandle :: run()
 	{
-		std::vector<Player*> players;
+		std::vector<SkillDatum*> iplayers;
+		int skillId = 0;
+
 		for(auto &i : team1){
-			i.rank = 1;
+			i.setTeam(1);
+			i.setId(skillId++);
 			i.iterateCount();
-			players.push_back(&i);
+			iplayers.push_back(&i);
 		}
 
 		for(auto &i : team2){
-			i.rank = 2;
+			i.setTeam(2);
+			i.setId(skillId++);
 			i.iterateCount();
-			players.push_back(&i);
+
+			i.iterateCount();
+			iplayers.push_back(&i);
 
 		}
 
-	TrueSkill ts;
-	ts.adjust_players(players);
+		for(auto p : iplayers)
+			addPlayer(p->getMu(),p->getSigma(),p->getTeam(),1,p->getId());
+
+
+
+	std::vector< int > ranks;
+	ranks.push_back(0);
+	ranks.push_back(1);
+
+	int teams = 2;
+
+
+	rate(players,ranks,teams);
+
+	for(auto i : iplayers){
+		for(auto p : players){
+			if(i->getId() == p[4])
+			{
+				i->setMu(p[0]);
+				i->setSigma(p[1]);
+			}
+		}
+
+	}
+
+			
+
 
 	}
 

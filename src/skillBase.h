@@ -6,28 +6,45 @@
 #include <fstream>
 #include <vector>
 #include <list>
-#include "trueskill/trueskill.h"
 #include <memory>
+
+#include "cskill/trueskill.h"
 
 namespace cute
 {
-	class SkillDatum :  public  Player
-	{
+	class SkillDatum{
+
 		private :
 			std::string tagName;
+			int id;
 			int count;
+			int team;
+			double mu;
+			double sigma;
+			double rank;
+
+			std::vector<double> codOut;
 
 		public :
 			SkillDatum(std::string n,double m = 100, double s = 33, double c = 0);
 			
-			int getMu();
-			int getSigma();
+			double getMu();
+			int getId();
+			double getSigma();
 			int getCount();
+			int getTeam();
 			std::string getName();
 
 			void setMu(double m);
+			void setTeam(int t);
 			void setSigma(double s);
 			void iterateCount();
+			void setId(int i);
+
+
+
+//mu sigma team weight identifier
+//
 
 	};
 
@@ -36,6 +53,7 @@ namespace cute
 		private :
 			std::string loc;
 			std::list<SkillDatum> localTags;
+
 
 		public :
 			SkillBase(std::string l);

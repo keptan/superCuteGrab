@@ -1,8 +1,8 @@
 CC=g++
 CFLAG= -c  -I ./lib 
 TSLIB= -pthread #-lmongoclient -L lib -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt
-TSOB= ./src/obj/mathexpr.o ./src/obj/trueskill.o ./src/obj/ndtri.o src/obj/pdf.o ./src/obj/ndtr.o ./src/obj/const.o
-TSOBN= mathexpr.o trueskill.o ndtri.o pdf.o ndtr.o const.o
+TSOB= ./src/obj/trueskill.o ./src/obj/matrix.o src/obj/gaussian.o ./src/obj/basemath.o ./src/obj/factorgraph.o
+TSOBN=  trueskill.o matrix.o gaussian.o basemath.o factorgraph.o
 
 all: superCuteGrab
 
@@ -28,24 +28,21 @@ fileMd5.o:
 	$(CC) $(CFLAG)  -c ./src/fileMd5.h -o ./src/obj/fileMd5.o -lcrypto -lssl -g
 	
 
-	
+
 trueskill.o:
-	$(CC) $(CFLAG) -c ./lib/trueskill/trueskill.cpp -o ./src/obj/trueskill.o -g -I ./src
+	$(CC) $(CFLAG) -c ./lib/cskill/trueskill.cpp -o ./src/obj/trueskill.o -g -I ./src
 	
-mathexpr.o:
-	$(CC) $(CFLAG) -c ./lib/trueskill/mathexpr.cpp -o ./src/obj/mathexpr.o -g
+matrix.o:
+	$(CC) $(CFLAG) -c ./lib/cskill/matrix.cpp -o ./src/obj/matrix.o -g
 
-ndtri.o:
-	$(CC) $(CFLAG) -c ./lib/trueskill/ndtri.cpp -o ./src/obj/ndtri.o -g
+gaussian.o:
+	$(CC) $(CFLAG) -c ./lib/cskill/gaussian.cpp -o ./src/obj/gaussian.o -g
 
 	
-pdf.o:
-	$(CC) $(CFLAG) -c ./lib/trueskill/pdf.cpp -o ./src/obj/pdf.o -g
+basemath.o:
+	$(CC) $(CFLAG) -c ./lib/cskill/basemath.cpp -o ./src/obj/basemath.o -g
 	
-ndtr.o:
-	$(CC) $(CFLAG) -c ./lib/trueskill/ndtr.cpp -o ./src/obj/ndtr.o -g
+factorgraph.o:
+	$(CC) $(CFLAG) -c ./lib/cskill/factorgraph.cpp -o ./src/obj/factorgraph.o -g
 	
-const.o:
-	$(CC) $(CFLAG) -c ./lib/trueskill/const.cpp -o ./src/obj/const.o	 -g
-
 
