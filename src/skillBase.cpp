@@ -277,7 +277,6 @@ void addPlayer( double mu, double sigma, double team, double weight, double iden
 			i.setTeam(3);
 			i.setId(skillId++);
 			i.iterateCount();
-			i.iterateCount();
 
 			iplayers.push_back(&i);
 

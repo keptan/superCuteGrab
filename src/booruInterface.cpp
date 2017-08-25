@@ -9,6 +9,7 @@
 #include <iostream>
 #include <mutex>
 
+
 namespace cute
 {
 	BooruInterface :: BooruInterface(std::string m)
@@ -43,6 +44,9 @@ namespace cute
 		url = "http://danbooru.donmai.us/posts.json?tags=md5:";
 		url.append(Image::getHash());
 
+
+
+		curl_easy_setopt(curl,CURLOPT_NOSIGNAL,1);
 		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
@@ -58,6 +62,7 @@ namespace cute
 
 
 		curl_easy_cleanup(curl);
+		return true;
 	}
 
 

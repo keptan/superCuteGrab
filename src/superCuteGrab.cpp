@@ -2,9 +2,10 @@
 #include "booruInterface.h"
 #include "image.h"
 #include "metaData.h"
-#include "threadPool/threadPool.h"
+#include "ThreadPool/ThreadPool.h"
 #include "skillBase.h"
 
+#include <curl/curl.h>
 #include <experimental/filesystem>
 #include <vector>
 #include <mutex>
@@ -66,9 +67,6 @@ void skillTest(std::string p)
 
 
 
-
-
-
 }
 
 
@@ -101,82 +99,6 @@ void runDoc(cute::BooruInterface *in,int depth)
 
 }
 
-/*
-
-int rankTest()
-{
-
-	std::vector<Player*> image1;
-	std::vector<Player*> image2;
-
-
-	Player* player1 = new Player();
-	player1->mu = 35.0;
-	player1->sigma = 3.0;
-
-	Player* player1a = new Player();
-	player1a->mu = 35.0;
-	player1a->sigma = 3.0;
-
-	Player* player1b = new Player();
-	player1b->mu = 25.0;
-	player1b->sigma = 2.0;
-
-	Player* player1c = new Player();
-	player1c->mu = 25.0;
-	player1c->sigma = 1;
-
-	image1.push_back(player1);
-	image1.push_back(player1b);
-	image1.push_back(player1c);
-	image1.push_back(player1a);
-
-
-	Player* player2 = new Player();
-	player2->mu = 35.0;
-	player2->sigma = 1.1;
-
-	Player* player2a = new Player();
-	player2a->mu = 15.0;
-	player2a->sigma = 1.1;
-
-	image2.push_back(player2);
-	image2.push_back(player2a);
-
-	while(image2.size() < image1.size()){
-		image2.push_back(new Player());
-		image2.back()->mu =( player2->mu+player2a->mu) /2;
-		image2.back()->sigma = (player2->sigma+player2a->sigma)/2;
-
-	}
-
-
-
-	std::vector<Player*> players;
-	for(auto & n : image1){
-		players.push_back(n);
-		players.back()->rank = 2;
-
-	}
-
-	for(auto & n : image2){
-		players.push_back(n);
-
-		players.back()->rank = 1;
-
-	}
-
-
-
-
-
-
-  //fill the team with average of current players to avoid player count weighting
-  //add to the mu the more tags present
-
-}
-}
-*/
 int directoryScan(std::string p, std::string t)
 {
 	for(auto& p: fs::recursive_directory_iterator(p)){
@@ -200,9 +122,14 @@ int directoryScan(std::string p, std::string t)
 
 }
 
-int booruWriteScan(std::string p)
+int danTest(std::string p)
 {
 
+	std::cout<<"initing curl.....";
+
+	curl_global_init(CURL_GLOBAL_ALL);
+
+	std::cout<<"inited"<<std::endl;
 	std::cout<<"scanning directory " << p <<  std::endl;
 
 	int i = 0;
@@ -240,22 +167,25 @@ int booruWriteScan(std::string p)
 
 				//threads.push_back(new std::thread(runDoc,interfaces.back()));
 				//
-				
-				results.emplace_back(pool.enqueue([&]{
+				interfaces.back()->makeHash();
+			}
+		}else{
+			w++;
+		}
+	}
 
-						runDoc(interfaces.back(),0);
+	for(auto i : interfaces){
+		if(!i->tagged()){
+			results.emplace_back(pool.enqueue([&]{
+
+						runDoc(i,0);
 						return 1;
 				}));
+		}
+		}
 
 
 			
-
-			}
-			else{
-				w++;
-			}
-		}
-	}
 
 
 
@@ -346,7 +276,16 @@ int booruScan(std::string p)
 int main(int argc, char *const argv[])
 {
 //	booruWriteScan(argv[1]);
-	skillTest(argv[1]);
+
+	if(argv[1] == (std::string) "skillTest")
+	skillTest(argv[2]);
+
+	else if(argv[1] == (std::string)"danTest")
+	danTest(argv[2]);
+
+
+
+
 //	rankTest();
 
 

@@ -19,6 +19,7 @@ namespace cute
             fs::path fileName();
             fs::path filePath();
 			std::string getHash();
+			std::string makeHash();
 
 		
 

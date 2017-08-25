@@ -24,11 +24,15 @@ namespace cute
         return path;
     }
 
+	std::string Image :: makeHash()
+	{
+		hash = hashFile(path.string().c_str());
+		return hash;
+	}
+
 	std::string Image :: getHash()
 	{
 
-		if((hash==""));
-		hash = hashFile(path.string().c_str());
 		return hash;
 
 	}
