@@ -33,12 +33,14 @@ namespace cute
 		CURLcode res;
 		struct curl_slist *headers=NULL;
 
-		doc = "";
+		//doc = "";
 
+		/*
 		curl_slist_append(headers, "Accept: application/json");
 		curl_slist_append(headers, "Content-Type: application/json");
 		curl_slist_append(headers, "charset: utf-8");
 
+		*/
 		curl = curl_easy_init();
 
 		url = "http://danbooru.donmai.us/posts.json?tags=md5:";
@@ -46,20 +48,23 @@ namespace cute
 
 
 
+
+		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 		curl_easy_setopt(curl,CURLOPT_NOSIGNAL,1);
+
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION,&BooruInterface::handle);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
+		/*
 		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-		curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+		//curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION,&BooruInterface::handle);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
 
 		http_code = 0;
+		*/
 		res = curl_easy_perform(curl);
-
-		curl_easy_getinfo(curl,CURLINFO_RESPONSE_CODE, &http_code);
-
 
 		curl_easy_cleanup(curl);
 		return true;
@@ -106,6 +111,53 @@ namespace cute
 		return 0;
 
 	}
+
+	bool BooruInterface :: reCurl()
+	{
+		if (doc == "[][]")
+			return true;
+
+		if (doc == "[]")
+			return true;
+
+		if (doc == "")
+			return true;
+
+	}
+
+	bool BooruInterface :: read()
+	{
+		Json::Value jsonData;
+		Json::Reader jsonReader;
+
+		std::string tagString;
+
+		if (doc == "[][]")
+			return false;
+
+		if( doc == "[]")
+			return false;
+
+		if(doc == "")
+			return false;
+
+		if (jsonReader.parse(doc,jsonData))
+
+		{
+			if (!jsonData[0].isMember("tag_string"))
+				return false;
+
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+
+
+	}
+
+
 
 	std::vector<std::string>  BooruInterface :: getDocTags()
 	{

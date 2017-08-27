@@ -4,6 +4,8 @@
 #include "metaData.h"
 #include "ThreadPool/ThreadPool.h"
 #include "skillBase.h"
+#include <openssl/crypto.h>
+#include "graphics.h"
 
 #include <curl/curl.h>
 #include <experimental/filesystem>
@@ -19,6 +21,53 @@ static int totalThreads =0;
 static int numThreads = 0;
 
 namespace fs = std::experimental::filesystem;
+
+static pthread_mutex_t *lockarray;
+
+static void lock_callback(int mode, int type, char *file, int line)
+{
+  (void)file;
+  (void)line;
+  if (mode & CRYPTO_LOCK) {
+    pthread_mutex_lock(&(lockarray[type]));
+  }
+  else {
+    pthread_mutex_unlock(&(lockarray[type]));
+  }
+}
+
+static unsigned long thread_id(void)
+{
+  unsigned long ret;
+
+  ret=(unsigned long)pthread_self();
+  return(ret);
+}
+
+static void init_locks(void)
+{
+  int i;
+
+  lockarray=(pthread_mutex_t *)OPENSSL_malloc(CRYPTO_num_locks() *
+                                        sizeof(pthread_mutex_t));
+  for (i=0; i<CRYPTO_num_locks(); i++) {
+    pthread_mutex_init(&(lockarray[i]),NULL);
+  }
+
+  CRYPTO_set_id_callback((unsigned long (*)())thread_id);
+  CRYPTO_set_locking_callback((void (*)(int, int, const char*, int))lock_callback);
+}
+
+static void kill_locks(void)
+{
+  int i;
+
+  CRYPTO_set_locking_callback(NULL);
+  for (i=0; i<CRYPTO_num_locks(); i++)
+    pthread_mutex_destroy(&(lockarray[i]));
+
+  OPENSSL_free(lockarray);
+}
 
 void skillTest(std::string p)
 {
@@ -70,6 +119,15 @@ void skillTest(std::string p)
 }
 
 
+void gtkTest()
+{
+
+	cute::Window win;
+
+	win.newWindow("test.jpg","test1.jpg");
+	return;
+
+}
 
 
 void runDoc(cute::BooruInterface *in,int depth)
@@ -80,17 +138,19 @@ void runDoc(cute::BooruInterface *in,int depth)
 	m.unlock();
 
 	in->getDoc();
+	
 
 	
-	if(in->readDocTags() == -1 && depth < 3){
-		std::this_thread::sleep_for(std::chrono::seconds(1));
+	if(in->reCurl() == -1 && depth < 3){
+		std::this_thread::sleep_for(std::chrono::seconds(4));
 		runDoc(in,depth+1);
 	}
+	
 
 	m.lock();
 	threadsDone++;
 	numThreads--;
-	std::cout<<"receiving curl threads "<< threadsDone << '/' << numThreads << " lifetime threads: " << totalThreads<<"                        "<<'\r';
+	//std::cout<<"receiving curl threads "<< threadsDone << '/' << numThreads << " lifetime threads: " << totalThreads<<"                        "<<'\r';
 	m.unlock();
 
 	return;
@@ -127,6 +187,7 @@ int danTest(std::string p)
 
 	std::cout<<"initing curl.....";
 
+	init_locks();
 	curl_global_init(CURL_GLOBAL_ALL);
 
 	std::cout<<"inited"<<std::endl;
@@ -166,14 +227,23 @@ int danTest(std::string p)
 
 
 				//threads.push_back(new std::thread(runDoc,interfaces.back()));
+	std::cout<<"scanning "<< p.path().filename() << std::endl;
 				//
 				interfaces.back()->makeHash();
+				runDoc(interfaces.back(),1);
+				if(interfaces.back()->read())
+				std::cout<<"Tags found! "<< std::endl;
 			}
 		}else{
+
+	std::cout<<"scanning "<< p.path().filename() << "already tagged!" <<std::endl;
 			w++;
 		}
 	}
 
+	//std::cout<<"starting boorusearch "  <<  std::endl;
+
+	/*
 	for(auto i : interfaces){
 		if(!i->tagged()){
 			results.emplace_back(pool.enqueue([&]{
@@ -184,14 +254,17 @@ int danTest(std::string p)
 		}
 		}
 
+		*/
 
 			
 
 
 
+	/*
 	for(auto && result: results){
 		result.get();
 	}
+	*/
 
 
 
@@ -214,6 +287,7 @@ int danTest(std::string p)
 
 
 	std::cout<<std::endl;
+	kill_locks();
 	return 0;
 
 
@@ -282,6 +356,9 @@ int main(int argc, char *const argv[])
 
 	else if(argv[1] == (std::string)"danTest")
 	danTest(argv[2]);
+	
+	else if(argv[1] == (std::string)"gtkTest")
+	gtkTest();
 
 
 

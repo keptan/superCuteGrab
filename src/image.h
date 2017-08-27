@@ -11,10 +11,11 @@ namespace cute
     {
         protected :
             fs::path path;
-			std::string hash;
             
         public :
 			
+
+			std::string hash;
             Image(std::string p);
             fs::path fileName();
             fs::path filePath();

@@ -7,6 +7,7 @@
 #include <json/json.h>
 #include <mutex>
 
+
 #include "metaData.h"
 #include "image.h"
 
@@ -31,8 +32,10 @@ namespace cute
 
 			bool getDoc();
 			int readDocTags();
+			bool reCurl();
 			void  printDocTags();
 			void printUrl();
+			bool read();
 
 			void writeDocTags();
 

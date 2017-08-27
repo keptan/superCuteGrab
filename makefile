@@ -3,14 +3,19 @@ CFLAG= -c  -I ./lib
 TSLIB= -pthread #-lmongoclient -L lib -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt
 TSOB= ./src/obj/trueskill.o ./src/obj/matrix.o src/obj/gaussian.o ./src/obj/basemath.o ./src/obj/factorgraph.o
 TSOBN=  trueskill.o matrix.o gaussian.o basemath.o factorgraph.o
+GTKL= -pthread -I/usr/include/gtk-2.0 -I/usr/lib/gtk-2.0/include -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/libdrm -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/pango-1.0 -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -lgtk-x11-2.0 -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lfontconfig -lfreetype
+ 
 
 all: superCuteGrab
 
-superCuteGrab: superCuteGrab.o image.o metaData.o booruInterface.o skillBase.o  $(TSOBN)
-	$(CC) ./src/obj/superCuteGrab.o ./src/obj/image.o ./src/obj/metaData.o ./src/obj/booruInterface.o ./src/obj/skillBase.o $(TSOB)  -lcurl -ljsoncpp -lexiv2 -lstdc++fs -lcrypto -lssl $(TSLIB)  -o cuteGrab -g
+superCuteGrab: superCuteGrab.o image.o metaData.o booruInterface.o skillBase.o graphics.o $(TSOBN)
+	$(CC) ./src/obj/superCuteGrab.o ./src/obj/image.o ./src/obj/metaData.o ./src/obj/booruInterface.o ./src/obj/skillBase.o ./src/obj/graphics.o $(TSOB) $(GTKL)  -lcurl -ljsoncpp -lexiv2 -lstdc++fs -lcrypto -lssl $(TSLIB)  -o cuteGrab -g
 
 superCuteGrab.o: ./src/superCuteGrab.cpp
-	$(CC) $(CFLAG)  -c ./src/superCuteGrab.cpp -o ./src/obj/superCuteGrab.o  -lcrypto -lssl -g
+	$(CC) $(CFLAG)  -c ./src/superCuteGrab.cpp -o ./src/obj/superCuteGrab.o  -lcrypto -lssl  $(GTKL)
+
+graphics.o:
+	$(CC) $(CFLAG) -c ./src/graphics.cpp -o ./src/obj/graphics.o $(GTKL)
 
 booruInterface.o:
 	$(CC) $(CFLAG) -c ./src/booruInterface.cpp -o ./src/obj/booruInterface.o -lcurl -ljsoncpp -g
