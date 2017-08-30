@@ -56,13 +56,18 @@ namespace cute
 		viewData.push_back(new resizeData);
 		resizeData* image = viewData.back();
 
-	
-
 		image->sourcePixbuf = gdk_pixbuf_new_from_file(i.c_str(),NULL);
 		image->image = gtk_image_new_from_pixbuf(gdk_pixbuf_copy(image->sourcePixbuf));
 
+
+		int width = gdk_pixbuf_get_width(image->sourcePixbuf);
+		int height = gdk_pixbuf_get_height(image->sourcePixbuf);
+
+		float ratio = width / (float) height;
+	
+
 		image->aspect = gtk_aspect_frame_new(NULL,0,0
-				,(float)(gdk_pixbuf_get_width(image->sourcePixbuf)/(float)gdk_pixbuf_get_width(image->sourcePixbuf))
+				,ratio
 				,FALSE);
 
 		image->viewport = gtk_scrolled_window_new(NULL,NULL);
