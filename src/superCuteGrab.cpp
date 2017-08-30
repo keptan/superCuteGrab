@@ -124,7 +124,7 @@ void gtkTest()
 
 	cute::Window win;
 
-	win.newWindow("test.jpg","test1.jpg");
+	win.newWindow("test.jpg","testBoat.png");
 	return;
 
 }

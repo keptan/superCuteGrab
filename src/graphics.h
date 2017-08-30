@@ -1,12 +1,16 @@
 #include <gtk/gtk.h>
 #include <string>
+#include <vector>
 
 namespace cute
 {
 	struct resizeData
 	{
 		GtkWidget *image;
-		GdkPixbuf *pixbuf;
+		GdkPixbuf *sourcePixbuf;
+		GtkWidget *aspect;
+		GtkWidget *viewport;
+		
 	};
 
 	gboolean resize_image(GtkWidget *widget, GtkAllocation *allocation, resizeData *data);	
@@ -18,17 +22,15 @@ namespace cute
 		public:
 			static GtkWidget *image1;
 			static GtkWidget *image2;
-	GtkWidget *viewport;
-		GtkWidget *aspect;
-		GdkPixbuf *sourcePixbuf = NULL;
-		GtkWidget *image;
 
-		resizeData viewData;
+		GdkPixbuf *sourcePixbuf = NULL;
+
+		std::vector<resizeData*> viewData;
 
 
 			//gboolean resize_imaeg(GtkWidget *widget, GdkEvent *event, GtkWindow *window);
 
-			GtkWidget *newImageBox(std::string i);
+			resizeData *newImageBox(std::string i);
 			GtkWidget *newWindow( std::string i1, std::string i2);
 
 		public:

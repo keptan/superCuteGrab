@@ -1,5 +1,6 @@
 #include <gtk/gtk.h>
 #include <string>
+#include <vector>
 
 #include "graphics.h"
 
@@ -20,7 +21,7 @@ namespace cute
 
 	static gboolean sizeChanged(GtkWidget *widget, GtkAllocation *allocation, resizeData *data)
 	{
-		GdkPixbuf *sourcePixbuf = data->pixbuf;
+		GdkPixbuf *sourcePixbuf = data->sourcePixbuf;
 		GdkPixbuf *imagePixbuf;
 
 		imagePixbuf = gtk_image_get_pixbuf(GTK_IMAGE(data->image));
@@ -50,23 +51,31 @@ namespace cute
 	
 
 
-	GtkWidget* Window :: newImageBox(std::string i)
+	resizeData *Window :: newImageBox(std::string i)
 	{
+		viewData.push_back(new resizeData);
+		resizeData* image = viewData.back();
+
 	
-		sourcePixbuf = gdk_pixbuf_new_from_file(i.c_str(),NULL);
-		image = gtk_image_new_from_pixbuf(gdk_pixbuf_copy(sourcePixbuf));
-		aspect = gtk_aspect_frame_new(NULL,0,0,1,TRUE);
-		viewport = gtk_scrolled_window_new(NULL,NULL);
 
-		gtk_container_add(GTK_CONTAINER(viewport),image);
-		gtk_container_add(GTK_CONTAINER(aspect),viewport);
+		image->sourcePixbuf = gdk_pixbuf_new_from_file(i.c_str(),NULL);
+		image->image = gtk_image_new_from_pixbuf(gdk_pixbuf_copy(image->sourcePixbuf));
 
-		g_signal_connect(viewport,"size-allocate",G_CALLBACK(sizeChanged),&viewData);
+		image->aspect = gtk_aspect_frame_new(NULL,0,0
+				,(float)(gdk_pixbuf_get_width(image->sourcePixbuf)/(float)gdk_pixbuf_get_width(image->sourcePixbuf))
+				,FALSE);
 
-		viewData.image = image;
-		viewData.pixbuf = sourcePixbuf;
+		image->viewport = gtk_scrolled_window_new(NULL,NULL);
+
+		gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(image->viewport),image->image);
+		gtk_container_add(GTK_CONTAINER(image->aspect),image->viewport);
+
+
+
+		g_signal_connect(image->viewport,"size-allocate",G_CALLBACK(sizeChanged),image);
+
 		
-		return aspect;
+		return image;
 
 	}
 
@@ -75,16 +84,25 @@ namespace cute
 		GtkWidget *window;	
 		GtkWidget *hbox;
 
+
 		gtk_init(NULL,NULL);
 		
 		hbox = gtk_hbox_new(FALSE,0);
 		window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 		g_signal_connect(G_OBJECT (window), "delete_event", G_CALLBACK(delete_event),NULL);
 
+		resizeData *image1 = newImageBox(i1);
+		resizeData *image2 = newImageBox(i2);
 
-		gtk_container_add(GTK_CONTAINER(hbox),newImageBox(i1));
-		gtk_container_add(GTK_CONTAINER(hbox),newImageBox(i2));
+	gtk_container_add(GTK_CONTAINER(hbox),image1->aspect);
+	gtk_container_add(GTK_CONTAINER(hbox),image2->aspect);
 		gtk_container_add(GTK_CONTAINER(window),hbox);
+
+		/*
+		gtk_window_set_default_size(GTK_WINDOW(window),
+		gdk_pixbuf_get_width(image1->sourcePixbuf),
+		gdk_pixbuf_get_height(image1->sourcePixbuf));
+		*/
 
 		gtk_widget_show_all(window);
 		gtk_main();
