@@ -123,8 +123,14 @@ void gtkTest()
 {
 
 	cute::Window win;
+	cute::MetaData *i1 = new cute::MetaData("tagged.png");
+	cute::MetaData *i2 = new cute::MetaData("testBoat.png");
 
-	win.newWindow("test.jpg","testBoat.png");
+	i1->readTags();
+	i1->printTags();
+	i2->readTags();
+
+	win.newWindow(i1,i2);
 	return;
 
 }
@@ -360,6 +366,8 @@ int main(int argc, char *const argv[])
 	else if(argv[1] == (std::string)"gtkTest")
 	gtkTest();
 
+	else if(argv[1] == (std::string)"searchTest")
+	directoryScan(argv[2],argv[3]);
 
 
 

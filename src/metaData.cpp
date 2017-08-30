@@ -50,6 +50,19 @@ namespace cute
 			std::cout << n << '\n';
 	}
 
+	std::string MetaData :: tagsString()
+	{
+		std::string output;
+
+		for (auto &n : tags){
+			output += n;
+			output += ' ';
+			
+		}
+
+		return output;
+	}
+
 	void MetaData :: addTag(std::string s)
 	{
 	

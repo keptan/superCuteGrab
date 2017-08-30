@@ -1,6 +1,7 @@
 #include <gtk/gtk.h>
 #include <string>
 #include <vector>
+#include "metaData.h"
 
 namespace cute
 {
@@ -19,22 +20,38 @@ namespace cute
 
 	class Window
 	{
-		public:
+		private:
 			static GtkWidget *image1;
 			static GtkWidget *image2;
 
-		GdkPixbuf *sourcePixbuf = NULL;
+			cute::MetaData *input1;
+			cute::MetaData *input2;
 
+
+		GtkWidget *leftText;
+		GObject *leftBuffer;
+
+		GtkWidget *rightText;
+		GObject *rightBuffer;
+
+
+
+		GtkBuilder *builder;
+
+
+
+		int runText();
 		std::vector<resizeData*> viewData;
 
 
 			//gboolean resize_imaeg(GtkWidget *widget, GdkEvent *event, GtkWindow *window);
 
-			resizeData *newImageBox(std::string i);
-			GtkWidget *newWindow( std::string i1, std::string i2);
+			resizeData *newImageBox(std::string i,int s);
 
 		public:
 			Window();
+
+			GtkWidget *newWindow(cute::MetaData *i1, cute::MetaData *i2);
 
 	};
 

@@ -31,6 +31,8 @@ namespace cute
 
 			std::vector<std::string> getTags();
 
+
+			std::string tagsString();
 			void addTag(std::string);
 			void clearTags();
 			void writeTags();
