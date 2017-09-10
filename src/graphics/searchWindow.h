@@ -38,6 +38,7 @@ namespace cute
 		public :
 			SearchWindow();
 			int createWindow();
+			int populate(std::vector<MetaData>);
 	};
 };
 
