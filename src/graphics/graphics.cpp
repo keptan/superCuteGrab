@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "graphics.h"
-#include "metaData.h"
+#include "../metaData.h"
 
 namespace cute
 {
@@ -53,6 +53,7 @@ namespace cute
 	int Window :: runText()
 	{
 		gtk_text_buffer_set_text(GTK_TEXT_BUFFER(leftBuffer),input1->tagsString().c_str(),input1->tagsString().length());
+	gtk_text_buffer_set_text(GTK_TEXT_BUFFER(rightBuffer),input2->tagsString().c_str(),input2->tagsString().length());
 	}
 		
 

@@ -16,6 +16,12 @@ namespace cute
 		: MetaData(m),doc("")
 	{}
 
+	BooruInterface :: BooruInterface(MetaData  m)
+		: MetaData(m),doc("")
+	{}
+
+
+
 	size_t BooruInterface :: handle(char * data, size_t size, size_t nmemb, void * p)
 	{
 		return static_cast<BooruInterface*>(p)->handle_impl(data, size, nmemb);

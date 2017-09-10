@@ -4,8 +4,10 @@
 #include "metaData.h"
 #include "ThreadPool/ThreadPool.h"
 #include "skillBase.h"
+#include "imageBase.h"
+
 #include <openssl/crypto.h>
-#include "graphics.h"
+#include "graphics/graphics.h"
 
 #include <curl/curl.h>
 #include <experimental/filesystem>
@@ -127,7 +129,6 @@ void gtkTest()
 	cute::MetaData *i2 = new cute::MetaData("testBoat.png");
 
 	i1->readTags();
-	i1->printTags();
 	i2->readTags();
 
 	win.newWindow(i1,i2);
@@ -353,6 +354,20 @@ int booruScan(std::string p)
 
 }
 
+int baseTest(std::string l)
+{
+	cute::ImageBase base(l);
+
+	base.readDirectory();
+	for(auto i : base.collectImages()){
+		i.readTags();
+		i.printTags();
+	}
+}
+
+
+
+
 int main(int argc, char *const argv[])
 {
 //	booruWriteScan(argv[1]);
@@ -368,6 +383,9 @@ int main(int argc, char *const argv[])
 
 	else if(argv[1] == (std::string)"searchTest")
 	directoryScan(argv[2],argv[3]);
+
+	else if(argv[1] == (std::string)"baseTest")
+	baseTest(argv[2]);
 
 
 

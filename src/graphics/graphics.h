@@ -1,7 +1,7 @@
 #include <gtk/gtk.h>
 #include <string>
 #include <vector>
-#include "metaData.h"
+#include "../metaData.h"
 
 namespace cute
 {
@@ -13,6 +13,7 @@ namespace cute
 		GtkWidget *viewport;
 		
 	};
+
 
 	gboolean resize_image(GtkWidget *widget, GtkAllocation *allocation, resizeData *data);	
 	static gboolean sizeChanged(GtkWidget *widget, GtkAllocation *allocation, resizeData *data);

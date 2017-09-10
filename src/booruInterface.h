@@ -29,6 +29,7 @@ namespace cute
 		public :
 			
 			BooruInterface(std::string m);
+			BooruInterface(MetaData  m);
 
 			bool getDoc();
 			int readDocTags();
