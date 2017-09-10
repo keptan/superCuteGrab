@@ -1,3 +1,6 @@
+#ifndef GRAPHICS_H
+#define GRAPHICS_H
+
 #include <gtk/gtk.h>
 #include <string>
 #include <vector>
@@ -16,10 +19,11 @@ namespace cute
 
 
 	gboolean resize_image(GtkWidget *widget, GtkAllocation *allocation, resizeData *data);	
-	static gboolean sizeChanged(GtkWidget *widget, GtkAllocation *allocation, resizeData *data);
+	gboolean sizeChanged(GtkWidget *widget, GtkAllocation *allocation, resizeData *data);
 	gint delete_event(GtkWidget *widget, GdkEvent *event, gpointer data);
+	int localGinit();
 
-	class Window
+	class CompareWindow
 	{
 		private:
 			static GtkWidget *image1;
@@ -50,10 +54,12 @@ namespace cute
 			resizeData *newImageBox(std::string i,int s);
 
 		public:
-			Window();
+			CompareWindow();
 
 			GtkWidget *newWindow(cute::MetaData *i1, cute::MetaData *i2);
 
 	};
 
 }	
+
+#endif

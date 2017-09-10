@@ -13,27 +13,27 @@ namespace cute
 	{
 		GdkPixbuf *pixbuf = gtk_image_get_pixbuf(GTK_IMAGE(widget));
 		
-		pixbuf = gdk_pixbuf_scale_simple(pixbuf,widget->allocation.width,widget->allocation.height, GDK_INTERP_BILINEAR);
+		pixbuf = gdk_pixbuf_scale_simple(pixbuf,widget->allocation.width -2,widget->allocation.height -2, GDK_INTERP_BILINEAR);
 
 		gtk_image_set_from_pixbuf(GTK_IMAGE(widget),pixbuf);
 
 		return FALSE;
 	}
 
-	static gboolean sizeChanged(GtkWidget *widget, GtkAllocation *allocation, resizeData *data)
+	gboolean sizeChanged(GtkWidget *widget, GtkAllocation *allocation, resizeData *data)
 	{
 		GdkPixbuf *sourcePixbuf = data->sourcePixbuf;
 		GdkPixbuf *imagePixbuf;
 
 		imagePixbuf = gtk_image_get_pixbuf(GTK_IMAGE(data->image));
 		
-		if (allocation->width != gdk_pixbuf_get_width(imagePixbuf)||
-				allocation->height != gdk_pixbuf_get_height(imagePixbuf)){
+		if (allocation->width -2  != gdk_pixbuf_get_width(imagePixbuf)||
+				allocation->height -2 != gdk_pixbuf_get_height(imagePixbuf)){
 			gtk_image_set_from_pixbuf(
 					GTK_IMAGE(data->image),
 					gdk_pixbuf_scale_simple(sourcePixbuf,
-						allocation->width,
-						allocation->height,
+						allocation->width -2,
+						allocation->height -2,
 						GDK_INTERP_BILINEAR)
 			);
 				g_object_unref(imagePixbuf);
@@ -47,10 +47,14 @@ namespace cute
 		return false;
 	}
 
+	int localGinit()
+	{
+		gtk_init(NULL,NULL);
 
-	Window :: Window(){}	
+	}
+	CompareWindow :: CompareWindow(){}	
 	
-	int Window :: runText()
+	int CompareWindow :: runText()
 	{
 		gtk_text_buffer_set_text(GTK_TEXT_BUFFER(leftBuffer),input1->tagsString().c_str(),input1->tagsString().length());
 	gtk_text_buffer_set_text(GTK_TEXT_BUFFER(rightBuffer),input2->tagsString().c_str(),input2->tagsString().length());
@@ -58,7 +62,7 @@ namespace cute
 		
 
 
-	resizeData *Window :: newImageBox(std::string i,int s)
+	resizeData *CompareWindow :: newImageBox(std::string i,int s)
 	{
 		viewData.push_back(new resizeData);
 		resizeData* image = viewData.back();
@@ -96,7 +100,7 @@ namespace cute
 
 	}
 
-	GtkWidget* Window :: newWindow(cute::MetaData *i1, cute::MetaData *i2)
+	GtkWidget* CompareWindow :: newWindow(cute::MetaData *i1, cute::MetaData *i2)
 	{
 		GtkWidget *window;	
 		GtkWidget *hbox;
@@ -106,7 +110,6 @@ namespace cute
 		input2 = i2;
 
 
-		gtk_init(NULL,NULL);
 		builder = gtk_builder_new();
 		gtk_builder_add_from_file(builder, "window.glade", NULL);
 

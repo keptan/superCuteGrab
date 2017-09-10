@@ -8,6 +8,7 @@
 
 #include <openssl/crypto.h>
 #include "graphics/graphics.h"
+#include "graphics/searchWindow.h"
 
 #include <curl/curl.h>
 #include <experimental/filesystem>
@@ -124,14 +125,18 @@ void skillTest(std::string p)
 void gtkTest()
 {
 
-	cute::Window win;
+	cute::localGinit();
+	cute::CompareWindow win;
+	cute::SearchWindow win2;
+
 	cute::MetaData *i1 = new cute::MetaData("tagged.png");
 	cute::MetaData *i2 = new cute::MetaData("testBoat.png");
 
 	i1->readTags();
 	i2->readTags();
 
-	win.newWindow(i1,i2);
+	//win.newWindow(i1,i2);
+	win2.createWindow();
 	return;
 
 }

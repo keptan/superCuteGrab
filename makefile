@@ -8,14 +8,18 @@ GTKL= -pthread -I/usr/include/gtk-2.0 -I/usr/lib/gtk-2.0/include -I/usr/include/
 
 all: superCuteGrab
 
-superCuteGrab: superCuteGrab.o image.o metaData.o booruInterface.o skillBase.o imageBase.o graphics.o $(TSOBN)
-	$(CC) ./src/obj/superCuteGrab.o ./src/obj/image.o ./src/obj/metaData.o ./src/obj/booruInterface.o ./src/obj/skillBase.o ./src/obj/imageBase.o ./src/obj/graphics.o $(TSOB) $(GTKL)  -lcurl -ljsoncpp -lexiv2 -lstdc++fs -lcrypto -lssl $(TSLIB)  -o cuteGrab -g
+superCuteGrab: superCuteGrab.o image.o metaData.o booruInterface.o skillBase.o imageBase.o graphics.o searchWindow.o $(TSOBN)
+	$(CC) ./src/obj/superCuteGrab.o ./src/obj/image.o ./src/obj/metaData.o ./src/obj/booruInterface.o ./src/obj/skillBase.o ./src/obj/imageBase.o ./src/obj/graphics.o ./src/obj/searchWindow.o $(TSOB) $(GTKL)  -lcurl -ljsoncpp -lexiv2 -lstdc++fs -lcrypto -lssl $(TSLIB)  -o cuteGrab -g
 
 superCuteGrab.o: ./src/superCuteGrab.cpp
 	$(CC) $(CFLAG)  -c ./src/superCuteGrab.cpp -o ./src/obj/superCuteGrab.o  -lcrypto -lssl  $(GTKL)
 
+searchWindow.o:
+	$(CC) $(CFLAG) -c ./src/graphics/searchWindow.cpp -o ./src/obj/searchWindow.o $(GTKL)
+
 graphics.o:
 	$(CC) $(CFLAG) -c ./src/graphics/graphics.cpp -o ./src/obj/graphics.o $(GTKL)
+
 
 booruInterface.o:
 	$(CC) $(CFLAG) -c ./src/booruInterface.cpp -o ./src/obj/booruInterface.o -lcurl -ljsoncpp -g
