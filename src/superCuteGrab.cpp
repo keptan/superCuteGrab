@@ -127,7 +127,6 @@ void gtkTest()
 
 	cute::localGinit();
 	cute::CompareWindow win;
-	cute::SearchWindow win2;
 
 	cute::MetaData *i1 = new cute::MetaData("tagged.png");
 	cute::MetaData *i2 = new cute::MetaData("testBoat.png");
@@ -135,7 +134,17 @@ void gtkTest()
 	i1->readTags();
 	i2->readTags();
 
+	cute::ImageBase base("test");
+
+	base.readDirectory();
+
+	
 	//win.newWindow(i1,i2);
+	//
+		for(auto i : *base.collectImages()){
+			std::cout<<i.fileName();
+	}
+	cute::SearchWindow win2(base.collectImages());
 	win2.createWindow();
 	return;
 
@@ -364,7 +373,7 @@ int baseTest(std::string l)
 	cute::ImageBase base(l);
 
 	base.readDirectory();
-	for(auto i : base.collectImages()){
+	for(auto i : *base.collectImages()){
 		i.readTags();
 		i.printTags();
 	}

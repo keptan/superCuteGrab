@@ -10,6 +10,7 @@
 
 namespace cute
 {
+
 	enum
 	{
 		COL_LOC,
@@ -26,20 +27,25 @@ namespace cute
 
 			resizeData image;
 			GtkBuilder *builder;
-			GtkListStore *store;
 			GtkTreeModel *model;
+			std::vector<MetaData> *population;
+			
 			GtkWidget *view;
-			int  newImageBox(std::string i = "test.png" );
 
 			GdkPixbuf *pixbuf;
-			GtkTreeModel *create_and_fill_model();
 			GtkWidget *create_view_and_model();
 
 		public :
-			SearchWindow();
+
+			GtkListStore *store;
+			SearchWindow(std::vector<MetaData> *p);
 			int createWindow();
-			int populate(std::vector<MetaData>);
+
+			int openImage(std::string p);
+			GtkTreeModel *populate();
 	};
+
+	void item_activated(GtkIconView *v,GtkTreePath *p,SearchWindow *user_data);
 };
 
 #endif
