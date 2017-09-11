@@ -137,6 +137,7 @@ void gtkTest()
 	cute::ImageBase base("test");
 
 	base.readDirectory();
+	base.filter("k-on!");
 
 	
 	//win.newWindow(i1,i2);

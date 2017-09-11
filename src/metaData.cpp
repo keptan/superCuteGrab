@@ -21,6 +21,7 @@ namespace cute
 
 	int MetaData :: readTags()
 	{
+		if(tags.empty()){
 		try {
 		Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(Image::filePath());
 		image.get();
@@ -41,6 +42,7 @@ namespace cute
 		{
 			return 1;
 		}
+	}
 
 	}
 
@@ -124,7 +126,7 @@ namespace cute
 			return true;
 
 		for(auto &t : tags){
-			if(s.compare(0,s.size(),t))
+			if(s == t.substr(0,s.length()))
 				return true;
 		}
 	}
@@ -136,8 +138,8 @@ namespace cute
 		if (tags.empty())
 			return false;
 
-		for(auto &t : tags)
-			if(s == t.substr(0,s.size()))
+		for(auto t : tags)
+			if(s == t.substr(0,s.length()))
 				return true;
 	
 
