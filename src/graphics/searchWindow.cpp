@@ -13,50 +13,94 @@ namespace cute
 	SearchWindow :: SearchWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder> &refGlade)
 		:Gtk::Window(cobject)
 		,builder(refGlade)
-		//,base(new ImageBase("test"))
 	{
-
-		
-		/*
-		base->readDirectory();
-		population = base->collectImages();
-		*/
-
-		//MetaData test1("test.png");
-		//MetaData test1 = population->back();
-
 		builder->get_widget("iconview1",iconView);
 		builder->get_widget("image5",image);
 		builder->get_widget("entry1",entry);
+		refListModel = Gtk::ListStore::create(m_Columns);
+
+
+
+
+	}
+	void SearchWindow :: baseInit(ImageBase *b)
+	{
+
+		base = b;
+		base->readDirectory();
+		base->filter("");
+		population = base->collectImages();
+
+		std::cout<<population->size()<<" "<<(*population)[population->size()-1].fileName()<<'\n';
+
+		iconView->set_model(refListModel);
+		iconView->set_markup_column(m_Columns.m_col_name);
+		iconView->set_pixbuf_column(m_Columns.m_col_pixbuf);
+		iconView->signal_item_activated().connect(sigc::mem_fun(*this,&SearchWindow::on_item_activated));
+		entry->signal_activate().connect(sigc::mem_fun(*this,&SearchWindow::entry_activated));
+
+
+	}
+
+	void SearchWindow :: add_entry(const std::string &filename, int loc)
+	{
+
+		MetaData data = (*population)[loc];
+
+		auto row =*(refListModel->append());
+		row[m_Columns.m_col_name] = filename;
+		row[m_Columns.m_col_path] = filename;
+		row[m_Columns.m_col_data] = loc;
+		row[m_Columns.m_col_pixbuf] = Gdk::Pixbuf::create_from_file(filename);
+
+	}
+
+
+	void SearchWindow :: on_item_activated(const Gtk::TreeModel::Path &path)
+	{
+		auto iter = refListModel->get_iter(path);
+		auto row = *iter;
+
+		int i = row[m_Columns.m_col_data];
+		const std::string loc = row[m_Columns.m_col_path];
+		const std::string name = row[m_Columns.m_col_path];
+
+		MetaData localData = (*population)[i];
+
+		std::cout<<localData.fileName()<<'\n';
+
+	}
+
+	void SearchWindow :: entry_activated()
+	{
+		std::string data = entry->get_text();
+		populate(data);
+		return;
+	}
+	void SearchWindow :: populate(std::string t)
+	{
+		base->filter(t);
+		population = base->collectImages();
 
 		refListModel = Gtk::ListStore::create(m_Columns);
 		iconView->set_model(refListModel);
 		iconView->set_markup_column(m_Columns.m_col_name);
 		iconView->set_pixbuf_column(m_Columns.m_col_pixbuf);
 
-		add_entry("icon.png",10);
-			
+		int i = 0;
+		while(i < population->size())
+		{
+			MetaData localData = (*population)[i];
+			std::cout<<localData.fileName()<<'\n';
+			add_entry("test.png",i);
+			++i;
+		}
+	
 
+		//add_entry("test.png",1);
 	}
 
-	void SearchWindow :: add_entry(const std::string &filename, int t)
-	{
-
-		TestData test(10);
-
-		Glib::RefPtr<TestData> ref;
-		ref::dynamic_cast(test);
-
-
-
-		auto row =*(refListModel->append());
-		row[m_Columns.m_col_name] = "name";
-		row[m_Columns.m_col_pixbuf] = Gdk::Pixbuf::create_from_file(filename);
-		//row[m_Columns.m_col_data] = test;
-
-	}
-
-}
+};
 /*
 
 void entry_activated(GtkWidget *w,SearchWindow *user_data)

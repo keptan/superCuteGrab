@@ -24,31 +24,18 @@ namespace cute
 			cute::ImageBase *base;
 
 		public:
+
+			void baseInit(ImageBase *b);
 			SearchWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder> &refGlade);
 		protected:
+			void populate(std::string t);
+			void populate();
 			void on_image_resize();
 			void on_icon_activated();
-			void on_entry_activated();
-			void add_entry(const std::string &filename,int t);
+			void entry_activated();
+			void on_item_activated(const Gtk::TreeModel::Path &path);
 
-
-		class TestData : public Glib::Object
-		{
-			public:
-			
-				int number;
-
-				TestData(int t)
-					: Glib::Object()
-					, number(t)
-				{}
-
-
-
-				void operator = (int t){
-				number = t;
-				}
-		};
+			void add_entry(const std::string &filename,int loc);
 
 
 		class ModelColumns : public Gtk::TreeModel::ColumnRecord
@@ -58,18 +45,31 @@ namespace cute
 				{
 					add(m_col_name);
 					add(m_col_pixbuf);
-				//	add(m_col_data);
+					add(m_col_path);
+					add(m_col_data);
 				}
-				int test;
+
+				Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf>> m_col_pixbuf;
+				Gtk::TreeModelColumn<std::string> m_col_name;
+				Gtk::TreeModelColumn<std::string> m_col_path;
+				Gtk::TreeModelColumn<int> m_col_data;
+		};
+
+		class TagModelColumns : public Gtk::TreeModel::ColumnRecord
+		{
+			public:
+				TagModelColumns()
+				{
+					add(m_col_name);
+				}
 
 				
 
-				Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf>> m_col_pixbuf;
-				//Gtk::TreeModelColumn<std::unique_ptr<TestData>> m_col_data;
 				Gtk::TreeModelColumn<std::string> m_col_name;
 		};
 
 		ModelColumns m_Columns;
+		TagModelColumns t_Columns;
 		Glib::RefPtr<Gtk::ListStore> refListModel;
 
 	};

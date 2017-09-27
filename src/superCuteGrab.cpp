@@ -136,12 +136,14 @@ void gtkTest(std::string l)
 	i2->readTags();
 
 	cute::ImageBase base(l);
+	base.readDirectory();
 
 	Gtk::Main kit(NULL,NULL);
 	Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create_from_file("window.glade");
 
 	cute::SearchWindow *sw = 0;
 	builder->get_widget_derived("SearchWindow",sw);
+	sw->baseInit(&base);
 	kit.run(*sw);
 	
 	return;
