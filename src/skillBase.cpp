@@ -8,6 +8,7 @@
 
 #include "cskill/trueskill.h"
 #include "skillBase.h"
+#include "metaData.h"
 
 namespace cute
 {
@@ -143,6 +144,21 @@ namespace cute
 			return localTags.back();
 	}
 
+	SkillDatum SkillBase :: getTag(MetaData m)
+	{
+		std::ostringstream n;
+		n << "MD5:"<<m.getHash();
+
+		for(auto s: localTags)
+				if(s.getName() == n.str())
+					return s;
+
+			localTags.push_back(SkillDatum(n.str()));
+			return localTags.back();
+	}
+
+
+
 	bool SkillBase :: setTag(SkillDatum sd)
 	{
 		for(auto &s: localTags)
@@ -171,7 +187,7 @@ namespace cute
 namespace cute
 {
 
-	SkillHandle :: SkillHandle(std::vector<std::string> p1, std::vector<std::string> p2, SkillBase* sb)
+	SkillHandle :: SkillHandle(MetaData m1, MetaData m2, SkillBase* sb)
 		:base(sb)
 	{
 
@@ -180,6 +196,9 @@ namespace cute
 		int team1mu = 0;
 		int team2mu = 0;
 		int team3mu = 0;
+
+		std::vector<std::string> p1 = m1.getTags();
+		std::vector<std::string> p2 = m2.getTags();
 
 		std::vector<std::string> p3;
 

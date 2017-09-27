@@ -21,8 +21,9 @@ namespace cute
 
 	int MetaData :: readTags()
 	{
-		if(tags.empty()){
+		if(tags.empty() && !read){
 		try {
+		read = true;
 		Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(Image::filePath());
 		image.get();
 		image->readMetadata();

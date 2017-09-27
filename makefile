@@ -1,9 +1,10 @@
 CC=g++
-CFLAG= -c  -I ./lib 
+CFLAG= -c  -I ./lib
+GTKL= `pkg-config --libs gtkmm-2.4`
+GTKC= `pkg-config --cflags gtkmm-2.4`
 TSLIB= -pthread #-lmongoclient -L lib -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt
 TSOB= ./src/obj/trueskill.o ./src/obj/matrix.o src/obj/gaussian.o ./src/obj/basemath.o ./src/obj/factorgraph.o
 TSOBN=  trueskill.o matrix.o gaussian.o basemath.o factorgraph.o
-GTKL= -pthread -I/usr/include/gtk-2.0 -I/usr/lib/gtk-2.0/include -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/libdrm -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/pango-1.0 -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -lgtk-x11-2.0 -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lfontconfig -lfreetype
  
 
 all: superCuteGrab
@@ -12,13 +13,13 @@ superCuteGrab: superCuteGrab.o image.o metaData.o booruInterface.o skillBase.o i
 	$(CC) ./src/obj/superCuteGrab.o ./src/obj/image.o ./src/obj/metaData.o ./src/obj/booruInterface.o ./src/obj/skillBase.o ./src/obj/imageBase.o ./src/obj/graphics.o ./src/obj/searchWindow.o $(TSOB) $(GTKL)  -lcurl -ljsoncpp -lexiv2 -lstdc++fs -lcrypto -lssl $(TSLIB)  -o cuteGrab -g
 
 superCuteGrab.o: ./src/superCuteGrab.cpp
-	$(CC) $(CFLAG)  -c ./src/superCuteGrab.cpp -o ./src/obj/superCuteGrab.o  -lcrypto -lssl  $(GTKL)
+	$(CC) $(CFLAG)  -c ./src/superCuteGrab.cpp -o ./src/obj/superCuteGrab.o  -lcrypto -lssl  $(GTKC)
 
 searchWindow.o:
-	$(CC) $(CFLAG) -c ./src/graphics/searchWindow.cpp -o ./src/obj/searchWindow.o $(GTKL)
+	$(CC) $(CFLAG) -c ./src/graphics/searchWindow.cpp -o ./src/obj/searchWindow.o $(GTKC)
 
 graphics.o:
-	$(CC) $(CFLAG) -c ./src/graphics/graphics.cpp -o ./src/obj/graphics.o $(GTKL)
+	$(CC) $(CFLAG) -c ./src/graphics/graphics.cpp -o ./src/obj/graphics.o $(GTKC)
 
 
 booruInterface.o:

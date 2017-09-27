@@ -172,13 +172,14 @@ namespace cute
 
 	void BooruInterface :: writeDocTags()
 	{
-		MetaData::addTag("MD5"+Image::getHash());
+		MetaData::addTag("MD5:"+Image::getHash());
+		MetaData::addTag("booruTags");
 		for(auto s : docTags)
 			MetaData::addTag(s);
 
 		MetaData::writeTags();
 
-		}
+	}
 
 
 
@@ -198,10 +199,10 @@ namespace cute
 
 	void BooruInterface :: printDoc()
 	{
-		std::cout<<"\nDOCK START" << Image::fileName() <<" \n";
+		std::cout<<"\nDOC START" << Image::fileName() <<" \n";
 		std::cout<<http_code<<'\n';
 		std::cout<<doc;
-		std::cout<<"\nDOCK END";
+		std::cout<<"\nDOC END";
 	}
 
 	void BooruInterface :: printUrl()

@@ -16,6 +16,7 @@
 #include <mutex>
 #include <thread>
 #include <chrono>
+#include <gtkmm.h>
 
 
 static std::mutex m;
@@ -74,7 +75,7 @@ static void kill_locks(void)
 
 void skillTest(std::string p)
 {
-
+/*
 	cute::SkillBase sb("dataBase");
 	int found = 0;
 	std::vector<std::string> p1;
@@ -116,13 +117,13 @@ void skillTest(std::string p)
 	std::cout<<"writing to file\n";
 	sb.writeFile();
 
-
+*/
 
 
 }
 
 
-void gtkTest()
+void gtkTest(std::string l)
 {
 
 	cute::localGinit();
@@ -134,19 +135,15 @@ void gtkTest()
 	i1->readTags();
 	i2->readTags();
 
-	cute::ImageBase base("test");
+	cute::ImageBase base(l);
 
-	base.readDirectory();
-	base.filter("k-on!");
+	Gtk::Main kit(NULL,NULL);
+	Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create_from_file("window.glade");
 
+	cute::SearchWindow *sw = 0;
+	builder->get_widget_derived("SearchWindow",sw);
+	kit.run(*sw);
 	
-	//win.newWindow(i1,i2);
-	//
-		for(auto i : *base.collectImages()){
-			std::cout<<i.fileName();
-	}
-	cute::SearchWindow win2(base.collectImages());
-	win2.createWindow();
 	return;
 
 }
@@ -298,6 +295,8 @@ int danTest(std::string p)
 			std::cout<<n->fileName()<<' ';
 			n->printDocTags();
 			std::cout<<"...\n";
+			n->writeDocTags();
+
 
 		}
 
@@ -372,12 +371,9 @@ int booruScan(std::string p)
 int baseTest(std::string l)
 {
 	cute::ImageBase base(l);
-
 	base.readDirectory();
-	for(auto i : *base.collectImages()){
-		i.readTags();
-		i.printTags();
-	}
+
+
 }
 
 
@@ -394,7 +390,7 @@ int main(int argc, char *const argv[])
 	danTest(argv[2]);
 	
 	else if(argv[1] == (std::string)"gtkTest")
-	gtkTest();
+	gtkTest(argv[2]);
 
 	else if(argv[1] == (std::string)"searchTest")
 	directoryScan(argv[2],argv[3]);

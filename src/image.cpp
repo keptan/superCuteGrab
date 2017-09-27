@@ -32,6 +32,8 @@ namespace cute
 
 	std::string Image :: getHash()
 	{
+		if(hash.length() == 0)
+			return makeHash();
 
 		return hash;
 

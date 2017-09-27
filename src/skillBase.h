@@ -9,6 +9,7 @@
 #include <memory>
 
 #include "cskill/trueskill.h"
+#include "metaData.h"
 
 namespace cute
 {
@@ -62,7 +63,8 @@ namespace cute
 			SkillBase(std::string l);
 
 			bool hasTag(std::string n);
-			SkillDatum getTag(std::string);
+			SkillDatum getTag(std::string n);
+			SkillDatum getTag(MetaData m);
 			bool setTag(SkillDatum sd);
 			void writeFile();
 
@@ -83,6 +85,7 @@ namespace cute
 
 		public:
 			SkillHandle(std::vector<std::string> p1, std::vector<std::string> p2,SkillBase* sb);
+			SkillHandle(MetaData m1, MetaData m2, SkillBase *sb);
 			void run();
 			void setTags();
 	};
