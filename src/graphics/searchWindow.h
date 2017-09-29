@@ -7,10 +7,15 @@
 #include "scalingImage.h"
 #include "../metaData.h"
 #include "../imageBase.h"
+#include <mutex>
+#include <thread>
+
 
 
 namespace cute
 {
+
+	static std::mutex m;
 	struct resizeData
 	{
 		Gtk::Image *image;
@@ -23,11 +28,15 @@ namespace cute
 	class SearchWindow : public Gtk::Window
 	{
 		protected:
+
+			std::vector<std::thread *> threads;
+
 			Glib::RefPtr<Gtk::Builder> builder;
 
 			Gtk::IconView *iconView;
 			Gtk::Entry *entry;
 			resizeData *image;
+			Gtk::ScrolledWindow *iconScroll;
 
 			std::vector<MetaData> *population;
 			cute::ImageBase *base;
@@ -45,6 +54,9 @@ namespace cute
 			void on_image_resize();
 			void on_icon_activated();
 			void entry_activated();
+
+			bool addThumb(Gtk::TreeModel::Path path);
+
 			void on_item_activated(const Gtk::TreeModel::Path &path);
 
 			void add_entry(const std::string &filename,int loc);
@@ -67,12 +79,14 @@ namespace cute
 					add(m_col_path);
 					add(m_col_data);
 					add(m_col_hasThumb);
+					add(m_col_thread);
 				}
 
 				Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf>> m_col_pixbuf;
 				Gtk::TreeModelColumn<std::string> m_col_name;
 				Gtk::TreeModelColumn<std::string> m_col_path;
 				Gtk::TreeModelColumn<int> m_col_hasThumb;
+				Gtk::TreeModelColumn<int> m_col_thread;
 				Gtk::TreeModelColumn<int> m_col_data;
 		};
 
