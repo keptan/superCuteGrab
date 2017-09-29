@@ -65,7 +65,7 @@ namespace cute
 		Glib::RefPtr<Gdk::Pixbuf> buf = Gdk::Pixbuf::create_from_file("icon.png");
 
 		auto row =*(refListModel->append());
-		row[m_Columns.m_col_name] = filename.substr(0,7);
+		row[m_Columns.m_col_name] = filename.substr(0,0);
 		row[m_Columns.m_col_path] = data.filePath().string();
 		row[m_Columns.m_col_data] = loc;
 		row[m_Columns.m_col_pixbuf] = buf;
@@ -124,7 +124,7 @@ namespace cute
 			buf  = Gdk::Pixbuf::create_from_file(loc);
 			m.unlock();
 			ratio = (double) buf->get_width() / buf->get_height();
-			buf = buf->scale_simple(64,64.0/ratio,Gdk::INTERP_BILINEAR);
+			buf = buf->scale_simple(84,84.0/ratio,Gdk::INTERP_BILINEAR);
 			m.lock();
 
 			row[m_Columns.m_col_pixbuf] = buf;
@@ -153,17 +153,17 @@ namespace cute
 		for(;start <= end;start.next())
 		{
 
+			/*
 			auto iter = refListModel->get_iter(start);
 			auto row = *iter;
-			/*for(auto &i:threads)
+			for(auto &i:threads)
 				i->join();
-				*/
 
 			if(!row[m_Columns.m_col_hasThumb]){
 			row[m_Columns.m_col_thread] = 1;
 			threads.push_back(new std::thread(sigc::mem_fun(*this,&SearchWindow::addThumb),start));
 			}
-			/*
+			*/
 			auto iter = refListModel->get_iter(start);
 			auto row = *iter;
 
@@ -175,13 +175,12 @@ namespace cute
 
 			buf  = Gdk::Pixbuf::create_from_file(loc);
 			ratio = (double) buf->get_width() / buf->get_height();
-			buf = buf->scale_simple(64,64.0/ratio,Gdk::INTERP_BILINEAR);
+			buf = buf->scale_simple(84,84.0/ratio,Gdk::INTERP_BILINEAR);
 
 			row[m_Columns.m_col_pixbuf] = buf;
 			row[m_Columns.m_col_hasThumb] = 1;
 
 			}
-			*/
 
 
 		}
@@ -222,7 +221,6 @@ namespace cute
 			++i;
 		}
 
-	
 
 		//add_entry("test.png",1);
 	}
