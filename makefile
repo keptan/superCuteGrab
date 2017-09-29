@@ -18,6 +18,9 @@ superCuteGrab.o: ./src/superCuteGrab.cpp
 searchWindow.o:
 	$(CC) $(CFLAG) -c ./src/graphics/searchWindow.cpp -o ./src/obj/searchWindow.o $(GTKC)
 
+scalingImage.o:
+	$(CC) $(CFLAG) -c ./src/graphics/scalingImage.cpp -o ./src/obj/scalingImage.o $(GTKC)
+
 graphics.o:
 	$(CC) $(CFLAG) -c ./src/graphics/graphics.cpp -o ./src/obj/graphics.o $(GTKC)
 

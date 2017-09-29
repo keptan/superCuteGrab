@@ -7,7 +7,6 @@
 #include "imageBase.h"
 
 #include <openssl/crypto.h>
-#include "graphics/graphics.h"
 #include "graphics/searchWindow.h"
 
 #include <curl/curl.h>
@@ -126,14 +125,8 @@ void skillTest(std::string p)
 void gtkTest(std::string l)
 {
 
-	cute::localGinit();
-	cute::CompareWindow win;
 
-	cute::MetaData *i1 = new cute::MetaData("tagged.png");
-	cute::MetaData *i2 = new cute::MetaData("testBoat.png");
 
-	i1->readTags();
-	i2->readTags();
 
 	cute::ImageBase base(l);
 	base.readDirectory();
@@ -144,7 +137,10 @@ void gtkTest(std::string l)
 	cute::SearchWindow *sw = 0;
 	builder->get_widget_derived("SearchWindow",sw);
 	sw->baseInit(&base);
+
+	sw->show_all();
 	kit.run(*sw);
+
 	
 	return;
 

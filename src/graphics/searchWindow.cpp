@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include "scalingImage.h"
 #include "../metaData.h"
 #include "../imageBase.h"
 #include "searchWindow.h"
@@ -14,11 +15,20 @@ namespace cute
 		:Gtk::Window(cobject)
 		,builder(refGlade)
 	{
-		builder->get_widget("iconview1",iconView);
-		builder->get_widget("image5",image);
-		builder->get_widget("entry1",entry);
-		refListModel = Gtk::ListStore::create(m_Columns);
 
+		image = new resizeData;
+		builder->get_widget("iconview1",iconView);
+		builder->get_widget("entry1",entry);
+
+		builder->get_widget("view",image->view);
+		builder->get_widget("scrollView",image->scrollView);
+		builder->get_widget("image",image->image);
+		builder->get_widget("aspect",image->aspect);
+
+		image->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::sizeChanged));
+
+
+		refListModel = Gtk::ListStore::create(m_Columns);
 
 
 
@@ -31,13 +41,15 @@ namespace cute
 		base->filter("");
 		population = base->collectImages();
 
-		std::cout<<population->size()<<" "<<(*population)[population->size()-1].fileName()<<'\n';
 
 		iconView->set_model(refListModel);
 		iconView->set_markup_column(m_Columns.m_col_name);
 		iconView->set_pixbuf_column(m_Columns.m_col_pixbuf);
 		iconView->signal_item_activated().connect(sigc::mem_fun(*this,&SearchWindow::on_item_activated));
+		iconView->signal_scroll_event().connect(sigc::mem_fun(*this,&SearchWindow::on_scroll));
+
 		entry->signal_activate().connect(sigc::mem_fun(*this,&SearchWindow::entry_activated));
+
 
 
 	}
@@ -45,19 +57,23 @@ namespace cute
 	void SearchWindow :: add_entry(const std::string &filename, int loc)
 	{
 
+
 		MetaData data = (*population)[loc];
+		Glib::RefPtr<Gdk::Pixbuf> buf = Gdk::Pixbuf::create_from_file("icon.png");
 
 		auto row =*(refListModel->append());
-		row[m_Columns.m_col_name] = filename;
-		row[m_Columns.m_col_path] = filename;
+		row[m_Columns.m_col_name] = filename.substr(0,7);
+		row[m_Columns.m_col_path] = data.filePath().string();
 		row[m_Columns.m_col_data] = loc;
-		row[m_Columns.m_col_pixbuf] = Gdk::Pixbuf::create_from_file(filename);
+		row[m_Columns.m_col_pixbuf] = buf;
 
+		row[m_Columns.m_col_hasThumb] = 0;
 	}
 
 
 	void SearchWindow :: on_item_activated(const Gtk::TreeModel::Path &path)
 	{
+
 		auto iter = refListModel->get_iter(path);
 		auto row = *iter;
 
@@ -67,14 +83,67 @@ namespace cute
 
 		MetaData localData = (*population)[i];
 
-		std::cout<<localData.fileName()<<'\n';
+		newImageBox(localData.filePath().string());
+
+		image->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::sizeChangedII));
+		busy = false;
+
+		/*
+		delete(apsi);
+		apsi = new 	AspectPreservingScalingImage(Gdk::Pixbuf::create_from_file(localData.filePath().string()));
+		imageWindow->add(*apsi);
+		imageWindow->show_all();
+		*/
+
+
 
 	}
 
+	bool SearchWindow :: on_scroll(GdkEventScroll *e)
+	{
+		Gtk::TreeModel::Path start;
+		Gtk::TreeModel::Path end;
+
+		Glib::RefPtr<Gdk::Pixbuf> buf;	
+		iconView->get_visible_range(start,end);
+		double ratio;
+	
+		for(;start <= end;start.next())
+		{
+		auto iter = refListModel->get_iter(start);
+		auto row = *iter;
+
+		int i = row[m_Columns.m_col_data];
+		const std::string loc = row[m_Columns.m_col_path];
+		const std::string name = row[m_Columns.m_col_path];
+
+		if(!row[m_Columns.m_col_hasThumb]){
+
+		buf  = Gdk::Pixbuf::create_from_file(loc);
+		ratio = (double) buf->get_width() / buf->get_height();
+		buf = buf->scale_simple(64,64.0/ratio,Gdk::INTERP_BILINEAR);
+
+		row[m_Columns.m_col_pixbuf] = buf;
+		row[m_Columns.m_col_hasThumb] = 1;
+		}
+
+
+
+
+		}
+		return false;
+	}
+
+
+
+
+
+		
 	void SearchWindow :: entry_activated()
 	{
 		std::string data = entry->get_text();
 		populate(data);
+
 		return;
 	}
 	void SearchWindow :: populate(std::string t)
@@ -91,17 +160,107 @@ namespace cute
 		while(i < population->size())
 		{
 			MetaData localData = (*population)[i];
-			std::cout<<localData.fileName()<<'\n';
-			add_entry("test.png",i);
+			add_entry(localData.fileName(),i);
 			++i;
 		}
+
 	
 
 		//add_entry("test.png",1);
 	}
 
+
+	void SearchWindow :: sizeChanged(Gtk::Allocation& allocation)
+	{
+		if(busy)
+			return;
+
+		Gtk::Image * imagePixbuf = image->image;
+
+		
+		if(sized){
+		
+		if (allocation.get_width() -2  != image->image->get_width() -2 ||
+			allocation.get_height() -2 !=  image->image->get_width()-2){
+
+				image->image->set(image->sourcePixbuf->scale_simple(
+				allocation.get_width() -2,
+				allocation.get_height() -2,
+				Gdk::INTERP_BILINEAR));
+
+
+		}
+		sized = false;
+		return;
+		}
+		sized = true;
+		return;
+	}
+	void SearchWindow :: sizeChangedII(Gtk::Allocation& allocation)
+	{
+	
+		return;
+	}
+
+
+	resizeData *SearchWindow :: newImageBox(std::string i)
+	{
+				
+		busy = true;
+		image->sourcePixbuf = Gdk::Pixbuf::create_from_file(i);
+	
+
+		int width = image->sourcePixbuf->get_width();
+		int height = image->sourcePixbuf->get_height();
+		float ratio = (float)width/ (float) height;
+
+
+		image->aspect->set(Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER,ratio,FALSE);
+		image->aspect->set_shadow_type(Gtk::SHADOW_NONE);
+		image->image->set(image->sourcePixbuf);
+
+		
+		return image;
+
+	}
+
+
+
 };
 /*
+
+gboolean  resize_image(GtkWidget *widget, GdkEvent *event, GtkWindow *window)
+	{
+		GdkPixbuf *pixbuf = gtk_image_get_pixbuf(GTK_IMAGE(widget));
+		
+		pixbuf = gdk_pixbuf_scale_simple(pixbuf,widget->allocation.width -2,widget->allocation.height -2, GDK_INTERP_BILINEAR);
+
+		gtk_image_set_from_pixbuf(GTK_IMAGE(widget),pixbuf);
+
+		return FALSE;
+	}
+
+	gboolean sizeChanged(GtkWidget *widget, GtkAllocation *allocation, resizeData *data)
+	{
+		GdkPixbuf *sourcePixbuf = data->sourcePixbuf;
+		GdkPixbuf *imagePixbuf;
+
+		imagePixbuf = gtk_image_get_pixbuf(GTK_IMAGE(data->image));
+		
+		if (allocation->width -2  != gdk_pixbuf_get_width(imagePixbuf)||
+				allocation->height -2 != gdk_pixbuf_get_height(imagePixbuf)){
+			gtk_image_set_from_pixbuf(
+					GTK_IMAGE(data->image),
+					gdk_pixbuf_scale_simple(sourcePixbuf,
+						allocation->width -2,
+						allocation->height -2,
+						GDK_INTERP_BILINEAR)
+			);
+				g_object_unref(imagePixbuf);
+		}
+		return FALSE;
+	}
+
 
 void entry_activated(GtkWidget *w,SearchWindow *user_data)
 {

@@ -4,24 +4,36 @@
 #include <gtkmm.h>
 #include <string>
 #include <vector>
+#include "scalingImage.h"
 #include "../metaData.h"
 #include "../imageBase.h"
 
 
 namespace cute
 {
-
+	struct resizeData
+	{
+		Gtk::Image *image;
+		Gtk::Viewport *view;
+		Gtk::ScrolledWindow *scrollView;
+		Gtk::AspectFrame *aspect;
+		Glib::RefPtr<Gdk::Pixbuf> sourcePixbuf;
+	};
+	
 	class SearchWindow : public Gtk::Window
 	{
 		protected:
 			Glib::RefPtr<Gtk::Builder> builder;
 
 			Gtk::IconView *iconView;
-			Gtk::Image *image;
 			Gtk::Entry *entry;
+			resizeData *image;
 
 			std::vector<MetaData> *population;
 			cute::ImageBase *base;
+
+			bool sized = true;
+			bool busy = true;
 
 		public:
 
@@ -36,6 +48,13 @@ namespace cute
 			void on_item_activated(const Gtk::TreeModel::Path &path);
 
 			void add_entry(const std::string &filename,int loc);
+			bool on_scroll(GdkEventScroll *e);
+			resizeData *newImageBox(std::string i);
+
+			void sizeChanged(Gtk::Allocation& allocation);
+
+			void sizeChangedII(Gtk::Allocation& allocation);
+
 
 
 		class ModelColumns : public Gtk::TreeModel::ColumnRecord
@@ -47,11 +66,13 @@ namespace cute
 					add(m_col_pixbuf);
 					add(m_col_path);
 					add(m_col_data);
+					add(m_col_hasThumb);
 				}
 
 				Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf>> m_col_pixbuf;
 				Gtk::TreeModelColumn<std::string> m_col_name;
 				Gtk::TreeModelColumn<std::string> m_col_path;
+				Gtk::TreeModelColumn<int> m_col_hasThumb;
 				Gtk::TreeModelColumn<int> m_col_data;
 		};
 
