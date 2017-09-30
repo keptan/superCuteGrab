@@ -107,6 +107,8 @@ namespace cute
 		Exiv2::Value::AutoPtr v = Exiv2::Value::create(Exiv2::string);
 
 		for(auto element : tags){
+
+		std::replace( element.begin(), element.end(), ' ', '_');
 		v->read(element);
 
 		iptcData.add(Exiv2::IptcKey("Iptc.Application2.Keywords") , v.get());
