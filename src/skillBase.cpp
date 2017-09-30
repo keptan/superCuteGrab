@@ -190,8 +190,8 @@ localTags.sort([](const auto & a, const auto & b) { return a.mu < b.mu; });
 namespace cute
 {
 
-	SkillHandle :: SkillHandle(MetaData m1, MetaData m2, SkillBase* sb)
-		:base(sb)
+	SkillHandle :: SkillHandle(MetaData m1, MetaData m2, SkillBase* sb,int t)
+		:base(sb),tie(t)
 	{
 
 		int i =0;
@@ -199,6 +199,12 @@ namespace cute
 		int team1mu = 0;
 		int team2mu = 0;
 		int team3mu = 0;
+
+		std::cout<<"num in t1"<<team1.size()<<'\n';
+
+		std::cout<<"num in t2"<<team2.size()<<'\n';
+
+		std::cout<<"num in t3"<<team3.size()<<'\n';
 
 		std::vector<std::string> p1 = m1.getTags();
 		std::vector<std::string> p2 = m2.getTags();
@@ -254,7 +260,11 @@ namespace cute
 	SkillDatum sd("meta",team3mu,team3mu/3,0);
 			team3.push_back(sd);
 
+
 		}
+
+
+
 
 	}
 
@@ -274,6 +284,7 @@ void addPlayer( double mu, double sigma, double team, double weight, double iden
 
 	void SkillHandle :: run()
 	{
+		players.clear();
 		std::vector<SkillDatum*> iplayers;
 		int skillId = 0;
 
@@ -281,15 +292,16 @@ void addPlayer( double mu, double sigma, double team, double weight, double iden
 			i.setTeam(1);
 			i.setId(skillId++);
 			i.iterateCount();
+
 			iplayers.push_back(&i);
 		}
 
 		for(auto &i : team2){
 			i.setTeam(2);
 			i.setId(skillId++);
-			i.iterateCount();
 
 			i.iterateCount();
+
 			iplayers.push_back(&i);
 
 		}
@@ -300,6 +312,10 @@ void addPlayer( double mu, double sigma, double team, double weight, double iden
 			i.setId(skillId++);
 			i.iterateCount();
 
+
+			std::cout<<"team3: "<<i.getName()<<" "<<i.getMu()<<'\n';
+
+
 			iplayers.push_back(&i);
 
 		}
@@ -308,11 +324,18 @@ void addPlayer( double mu, double sigma, double team, double weight, double iden
 			addPlayer(p->getMu(),p->getSigma(),p->getTeam(),1,p->getId());
 
 
-
 	std::vector< int > ranks;
+
+	if(tie < 0)
+	{
+	ranks.push_back(0);
+	ranks.push_back(0);
+	ranks.push_back(0);
+	}else{
 	ranks.push_back(0);
 	ranks.push_back(2);
 	ranks.push_back(1);
+	}
 
 	int teams = 3;
 
@@ -323,6 +346,8 @@ void addPlayer( double mu, double sigma, double team, double weight, double iden
 		for(auto p : players){
 			if(i->getId() == p[4])
 			{
+
+				std::cout<<i->getTeam() << " " << i->getName()<<" "<<i->getMu()<<" "<<p[0]<<'\n';
 				i->setMu(p[0]);
 				i->setSigma(p[1]);
 			}

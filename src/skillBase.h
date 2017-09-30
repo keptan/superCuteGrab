@@ -91,12 +91,14 @@ namespace cute
 			std::vector<SkillDatum> team3;
 			SkillBase* base;
 
+			int tie = 0;
+
 
 			void prepareTeams();
 
 		public:
 			SkillHandle(std::vector<std::string> p1, std::vector<std::string> p2,SkillBase* sb);
-			SkillHandle(MetaData m1, MetaData m2, SkillBase *sb);
+			SkillHandle(MetaData m1, MetaData m2, SkillBase *sb,int t = 0);
 			void run();
 			void setTags();
 	};

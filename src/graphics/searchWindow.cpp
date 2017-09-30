@@ -425,6 +425,8 @@ namespace cute
 			rightCount = 0;
 			leftCount = 0;
 
+			base->runElo(*image->data,*image2->data,-1);
+
 			image2->data = new MetaData(base->findMatch(*image->data,-1));
 			rightImageBox(image2->data->filePath().string());
 			image->data = new MetaData(base->findMatch(*image2->data,-1));
