@@ -174,6 +174,7 @@ namespace cute
 	{
 		MetaData::addTag("MD5:"+Image::getHash());
 		MetaData::addTag("booruTags");
+		MetaData::addTag(Image::filePath().parent_path().filename().string());
 		for(auto s : docTags)
 			MetaData::addTag(s);
 

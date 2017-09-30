@@ -97,15 +97,17 @@ void skillTest(std::string p)
 }
 
 
-void gtkTest(std::string l)
+void gtkTest(int argc, char *const argv[])
 {
 
 
 
 
 	cute::SkillBase sBase("database");
-	cute::ImageBase base(l,&sBase);
+	cute::ImageBase base(argv[2],&sBase);
 	base.readDirectory();
+	if(argc = 4)
+	base.readDirectory(argv[3]);
 
 	Gtk::Main kit(NULL,NULL);
 	Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create_from_file("window.glade");
@@ -226,6 +228,16 @@ int danTest(std::string p)
 				runDoc(interfaces.back(),1);
 				if(interfaces.back()->read())
 				std::cout<<"Tags found! "<< std::endl;
+				if(!(interfaces.back()->readDocTags())){
+			f++;
+			std::cout<<interfaces.back()->fileName()<<' ';
+			interfaces.back()->printDocTags();
+			std::cout<<"...\n";
+			interfaces.back()->writeDocTags();
+
+
+		}
+
 			}
 		}else{
 
@@ -269,7 +281,7 @@ int danTest(std::string p)
 			std::cout<<n->fileName()<<' ';
 			n->printDocTags();
 			std::cout<<"...\n";
-			n->writeDocTags();
+			//n->writeDocTags();
 
 
 		}
@@ -300,6 +312,7 @@ int scanPreviouslyTagged(std::string p)
 
 
 		if(	loop.tagged()){
+			loop.removeDup();
 
 			std::cout<<"found tagged" << " in directory "<<p.path()<<'\n';
 		}
@@ -364,9 +377,12 @@ int main(int argc, char *const argv[])
 
 	else if(argv[1] == (std::string)"danTest")
 	danTest(argv[2]);
+
+	else if(argv[1] == (std::string)"removeDup")
+	scanPreviouslyTagged(argv[2]);
 	
 	else if(argv[1] == (std::string)"gtkTest")
-	gtkTest(argv[2]);
+	gtkTest(argc,argv);
 
 	else if(argv[1] == (std::string)"searchTest")
 	directoryScan(argv[2],argv[3]);

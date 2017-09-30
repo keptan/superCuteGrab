@@ -175,7 +175,7 @@ namespace cute
 
 	void SkillBase :: writeFile()
 	{
-localTags.sort([](const auto & a, const auto & b) { return a.mu < b.mu; });
+localTags.sort([]( auto & a,  auto & b) { return ((a.mu*a.mu)/a.getSigma()) < ((b.mu*b.mu)/b.getSigma()); });
 		
 
 		std::ofstream db(loc);
@@ -313,7 +313,6 @@ void addPlayer( double mu, double sigma, double team, double weight, double iden
 			i.iterateCount();
 
 
-			std::cout<<"team3: "<<i.getName()<<" "<<i.getMu()<<'\n';
 
 
 			iplayers.push_back(&i);
@@ -347,7 +346,6 @@ void addPlayer( double mu, double sigma, double team, double weight, double iden
 			if(i->getId() == p[4])
 			{
 
-				std::cout<<i->getTeam() << " " << i->getName()<<" "<<i->getMu()<<" "<<p[0]<<'\n';
 				i->setMu(p[0]);
 				i->setSigma(p[1]);
 			}

@@ -48,7 +48,6 @@ namespace cute
 	{
 
 		base = b;
-		base->readDirectory();
 		base->filter("");
 		population = base->collectImages();
 
@@ -415,6 +414,8 @@ namespace cute
 		image2->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::rightsizeChangedII));
 		busy = false;
 		mansizeChanged();
+
+					return true;
 			   
 			}
 
@@ -441,6 +442,8 @@ namespace cute
 		image2->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::rightsizeChangedII));
 		busy = false;
 		mansizeChanged();
+
+					return true;
 			   
 			}
 
@@ -464,11 +467,22 @@ namespace cute
 
 		mansizeChanged();
 
+					return true;
+
 			   
 			}
+		if( event->hardware_keycode == 65 || event->hardware_keycode == 116){
+			 		mansizeChanged();
+					return true;
+
+			   
+			}
+		else{
+			std::cout<<event->hardware_keycode<<'\n';
+		}
 		
 			
-	return true;
+	return false;
 
 	}
 

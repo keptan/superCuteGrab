@@ -37,6 +37,7 @@ namespace cute
 			void addTag(std::string);
 			void clearTags();
 			void writeTags();
+			void removeDup();
 			//int addTag(std::vector<std::string>);
 
 

@@ -78,6 +78,49 @@ namespace cute
 		tags.clear();
 	}
 
+	void MetaData :: removeDup()
+	{
+		readTags();
+		time_t mtime;
+		struct stat attrib;
+		struct utimbuf new_times;
+
+		mtime = attrib.st_mtime;
+
+		new_times.modtime = attrib.st_mtime;
+		new_times.actime = time(NULL);
+
+		std::sort(tags.begin(), tags.end());
+		auto last = std::unique(tags.begin(), tags.end());
+		tags.erase(last, tags.end());
+
+
+		stat(Image::filePath().string().c_str(),&attrib);
+
+
+		Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(Image::filePath());
+		image.get();
+		//image->readMetadata();
+		Exiv2::IptcData iptcData;
+
+
+		Exiv2::Value::AutoPtr v = Exiv2::Value::create(Exiv2::string);
+
+		for(auto element : tags){
+		v->read(element);
+
+		iptcData.add(Exiv2::IptcKey("Iptc.Application2.Keywords") , v.get());
+		}
+
+		image->setIptcData(iptcData);
+		image->writeMetadata(); //replace with modifying tag list vector and write with seperate method
+
+		utime(Image::filePath().string().c_str(),&new_times);
+
+
+
+	}
+
 	void MetaData :: writeTags()
 	{	
 		time_t mtime;
