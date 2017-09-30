@@ -9,8 +9,8 @@ TSOBN=  trueskill.o matrix.o gaussian.o basemath.o factorgraph.o
 
 all: superCuteGrab
 
-superCuteGrab: superCuteGrab.o image.o metaData.o booruInterface.o skillBase.o imageBase.o graphics.o searchWindow.o $(TSOBN)
-	$(CC) ./src/obj/superCuteGrab.o ./src/obj/image.o ./src/obj/metaData.o ./src/obj/booruInterface.o ./src/obj/skillBase.o ./src/obj/imageBase.o ./src/obj/graphics.o ./src/obj/searchWindow.o $(TSOB) $(GTKL)  -lcurl -ljsoncpp -lexiv2 -lstdc++fs -lcrypto -lssl $(TSLIB)  -o cuteGrab -g
+superCuteGrab: superCuteGrab.o image.o metaData.o booruInterface.o skillBase.o imageBase.o  searchWindow.o $(TSOBN)
+	$(CC) ./src/obj/superCuteGrab.o ./src/obj/image.o ./src/obj/metaData.o ./src/obj/booruInterface.o ./src/obj/skillBase.o ./src/obj/imageBase.o  ./src/obj/searchWindow.o $(TSOB) $(GTKL)  -lcurl -ljsoncpp -lexiv2 -lstdc++fs -lcrypto -lssl $(TSLIB)  -o cuteGrab -g
 
 superCuteGrab.o: ./src/superCuteGrab.cpp
 	$(CC) $(CFLAG)  -c ./src/superCuteGrab.cpp -o ./src/obj/superCuteGrab.o  -lcrypto -lssl  $(GTKC)
@@ -21,8 +21,6 @@ searchWindow.o:
 scalingImage.o:
 	$(CC) $(CFLAG) -c ./src/graphics/scalingImage.cpp -o ./src/obj/scalingImage.o $(GTKC)
 
-graphics.o:
-	$(CC) $(CFLAG) -c ./src/graphics/graphics.cpp -o ./src/obj/graphics.o $(GTKC)
 
 
 booruInterface.o:

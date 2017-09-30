@@ -74,37 +74,12 @@ static void kill_locks(void)
 
 void skillTest(std::string p)
 {
-/*
+	/*
 	cute::SkillBase sb("dataBase");
 	int found = 0;
 	std::vector<std::string> p1;
 	std::vector<std::string> p2;
 
-	for(auto& p: fs::recursive_directory_iterator(p)){
-
-		if (p.path().extension() == ".jpg" || p.path().extension()  == ".png"){
-
-
-		cute::MetaData loop(p.path());
-		loop.readTags();
-
-
-		if(	loop.tagged()){
-
-			std::cout<<"found tagged" << " in directory "<<p.path()<<'\n';
-			if(found == 0)
-			p1 = loop.getTags();
-			else
-			p2 = loop.getTags();
-
-
-			found++;
-			if (found > 1)
-				break;
-			}
-		}
-		
-	}
 
 	std::cout<<"creating skillhandle\n";
 	cute::SkillHandle sh(p1,p2,&sb);
@@ -116,7 +91,7 @@ void skillTest(std::string p)
 	std::cout<<"writing to file\n";
 	sb.writeFile();
 
-*/
+	*/
 
 
 }
@@ -128,7 +103,8 @@ void gtkTest(std::string l)
 
 
 
-	cute::ImageBase base(l);
+	cute::SkillBase sBase("database");
+	cute::ImageBase base(l,&sBase);
 	base.readDirectory();
 
 	Gtk::Main kit(NULL,NULL);
@@ -368,8 +344,10 @@ int booruScan(std::string p)
 
 int baseTest(std::string l)
 {
+	/*
 	cute::ImageBase base(l);
 	base.readDirectory();
+	*/
 
 
 }

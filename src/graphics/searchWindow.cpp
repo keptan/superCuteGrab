@@ -18,6 +18,8 @@ namespace cute
 	{
 
 		image = new resizeData;
+		image2 = new resizeData;
+
 		builder->get_widget("iconview1",iconView);
 		builder->get_widget("entry1",entry);
 		builder->get_widget("iconScroll",iconScroll);
@@ -27,14 +29,21 @@ namespace cute
 		builder->get_widget("image",image->image);
 		builder->get_widget("aspect",image->aspect);
 
+		builder->get_widget("view1",image2->view);
+		builder->get_widget("scrollView1",image2->scrollView);
+		builder->get_widget("image1",image2->image);
+		builder->get_widget("aspect1",image2->aspect);
+
+
+
+		//image2->view->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::rightsizeChanged));
 		image->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::sizeChanged));
+		//image2->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::rightsizeChanged));
 
 
 		refListModel = Gtk::ListStore::create(m_Columns);
-
-
-
 	}
+
 	void SearchWindow :: baseInit(ImageBase *b)
 	{
 
@@ -86,11 +95,21 @@ namespace cute
 		const std::string loc = row[m_Columns.m_col_path];
 		const std::string name = row[m_Columns.m_col_path];
 
-		MetaData localData = (*population)[i];
+		busy = true;
 
-		newImageBox(localData.filePath().string());
+
+		image->data = new MetaData((*population)[i]);
+	   	image2->data = new MetaData(base->findMatch(*image->data));
+
+
+		newImageBox(image->data->filePath().string());
+		rightImageBox(image2->data->filePath().string());
+
+
+		this->signal_key_press_event().connect(sigc::mem_fun(*this, &SearchWindow::onKeyPress), false);
 
 		image->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::sizeChangedII));
+		image2->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::rightsizeChangedII));
 		busy = false;
 
 		/*
@@ -226,24 +245,34 @@ namespace cute
 	}
 
 
-	void SearchWindow :: sizeChanged(Gtk::Allocation& allocation)
+	void SearchWindow :: sizeChanged(Gtk::Allocation& a)
 	{
 		if(busy)
 			return;
+
+		Gtk::Allocation& allocation = a;
 
 		Gtk::Image * imagePixbuf = image->image;
 
 		
 		if(sized){
 		
-		if (allocation.get_width() -2  != image->image->get_width() -2 ||
-			allocation.get_height() -2 !=  image->image->get_width()-2){
+		if (allocation.get_width() -4  != image->image->get_width() -4 ||
+			allocation.get_height() -4 !=  image->image->get_width()-4){
 
 				image->image->set(image->sourcePixbuf->scale_simple(
-				allocation.get_width() -2,
-				allocation.get_height() -2,
+				allocation.get_width() -4,
+				allocation.get_height() -4,
 				Gdk::INTERP_BILINEAR));
 
+				 imagePixbuf = image2->image;
+				 allocation = image2->scrollView->get_allocation();
+
+		
+				image2->image->set(image2->sourcePixbuf->scale_simple(
+				allocation.get_width() -4,
+				allocation.get_height() -4,
+				Gdk::INTERP_BILINEAR));
 
 		}
 		sized = false;
@@ -252,7 +281,71 @@ namespace cute
 		sized = true;
 		return;
 	}
+	void SearchWindow :: mansizeChanged()
+	{
+		if(busy)
+			return;
+
+		Gtk::Allocation allocation;
+		allocation= image->scrollView->get_allocation();
+
+		Gtk::Image * imagePixbuf = image->image;
+
+		
+		if(sized){
+		
+		if (allocation.get_width() -4  != image->image->get_width() -4 ||
+			allocation.get_height() -4 !=  image->image->get_width()-4){
+
+				image->image->set(image->sourcePixbuf->scale_simple(
+				allocation.get_width() -4,
+				allocation.get_height() -4,
+				Gdk::INTERP_BILINEAR));
+
+				 imagePixbuf = image2->image;
+				 allocation = image2->scrollView->get_allocation();
+
+		
+				image2->image->set(image2->sourcePixbuf->scale_simple(
+				allocation.get_width() -4,
+				allocation.get_height() -4,
+				Gdk::INTERP_BILINEAR));
+
+		}
+		sized = false;
+		return;
+		}
+		sized = true;
+		return;
+	}
+
+
+
+/*	void SearchWindow :: rightsizeChanged(Gtk::Allocation& allocation)
+	{
+		if(busy)
+			return;
+
+	
+		}
+		sized = false;
+		return;
+		}
+		sized = true;
+		return;
+	}
+	*/
 	void SearchWindow :: sizeChangedII(Gtk::Allocation& allocation)
+	{
+	
+		return;
+	}
+	void SearchWindow :: rightsizeChangedII(Gtk::Allocation& allocation)
+	{
+	
+		return;
+	}
+	void SearchWindow :: imageClicked()
 	{
 	
 		return;
@@ -280,6 +373,102 @@ namespace cute
 
 	}
 
+	resizeData *SearchWindow :: rightImageBox(std::string i)
+	{
+				
+		busy = true;
+		image2->sourcePixbuf = Gdk::Pixbuf::create_from_file(i);
+	
+
+		int width = image2->sourcePixbuf->get_width();
+		int height = image2->sourcePixbuf->get_height();
+		float ratio = (float)width/ (float) height;
+
+
+		image2->aspect->set(Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER,ratio,FALSE);
+		image2->aspect->set_shadow_type(Gtk::SHADOW_NONE);
+		image2->image->set(image2->sourcePixbuf);
+
+		
+		return image2;
+
+	}
+
+	bool SearchWindow :: onKeyPress(GdkEventKey *event)
+	{
+		if( event->hardware_keycode == 113){
+			   std::cout<<"left key";
+		mansizeChanged();
+
+			leftCount++;
+			rightCount = 0;
+
+			image2->data = new MetaData(base->findMatch(*image->data,-1));
+
+			rightImageBox(image2->data->filePath().string());
+
+			base->runElo(*image->data,*image2->data);
+
+	
+
+		image->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::sizeChangedII));
+		image2->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::rightsizeChangedII));
+		busy = false;
+		mansizeChanged();
+			   
+			}
+
+	if( event->hardware_keycode == 111){
+			   std::cout<<"up? ";
+			mansizeChanged();
+
+			rightCount = 0;
+			leftCount = 0;
+
+			image2->data = new MetaData(base->findMatch(*image->data,-1));
+			rightImageBox(image2->data->filePath().string());
+			image->data = new MetaData(base->findMatch(*image2->data,-1));
+			newImageBox(image->data->filePath().string());
+
+
+			//base->runElo(*image->data,*image2->data);
+
+	
+
+		image->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::sizeChangedII));
+		image2->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::rightsizeChangedII));
+		busy = false;
+		mansizeChanged();
+			   
+			}
+
+		if( event->hardware_keycode == 114){
+			   std::cout<<"right key";
+
+
+		rightCount++;
+			leftCount = 0;
+			base->runElo(*image2->data,*image->data);
+
+	
+
+			image->data = new MetaData(base->findMatch(*image2->data,-1));
+
+	newImageBox(image->data->filePath().string());
+
+		image->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::sizeChangedII));
+		image2->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::rightsizeChangedII));
+		busy = false;
+
+		mansizeChanged();
+
+			   
+			}
+		
+			
+	return true;
+
+	}
 
 
 };

@@ -74,9 +74,9 @@ namespace cute
 		image->aspect =  GTK_WIDGET(gtk_builder_get_object(builder,"aspectframe1"));
 		}
 		else{	
-		image->image =  GTK_WIDGET(gtk_builder_get_object(builder,"image2"));
-		image->viewport = GTK_WIDGET(gtk_builder_get_object(builder,"viewport2"));
-		image->aspect =  GTK_WIDGET(gtk_builder_get_object(builder,"aspectframe2"));
+		image2->image =  GTK_WIDGET(gtk_builder_get_object(builder,"image2"));
+		image2->viewport = GTK_WIDGET(gtk_builder_get_object(builder,"viewport2"));
+		image2->aspect =  GTK_WIDGET(gtk_builder_get_object(builder,"aspectframe2"));
 		}
 
 		

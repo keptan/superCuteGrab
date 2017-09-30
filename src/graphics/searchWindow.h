@@ -23,6 +23,7 @@ namespace cute
 		Gtk::ScrolledWindow *scrollView;
 		Gtk::AspectFrame *aspect;
 		Glib::RefPtr<Gdk::Pixbuf> sourcePixbuf;
+		MetaData *data;
 	};
 	
 	class SearchWindow : public Gtk::Window
@@ -35,7 +36,13 @@ namespace cute
 
 			Gtk::IconView *iconView;
 			Gtk::Entry *entry;
+
 			resizeData *image;
+			resizeData *image2;
+
+			MetaData *metaData;
+			MetaData *metaData2;
+
 			Gtk::ScrolledWindow *iconScroll;
 
 			std::vector<MetaData> *population;
@@ -53,6 +60,8 @@ namespace cute
 			void populate();
 			void on_image_resize();
 			void on_icon_activated();
+			int leftCount = 0;
+			int rightCount = 0;
 			void entry_activated();
 
 			bool addThumb(Gtk::TreeModel::Path path);
@@ -63,9 +72,20 @@ namespace cute
 			bool on_scroll(GdkEventScroll *e);
 			resizeData *newImageBox(std::string i);
 
+			void rightsizeChanged(Gtk::Allocation& allocation);
+
+			resizeData *rightImageBox(std::string i);
+
 			void sizeChanged(Gtk::Allocation& allocation);
 
+			void mansizeChanged();
+
+			void imageClicked();
+
 			void sizeChangedII(Gtk::Allocation& allocation);
+
+			void rightsizeChangedII(Gtk::Allocation& allocation);
+			bool onKeyPress(GdkEventKey *event);
 
 
 

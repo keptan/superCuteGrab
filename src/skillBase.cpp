@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 
-
+#include <algorithm>  
 #include "cskill/trueskill.h"
 #include "skillBase.h"
 #include "metaData.h"
@@ -112,6 +112,7 @@ namespace cute
 	bool SkillBase :: readFile()
 	{
 		std::fstream db;
+		localTags.clear();
 		db.open(loc);
 
 		db.clear();
@@ -174,6 +175,8 @@ namespace cute
 
 	void SkillBase :: writeFile()
 	{
+localTags.sort([](const auto & a, const auto & b) { return a.mu < b.mu; });
+		
 
 		std::ofstream db(loc);
 		for(auto sd: localTags){

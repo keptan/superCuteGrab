@@ -20,7 +20,6 @@ namespace cute
 			int id;
 			int count;
 			int team;
-			double mu;
 			double sigma;
 			double rank;
 			bool dup;
@@ -31,6 +30,8 @@ namespace cute
 			SkillDatum(std::string n,double m = 100, double s = 33, double c = 0);
 			
 			double getMu();
+
+			double mu;
 			int getId();
 			double getSigma();
 			int getCount();
@@ -44,6 +45,16 @@ namespace cute
 			void setId(int i);
 			bool  isDup();
 			void setDup(bool d);
+			bool operator < (const SkillDatum& str) const
+			{
+				return (mu < str.mu);
+			}
+			bool operator > (const SkillDatum& str) const
+			{
+				return (mu > str.mu);
+			}
+
+
 
 
 
