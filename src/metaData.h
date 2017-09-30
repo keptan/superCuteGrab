@@ -29,6 +29,7 @@ namespace cute
 
 			void printTags();
 			int readTags();
+			//int tempMu;
 
 			std::vector<std::string> getTags();
 
@@ -38,6 +39,7 @@ namespace cute
 			void clearTags();
 			void writeTags();
 			void removeDup();
+			
 			//int addTag(std::vector<std::string>);
 
 

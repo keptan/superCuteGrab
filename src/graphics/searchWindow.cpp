@@ -402,11 +402,21 @@ namespace cute
 			leftCount++;
 			rightCount = 0;
 
-			image2->data = new MetaData(base->findMatch(*image->data,-1));
+			base->runElo(*image->data,*image2->data);
 
+			image2->data = new MetaData(base->findMatch(*image->data,-1));
 			rightImageBox(image2->data->filePath().string());
 
-			base->runElo(*image->data,*image2->data);
+			if(leftCount > 10){
+
+			leftCount = 0;
+			image->data = new MetaData(base->findMatch(*image2->data,-1));
+	newImageBox(image->data->filePath().string());
+			}
+
+
+
+
 
 	
 
@@ -451,15 +461,22 @@ namespace cute
 			   std::cout<<"right key";
 
 
-		rightCount++;
+			rightCount++;
 			leftCount = 0;
 			base->runElo(*image2->data,*image->data);
 
-	
 
 			image->data = new MetaData(base->findMatch(*image2->data,-1));
+			newImageBox(image->data->filePath().string());
 
-	newImageBox(image->data->filePath().string());
+			if(rightCount > 10){
+			rightCount = 0;
+			image2->data = new MetaData(base->findMatch(*image->data,-1));
+			rightImageBox(image2->data->filePath().string());
+			}
+
+
+
 
 		image->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::sizeChangedII));
 		image2->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::rightsizeChangedII));

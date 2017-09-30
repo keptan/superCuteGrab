@@ -106,8 +106,14 @@ void gtkTest(int argc, char *const argv[])
 	cute::SkillBase sBase("database");
 	cute::ImageBase base(argv[2],&sBase);
 	base.readDirectory();
-	if(argc = 4)
-	base.readDirectory(argv[3]);
+
+	int i = 3;
+	while(argc >= 4){
+	base.readDirectory(argv[i]);
+	argc--;
+	i++;
+	
+	}
 
 	Gtk::Main kit(NULL,NULL);
 	Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create_from_file("window.glade");

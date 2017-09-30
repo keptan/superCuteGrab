@@ -200,11 +200,6 @@ namespace cute
 		int team2mu = 0;
 		int team3mu = 0;
 
-		std::cout<<"num in t1"<<team1.size()<<'\n';
-
-		std::cout<<"num in t2"<<team2.size()<<'\n';
-
-		std::cout<<"num in t3"<<team3.size()<<'\n';
 
 		std::vector<std::string> p1 = m1.getTags();
 		std::vector<std::string> p2 = m2.getTags();
@@ -229,6 +224,8 @@ namespace cute
 			}
 
 		}
+if(team1.size() != 0 && team2.size() != 0)
+		{
 		team1mu = team1mu / i;
 		team3mu = team3mu / x;
 		i =0;
@@ -243,6 +240,7 @@ namespace cute
 		}
 		team2mu = team2mu / i;
 		i =0;
+
 
 		while(team1.size() < team2.size()){
 			SkillDatum sd("meta",team1mu,team1mu/3,0);
@@ -261,6 +259,7 @@ namespace cute
 			team3.push_back(sd);
 
 
+		}
 		}
 
 
@@ -287,6 +286,17 @@ void addPlayer( double mu, double sigma, double team, double weight, double iden
 		players.clear();
 		std::vector<SkillDatum*> iplayers;
 		int skillId = 0;
+
+		std::cout<<"team1"<<team1.size()<<'\n';
+		std::cout<<"team2"<<team2.size()<<'\n';
+
+		std::cout<<"team3"<<team3.size()<<'\n';
+
+
+		if(team1.size() == 0 || team2.size() == 0){
+			std::cout<<"exiting because of 0 team sizes";
+			return;
+		}
 
 		for(auto &i : team1){
 			i.setTeam(1);
@@ -324,7 +334,9 @@ void addPlayer( double mu, double sigma, double team, double weight, double iden
 
 
 	std::vector< int > ranks;
+	int teams;
 
+	if(team3.size() != 0){
 	if(tie < 0)
 	{
 	ranks.push_back(0);
@@ -336,7 +348,20 @@ void addPlayer( double mu, double sigma, double team, double weight, double iden
 	ranks.push_back(1);
 	}
 
-	int teams = 3;
+	 teams = 3;
+	}
+	else{
+	if(tie < 0)
+	{
+	ranks.push_back(0);
+	ranks.push_back(0);
+	}else{
+	ranks.push_back(0);
+	ranks.push_back(1);
+	}
+
+	 teams = 2;
+	}
 
 
 	rate(players,ranks,teams);
