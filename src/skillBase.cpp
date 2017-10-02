@@ -6,6 +6,8 @@
 #include <memory>
 
 #include <algorithm>  
+
+#include <experimental/random>
 #include "cskill/trueskill.h"
 #include "skillBase.h"
 #include "metaData.h"
@@ -147,14 +149,20 @@ namespace cute
 
 	SkillDatum SkillBase :: getTag(MetaData m)
 	{
+		std::string tagHash = m.getTagMd5();
+		if(tagHash.size() == 0){
 		std::ostringstream n;
 		n << "MD5:"<<m.getHash();
+		m = n.str();
+		}
+
+
 
 		for(auto s: localTags)
-				if(s.getName() == n.str())
+				if(s.getName() == tagHash)
 					return s;
 
-			localTags.push_back(SkillDatum(n.str()));
+			localTags.push_back(SkillDatum(tagHash));
 			return localTags.back();
 	}
 
@@ -175,7 +183,7 @@ namespace cute
 
 	void SkillBase :: writeFile()
 	{
-localTags.sort([]( auto & a,  auto & b) { return ((a.mu*a.mu)/a.getSigma()) < ((b.mu*b.mu)/b.getSigma()); });
+localTags.sort([]( auto & a,  auto & b) { return ((a.mu * a.mu * a.mu) /a.getSigma()< (b.mu * b.mu * b.mu)/b.getSigma()); });
 		
 
 		std::ofstream db(loc);
@@ -212,7 +220,6 @@ namespace cute
 				team3.push_back(base->getTag(s));
 				team3.back().setDup(true);
 				team3mu += team3.back().getMu();
-				std::cout<<"dup tag" << s<< std::endl;
 
 				}
 			else{
@@ -224,9 +231,10 @@ namespace cute
 			}
 
 		}
-if(team1.size() != 0 && team2.size() != 0)
+		if(team1.size() > 0 )
 		{
 		team1mu = team1mu / i;
+		if(team3.size() != 0)
 		team3mu = team3mu / x;
 		i =0;
 
@@ -238,7 +246,8 @@ if(team1.size() != 0 && team2.size() != 0)
 			team2mu += team2.back().getMu();
 		}
 		}
-		team2mu = team2mu / i;
+		if(team2.size() > 0)
+			team2mu = team2mu / i;
 		i =0;
 
 
@@ -254,9 +263,11 @@ if(team1.size() != 0 && team2.size() != 0)
 
 		}
 
+		if(team3.size() > 0){
 		while(team1.size() > team3.size()){
 	SkillDatum sd("meta",team3mu,team3mu/3,0);
 			team3.push_back(sd);
+		}
 
 
 		}
@@ -293,7 +304,7 @@ void addPlayer( double mu, double sigma, double team, double weight, double iden
 		std::cout<<"team3"<<team3.size()<<'\n';
 
 
-		if(team1.size() == 0 || team2.size() == 0){
+		if(team1.size() < 4 || team2.size() < 4){
 			std::cout<<"exiting because of 0 team sizes";
 			return;
 		}
@@ -314,6 +325,7 @@ void addPlayer( double mu, double sigma, double team, double weight, double iden
 
 			iplayers.push_back(&i);
 
+
 		}
 
 
@@ -321,6 +333,7 @@ void addPlayer( double mu, double sigma, double team, double weight, double iden
 			i.setTeam(3);
 			i.setId(skillId++);
 			i.iterateCount();
+
 
 
 
@@ -395,6 +408,141 @@ void addPlayer( double mu, double sigma, double team, double weight, double iden
 
 	}
 
+
+
+
+}
+
+namespace cute
+{
+
+FileDatum :: FileDatum(std::string n,std::string l)
+	:fileName(n),fileLoc(l){}
+
+FileDatum :: FileDatum(MetaData m)
+{
+	fileName = m.getTagMd5();
+	fileLoc = m.filePath();
+}
+
+void FileDatum :: setName(std::string n)
+{
+	fileName = n;
+}
+
+void FileDatum :: setLoc(std::string l)
+{
+	fileLoc = l;
+}
+
+std::string FileDatum :: getLoc()
+{
+	return fileLoc;
+}
+
+std::string FileDatum :: getName()
+{
+	return fileName;
+}
+
+
+
+
+FileBase :: FileBase(std::string l)
+	: loc(l)
+	{
+		readFile();
+	}
+
+bool FileBase :: readFile()
+{
+		std::fstream db;
+		localTags.clear();
+		db.open(loc);
+
+		db.clear();
+		db.seekg(0,std::ios::beg);
+
+		std::string n;
+		std::string l;
+		std::string line;
+
+		while(getline(db,line)){
+			if(line.size() > 2){
+				n = line.substr(0,line.find(' '));
+				l = line.substr(line.find(' ')+1,line.size());
+
+				FileDatum fd(n,l);
+				localTags.push_back(fd);
+			}
+		}
+
+		db.close();
+}
+	
+void FileBase :: writeFile()
+	{
+		
+
+		std::ofstream db(loc);
+		for(auto fd: localTags){
+			db << fd.getName() <<' '<< fd.getLoc() << '\n';
+		}
+
+		db.close();
+
+	}
+
+bool FileBase :: setTag(FileDatum fd)
+	{
+		for(auto &s: localTags)
+			if(s.getName() == fd.getName()){
+				s = fd;
+				return true;
+			}
+
+		localTags.push_back(fd);
+		return true;
+
+	}
+
+	FileDatum  FileBase :: getTag(MetaData m)
+	{
+		std::ostringstream n;
+
+		for(auto s: localTags)
+				if(s.getName() == n.str())
+					return s;
+	}
+
+	FileDatum FileBase :: getRandom()
+{
+
+		int r = std::experimental::randint(0,(int)localTags.size() -1);
+
+		return localTags[r];
+
+}
+
+	
+	void FileBase :: addTag(MetaData m)
+{
+	FileDatum fd(m);
+
+	for(auto s: localTags){
+		if(s.getName() == fd.getName()){
+			s = fd;
+			return;
+		}
+	}
+
+	localTags.push_back(fd);
+}
+
+void FileBase :: clear()
+{
+	localTags.clear();
+}
 
 
 

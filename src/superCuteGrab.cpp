@@ -104,7 +104,9 @@ void gtkTest(int argc, char *const argv[])
 
 
 	cute::SkillBase sBase("database");
-	cute::ImageBase base(argv[2],&sBase);
+	cute::FileBase fBase("filebase");
+
+	cute::ImageBase base(argv[2],&sBase,&fBase);
 	base.readDirectory();
 
 	int i = 3;

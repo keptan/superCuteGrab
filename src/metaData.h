@@ -29,12 +29,13 @@ namespace cute
 
 			void printTags();
 			int readTags();
-			//int tempMu;
+			int tempMu;
 
 			std::vector<std::string> getTags();
 
 
 			std::string tagsString();
+			std::string getTagMd5();
 			void addTag(std::string);
 			void clearTags();
 			void writeTags();

@@ -29,9 +29,9 @@ namespace cute
 		public :
 			SkillDatum(std::string n,double m = 100, double s = 33, double c = 0);
 			
-			double getMu();
 
 			double mu;
+			double getMu();
 			int getId();
 			double getSigma();
 			int getCount();
@@ -45,16 +45,6 @@ namespace cute
 			void setId(int i);
 			bool  isDup();
 			void setDup(bool d);
-			bool operator < (const SkillDatum& str) const
-			{
-				return (mu < str.mu);
-			}
-			bool operator > (const SkillDatum& str) const
-			{
-				return (mu > str.mu);
-			}
-
-
 
 
 
@@ -62,6 +52,12 @@ namespace cute
 //
 
 	};
+
+
+
+//mu sigma team weight identifier
+//
+
 
 	class SkillBase
 	{
@@ -82,6 +78,53 @@ namespace cute
 			bool readFile();
 				
 		};
+	class FileDatum
+	{
+
+		private :
+			std::string fileName;
+			std::string fileLoc;
+
+		public :
+			FileDatum(std::string n,std::string l);
+			FileDatum(MetaData m);
+			
+			void setName(std::string);
+			void setLoc(std::string);
+			
+			std::string getLoc();
+			std::string getName();
+
+			void  addTag(MetaData m);
+	};
+
+
+
+	class FileBase
+	{
+		private :
+			std::string loc;
+			std::vector<FileDatum> localTags;
+
+
+		public :
+			FileBase(std::string l);
+
+			//bool hasFileName(std::string n);
+			//bool hasFileLoc(std::string n);
+
+			FileDatum getTag(std::string n);
+			FileDatum getTag(MetaData m);
+			FileDatum getRandom();
+
+			bool setTag(FileDatum sd);
+			void addTag(MetaData m);
+
+			void clear();
+			void writeFile();
+			bool readFile();
+				
+		};
 		
 	class SkillHandle
 	{
@@ -91,15 +134,14 @@ namespace cute
 			std::vector<SkillDatum> team3;
 			SkillBase* base;
 
-			int tie = 0;
-
 
 			void prepareTeams();
 
 		public:
 			SkillHandle(std::vector<std::string> p1, std::vector<std::string> p2,SkillBase* sb);
-			SkillHandle(MetaData m1, MetaData m2, SkillBase *sb,int t = 0);
+			SkillHandle(MetaData m1, MetaData m2, SkillBase *sb,int t=0);
 			void run();
+			int tie = 0;
 			void setTags();
 	};
 }

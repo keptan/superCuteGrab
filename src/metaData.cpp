@@ -107,8 +107,15 @@ namespace cute
 		Exiv2::Value::AutoPtr v = Exiv2::Value::create(Exiv2::string);
 
 		for(auto element : tags){
+			std::string s = "MD5";
 
 		std::replace( element.begin(), element.end(), ' ', '_');
+
+			if(s == element.substr(0,s.length())){
+			if(element[3] != ':')
+				element.insert(3,":");
+		}
+
 		v->read(element);
 
 		iptcData.add(Exiv2::IptcKey("Iptc.Application2.Keywords") , v.get());
@@ -148,6 +155,8 @@ namespace cute
 		Exiv2::Value::AutoPtr v = Exiv2::Value::create(Exiv2::string);
 
 		for(auto element : tags){
+
+		std::replace( element.begin(), element.end(), ' ', '_');
 		v->read(element);
 
 		iptcData.add(Exiv2::IptcKey("Iptc.Application2.Keywords") , v.get());
@@ -179,7 +188,7 @@ namespace cute
 
 	bool MetaData :: tagged()
 	{
-		std::string s = "MD5:";
+		std::string s = "MD5";
 	
 		if (tags.empty())
 			return false;
@@ -191,7 +200,23 @@ namespace cute
 
 			return false;
 
-		}
+	}
+
+	std::string MetaData :: getTagMd5()
+	{
+		std::string s = "MD5";
+
+		readTags();
+	
+		if (tags.empty())
+			return "";
+
+		for(auto t : tags)
+			if(s == t.substr(0,s.length()))
+			return t;
+
+
+	}
 
 	std::vector<std::string> MetaData :: getTags()
 	{

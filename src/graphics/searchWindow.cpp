@@ -142,7 +142,7 @@ namespace cute
 			buf  = Gdk::Pixbuf::create_from_file(loc);
 			m.unlock();
 			ratio = (double) buf->get_width() / buf->get_height();
-			buf = buf->scale_simple(84,84.0/ratio,Gdk::INTERP_BILINEAR);
+			buf = buf->scale_simple(64,64.0/ratio,Gdk::INTERP_BILINEAR);
 			m.lock();
 
 			row[m_Columns.m_col_pixbuf] = buf;
@@ -404,7 +404,7 @@ namespace cute
 
 			base->runElo(*image->data,*image2->data);
 
-			image2->data = new MetaData(base->findMatch(*image->data,-1));
+			image2->data = new MetaData(base->findMatch(*image->data,leftCount));
 			rightImageBox(image2->data->filePath().string());
 
 			if(leftCount > 10){
@@ -466,7 +466,7 @@ namespace cute
 			base->runElo(*image2->data,*image->data);
 
 
-			image->data = new MetaData(base->findMatch(*image2->data,-1));
+			image->data = new MetaData(base->findMatch(*image2->data,rightCount));
 			newImageBox(image->data->filePath().string());
 
 			if(rightCount > 10){
