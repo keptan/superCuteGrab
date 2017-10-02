@@ -410,7 +410,7 @@ namespace cute
 			if(leftCount > 10){
 
 			leftCount = 0;
-			image->data = new MetaData(base->findMatch(*image2->data,-1));
+			image->data = new MetaData(base->findMatch(*image2->data,leftCount));
 	newImageBox(image->data->filePath().string());
 			}
 
@@ -471,7 +471,7 @@ namespace cute
 
 			if(rightCount > 10){
 			rightCount = 0;
-			image2->data = new MetaData(base->findMatch(*image->data,-1));
+			image2->data = new MetaData(base->findMatch(*image->data,rightCount));
 			rightImageBox(image2->data->filePath().string());
 			}
 

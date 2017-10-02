@@ -30,6 +30,7 @@ namespace cute
 			void printTags();
 			int readTags();
 			int tempMu;
+			int tempSigma;
 
 			std::vector<std::string> getTags();
 
