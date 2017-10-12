@@ -198,7 +198,7 @@ namespace cute
 				return true;
 	
 
-			return false;
+		return false;
 
 	}
 
@@ -213,7 +213,7 @@ namespace cute
 
 		for(auto t : tags)
 			if(s == t.substr(0,s.length()))
-			return t;
+				return t;
 
 
 	}

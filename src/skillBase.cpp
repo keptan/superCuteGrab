@@ -130,6 +130,7 @@ namespace cute
 
 				is >> n >> m >> s >> c;
 
+
 				SkillDatum sd(n,m,s,c);
 				localTags.push_back(sd);
 		}
@@ -183,7 +184,8 @@ namespace cute
 
 	void SkillBase :: writeFile()
 	{
-localTags.sort([]( auto & a,  auto & b) { return ((a.mu * a.mu * a.mu) /a.getSigma()< (b.mu * b.mu * b.mu)/b.getSigma()); });
+localTags.sort([]( auto & a,  auto & b) { return ((a.mu * a.mu + a.mu) /a.getSigma()  > (b.mu * b.mu * b.mu )/b.getSigma()); });
+//localTags.sort([]( auto & a,  auto & b) { return a.mu > b.mu; });
 		
 
 		std::ofstream db(loc);
