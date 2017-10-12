@@ -1,2 +1,2 @@
 # superCuteGrab
-Booru image tag-fetching and ranking with Microsoft TRUESKILL and ELO 
+Booru image tag-fetching and ranking with Microsoft TRUESKIL and IPTC metadata
