@@ -4,6 +4,7 @@
 #include <sstream>
 #include <vector>
 #include <memory>
+#include <cassert>
 
 #include <algorithm>  
 
@@ -217,6 +218,7 @@ namespace cute
 		std::vector<std::string> p3;
 
 		for(auto s: p1){
+			std::string c = "MD5";
 			if (std::find(p2.begin(), p2.end(),s) != p2.end()){
 				x++;
 				team3.push_back(base->getTag(s));
@@ -227,9 +229,15 @@ namespace cute
 			else{
 				
 
+			if(c == s.substr(0,c.length())){
+				name1 = base->getTag(s);
+			}
+			else{
+
 			team1.push_back(base->getTag(s));
 			i++;
 			team1mu += team1.back().getMu();
+			}
 			}
 
 		}
@@ -242,10 +250,17 @@ namespace cute
 
 		for(auto s: p2){
 
+			std::string c = "MD5";
 			if (std::find(p1.begin(), p1.end(),s) == p1.end()){
+
+			if(c == s.substr(0,c.length())){
+				name2 = base->getTag(s);
+			}
+			else{
 			team2.push_back(base->getTag(s));
 			i++;
 			team2mu += team2.back().getMu();
+			}
 		}
 		}
 		if(team2.size() > 0)
@@ -306,7 +321,7 @@ void addPlayer( double mu, double sigma, double team, double weight, double iden
 		std::cout<<"team3"<<team3.size()<<'\n';
 
 
-		if(team1.size() < 4 || team2.size() < 4){
+		if(team1.size() < 1 || team2.size() < 1){
 			std::cout<<"exiting because of 0 team sizes";
 			return;
 		}
@@ -329,7 +344,6 @@ void addPlayer( double mu, double sigma, double team, double weight, double iden
 
 
 		}
-
 
 	for(auto &i : team3){
 			i.setTeam(3);
@@ -379,6 +393,7 @@ void addPlayer( double mu, double sigma, double team, double weight, double iden
 	}
 
 
+	assert(team1.size() > 0 && team2.size() > 0);
 	rate(players,ranks,teams);
 
 	for(auto i : iplayers){
@@ -392,6 +407,52 @@ void addPlayer( double mu, double sigma, double team, double weight, double iden
 		}
 
 	}
+	
+	iplayers.clear();
+	ranks.clear();
+	players.clear();
+
+	teams = 2;
+
+	name1.setTeam(1);
+	name1.setId(skillId++);
+	name1.iterateCount();
+
+	iplayers.push_back(&name1);
+
+	name2.setTeam(2);
+	name2.setId(skillId++);
+	name2.iterateCount();
+
+	iplayers.push_back(&name2);
+
+	for(auto p : iplayers)
+			addPlayer(p->getMu(),p->getSigma(),p->getTeam(),1,p->getId());
+
+	if(tie < 0)
+	{
+		ranks.push_back(0);
+		ranks.push_back(0);
+	}
+	else{
+		ranks.push_back(0);
+		ranks.push_back(1);
+	}
+
+	rate(players,ranks,teams);
+
+	for(auto i : iplayers){
+		for(auto p : players){
+			if(i->getId() == p[4])
+			{
+
+				i->setMu(p[0]);
+				i->setSigma(p[1]);
+			}
+		}
+
+	}
+
 
 			
 
@@ -407,6 +468,9 @@ void addPlayer( double mu, double sigma, double team, double weight, double iden
 			base->setTag(t);
 		for(auto t : team3)
 			base->setTag(t);
+
+		base->setTag(name1);
+		base->setTag(name2);
 
 	}
 

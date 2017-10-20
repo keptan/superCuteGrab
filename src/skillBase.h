@@ -27,7 +27,7 @@ namespace cute
 			std::vector<double> codOut;
 
 		public :
-			SkillDatum(std::string n,double m = 100, double s = 33, double c = 0);
+			SkillDatum(std::string n = "" ,double m = 100, double s = 33, double c = 0);
 			
 
 			double mu;
@@ -134,6 +134,8 @@ namespace cute
 			std::vector<SkillDatum> team3;
 			SkillBase* base;
 
+			SkillDatum name1;
+			SkillDatum name2;
 
 			void prepareTeams();
 

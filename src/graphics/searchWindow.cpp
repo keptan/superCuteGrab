@@ -396,23 +396,24 @@ namespace cute
 	bool SearchWindow :: onKeyPress(GdkEventKey *event)
 	{
 		if( event->hardware_keycode == 113){
-			   std::cout<<"left key";
-		mansizeChanged();
+			std::cout<<"left key";
+			mansizeChanged();
 
+			base->runElo(*image->data,*image2->data);
 			leftCount++;
 			rightCount = 0;
 
-			base->runElo(*image->data,*image2->data);
+			if(leftCount > 4){
+
+				leftCount = 0;
+				image->data = new MetaData(base->findMatch(*image2->data,-1));
+				newImageBox(image->data->filePath().string());
+			}
+
+
 
 			image2->data = new MetaData(base->findMatch(*image->data,leftCount));
 			rightImageBox(image2->data->filePath().string());
-
-			if(leftCount > 4){
-
-			leftCount = 0;
-			image->data = new MetaData(base->findMatch(*image2->data,leftCount));
-	newImageBox(image->data->filePath().string());
-			}
 
 
 
@@ -420,12 +421,12 @@ namespace cute
 
 	
 
-		image->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::sizeChangedII));
-		image2->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::rightsizeChangedII));
-		busy = false;
-		mansizeChanged();
+			image->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::sizeChangedII));
+			image2->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::rightsizeChangedII));
+			busy = false;
+			mansizeChanged();
 
-					return true;
+			return true;
 			   
 			}
 
@@ -493,15 +494,16 @@ namespace cute
 			leftCount = 0;
 			base->runElo(*image2->data,*image->data);
 
+			if(rightCount > 4){
+				rightCount = 0;
+				image2->data = new MetaData(base->findMatch(*image->data,-1));
+				rightImageBox(image2->data->filePath().string());
+			}
 
 			image->data = new MetaData(base->findMatch(*image2->data,rightCount));
 			newImageBox(image->data->filePath().string());
 
-			if(rightCount > 4){
-			rightCount = 0;
-			image2->data = new MetaData(base->findMatch(*image->data,rightCount));
-			rightImageBox(image2->data->filePath().string());
-			}
+		
 
 
 

@@ -55,6 +55,7 @@ namespace cute
 
 			void baseInit(ImageBase *b);
 			SearchWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder> &refGlade);
+
 		protected:
 			void populate(std::string t);
 			void populate();
