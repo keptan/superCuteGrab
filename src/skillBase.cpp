@@ -185,16 +185,23 @@ namespace cute
 
 	void SkillBase :: writeFile()
 	{
-localTags.sort([]( auto & a,  auto & b) { return ((a.mu * a.mu + a.mu) /a.getSigma()  > (b.mu * b.mu * b.mu )/b.getSigma()); });
-//localTags.sort([]( auto & a,  auto & b) { return a.mu > b.mu; });
+//localTags.sort([]( auto & a,  auto & b) { return ((a.mu * a.mu + a.mu) /a.getSigma()  > (b.mu * b.mu * b.mu )/b.getSigma()); });
+localTags.sort([]( auto & a,  auto & b) { return a.mu > b.mu; });
 		
 
 		std::ofstream db(loc);
+		std::ofstream adb(loc + "tags");
+
 		for(auto sd: localTags){
 			db << sd.getName() << ' ' << sd.getMu() << ' ' << sd.getSigma() << ' ' << sd.getCount() << '\n';
+			if(sd.getName().substr(0,3) != "MD5")
+			{
+				adb << sd.getName() << ' ' << sd.getMu() << ' ' << sd.getSigma() << ' ' << sd.getCount() << '\n';
+			}
 		}
 
 		db.close();
+		adb.close();
 
 	}
 }

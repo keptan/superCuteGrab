@@ -412,14 +412,8 @@ namespace cute
 
 
 
-			image2->data = new MetaData(base->findMatch(*image->data,leftCount));
+			image2->data = new MetaData(base->findMatch(*image->data,-1));
 			rightImageBox(image2->data->filePath().string());
-
-
-
-
-
-	
 
 			image->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::sizeChangedII));
 			image2->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::rightsizeChangedII));
@@ -500,12 +494,8 @@ namespace cute
 				rightImageBox(image2->data->filePath().string());
 			}
 
-			image->data = new MetaData(base->findMatch(*image2->data,rightCount));
+			image->data = new MetaData(base->findMatch(*image2->data,-1));
 			newImageBox(image->data->filePath().string());
-
-		
-
-
 
 
 		image->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::sizeChangedII));
