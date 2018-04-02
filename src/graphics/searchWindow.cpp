@@ -403,7 +403,7 @@ namespace cute
 			leftCount++;
 			rightCount = 0;
 
-			if(leftCount > 4){
+			if(leftCount > 0){
 
 				leftCount = 0;
 				image->data = new MetaData(base->findMatch(*image2->data,-1));
@@ -488,7 +488,7 @@ namespace cute
 			leftCount = 0;
 			base->runElo(*image2->data,*image->data);
 
-			if(rightCount > 4){
+			if(rightCount > 0){
 				rightCount = 0;
 				image2->data = new MetaData(base->findMatch(*image->data,-1));
 				rightImageBox(image2->data->filePath().string());
