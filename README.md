@@ -1,6 +1,7 @@
 # superCuteGrab
 Booru image tag-fetching and ranking with Microsoft TRUESKIL and IPTC metadata
 >minimum requirements for the binary to run
+
 must be in the same directory as icon.png and window.glade
 
 >how to tag images with metadata
