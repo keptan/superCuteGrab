@@ -4,6 +4,7 @@ Booru image tag-fetching and ranking with Microsoft TRUESKIL and IPTC metadata
 must be in the same directory as icon.png and window.glade
 
 >how to tag images with metadata
+
 ./cutegrab danTest <location of images>
 
 be very careful and please backup your images; please note that it searches for images RECURSIVELY meaning if you run it on a top level directory it might tag thousands of images you didnt want too
@@ -11,10 +12,12 @@ it might also mess with the last modified date
 id run on a backup of images and keep your originals seperate to be extra safe
 
 >how to search for a tag in cli
+
 ./cutegrab searchTest <location> <tag>
 this will find images with that tag for you
 
 >how to do tag ranking with trueskill
+
 ./cutegrab gtkTest <location>
 first filter the images down with a MD5: search because all tagged images contain a MD5: tag
 this way you dont rank untagged images; desu i dont even remember what that does if you accideentally do that
