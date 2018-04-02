@@ -32,3 +32,8 @@ thumbnails wont appear unless you scroll
 sorry if you have any problems with my crappy software; I didnt really expect anyone else to use it
 please tell me any questions or problems you have
 ill rewrite it soon!
+
+the up arrow indicates that the two images are equally cute
+and if the aspect ratio of the image is all messed up use the down arrow to fix that
+
+use freesoftware like libreoffice or gnuplot to look at your cute tag results after
