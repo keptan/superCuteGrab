@@ -403,7 +403,7 @@ namespace cute
 			leftCount++;
 			rightCount = 0;
 
-			if(leftCount > 0){
+			if(leftCount > 2){
 
 				leftCount = 0;
 				image->data = new MetaData(base->findMatch(*image2->data,-1));
@@ -412,7 +412,7 @@ namespace cute
 
 
 
-			image2->data = new MetaData(base->findMatch(*image->data,-1));
+			image2->data = new MetaData(base->findMatch(*image->data,leftCount));
 			rightImageBox(image2->data->filePath().string());
 
 			image->scrollView->signal_size_allocate().connect(sigc::mem_fun(*this,&SearchWindow::sizeChangedII));
@@ -488,13 +488,13 @@ namespace cute
 			leftCount = 0;
 			base->runElo(*image2->data,*image->data);
 
-			if(rightCount > 0){
+			if(rightCount > 2){
 				rightCount = 0;
 				image2->data = new MetaData(base->findMatch(*image->data,-1));
 				rightImageBox(image2->data->filePath().string());
 			}
 
-			image->data = new MetaData(base->findMatch(*image2->data,-1));
+			image->data = new MetaData(base->findMatch(*image2->data,rightCount));
 			newImageBox(image->data->filePath().string());
 
 

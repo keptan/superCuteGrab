@@ -1,0 +1,75 @@
+store:
+size of file 
+std::optional hash of file 
+filename 
+std::optional tags 
+
+filename to hash db that can be invalidated and rebuilt 
+that contains: filename, size, hash, inode data 
+POD serialized? 
+
+check size first and then, rare for collisions and then chech hash 
+tag db either contains tags or date last checked and dbs checked
+store artist seperately 
+
+built during runtime as new images appear ? 
+
+
+hash -> score 
+
+
+ability to rebuild from hashs 
+async hash  -> threadpool 
+
+different score databases use hash ? 
+
+get list of old filenames / inodes to hashs 
+if inode has changed, or filesize, or inode date then rehash 
+otherwise keep the old hash 
+
+then we can proceed with the has to tag and hash to score dbs 
+db interface that takes two hashes and runs a competition on it (?) 
+for example db that increments the number of times it was ranked 
+hash numberooftimesranked 
+hash listoftags 
+
+map of all tags to hashes 
+map of all hashes to a set of tags 
+map of tags to scores is a db 
+set of all tags 
+tags aren't ordered so have to use map here  tags can be string ordered 
+maybe can compile time hash autism 
+
+structual sharing would be awesome there 
+the sets in the third set would be modifications of the set of all tags 
+
+program start, given list of files 
+build set of tags with score from db 
+
+interface: 
+	set with our operator overloads 
+
+interfaces: 
+hash to tag finder 
+	get artits, get db tags, one that just returns its own hash as a string 
+	each interface uses policy design for ELO or TRUESKILL ect 
+	and if you give it two hashes it can run its own scores 
+	and can be a handle to a std::set of tags 
+	choose a tag and get a list of hashs that connect to it in that db 
+
+
+image one wins 
+for all active hash to tag, gather the tags for each image and run scores 
+for(auto i& : interfaces)
+	i.runContest(hash1, hash2); 
+
+looser = filesDB.getRange(mu1, mu2); 
+
+filesDB.filter.contains( danDB.hashWith(selectedTAg)); 
+
+litteraly just finish your persistent RB tree you autistic retard 
+
+
+
+test if filling with average mu actually works, two tags on one team with a score and one on another plus 10 fillers and see what scores trend towards vs alone 
+
