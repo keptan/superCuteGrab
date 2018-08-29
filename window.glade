@@ -5,7 +5,7 @@
   <object class="GtkWindow" id="SearchWindow">
     <property name="can_focus">False</property>
     <child>
-      <object class="GtkHPaned" id="hpaned1">
+      <object class="GtkHPaned" id="hPane">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <child>
@@ -13,7 +13,7 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <object class="GtkMenuBar" id="menubar1">
+              <object class="GtkMenuBar" id="menubar">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
@@ -170,7 +170,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="entry1">
+              <object class="GtkEntry" id="searchEntry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="invisible_char">•</property>
@@ -193,7 +193,7 @@
                 <property name="hscrollbar_policy">automatic</property>
                 <property name="vscrollbar_policy">automatic</property>
                 <child>
-                  <object class="GtkIconView" id="iconview1">
+                  <object class="GtkIconView" id="iconView">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                   </object>
@@ -218,23 +218,23 @@
             <property name="n_rows">4</property>
             <property name="n_columns">2</property>
             <child>
-              <object class="GtkAspectFrame" id="aspect">
+              <object class="GtkAspectFrame" id="leftAspect">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label_xalign">0</property>
                 <property name="shadow_type">none</property>
                 <child>
-                  <object class="GtkScrolledWindow" id="scrollView">
+                  <object class="GtkScrolledWindow" id="leftScrollView">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="hscrollbar_policy">automatic</property>
                     <property name="vscrollbar_policy">automatic</property>
                     <child>
-                      <object class="GtkViewport" id="view">
+                      <object class="GtkViewport" id="leftView">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkImage" id="image">
+                          <object class="GtkImage" id="leftImage">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="stock">gtk-missing-image</property>
@@ -250,22 +250,22 @@
               </packing>
             </child>
             <child>
-              <object class="GtkAspectFrame" id="aspect1">
+              <object class="GtkAspectFrame" id="rightAspect">
                 <property name="can_focus">False</property>
                 <property name="label_xalign">0</property>
                 <property name="shadow_type">none</property>
                 <child>
-                  <object class="GtkScrolledWindow" id="scrollView1">
+                  <object class="GtkScrolledWindow" id="rightScrollView">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="hscrollbar_policy">automatic</property>
                     <property name="vscrollbar_policy">automatic</property>
                     <child>
-                      <object class="GtkViewport" id="view1">
+                      <object class="GtkViewport" id="rightView">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkImage" id="image1">
+                          <object class="GtkImage" id="rightImage">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="stock">gtk-missing-image</property>

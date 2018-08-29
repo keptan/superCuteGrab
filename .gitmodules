@@ -1,0 +1,3 @@
+[submodule "lib/fun"]
+	path = lib/fun
+	url = https://github.com/keptan/fun
