@@ -6,29 +6,21 @@
 #include <map>
 #include <fstream>
 #include <string>
+#include "image.h"
 
 
 namespace cute {
 
-struct PathMetaData 
-{
-	using Hash = std::string;
-	unsigned long  file_size;
-	unsigned long  write_time;
-	
-	Hash hash;
 
-	PathMetaData (unsigned long , unsigned long, const Hash&);
-
-};
 
 class HashDB
 {
 
-	using Hash = std::string;
+	using Hash = PathMetaData::Hash;
 
 	std::filesystem::path dbFile;
 	std::map<std::filesystem::path, PathMetaData> pathMap;
+
 	std::map<std::filesystem::path, PathMetaData> localPathMap;
 
 public:
@@ -38,6 +30,9 @@ public:
 	void writeCSV (void);
 	
 	void scanDirectory (std::filesystem::path p);
+
+	bool contains (const std::filesystem::path p);
+	PathMetaData retrieveData (const std::filesystem::path p);
 
 };
 }
