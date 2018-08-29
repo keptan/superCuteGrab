@@ -1,7 +1,7 @@
 CC=g++
 CFLAG= -c  -std=c++17 -I ./lib
-GTKL= `pkg-config --libs gtkmm-2.4`
-GTKC= `pkg-config --cflags gtkmm-2.4`
+GTKL= `pkg-config --libs gtkmm-3.0`
+GTKC= `pkg-config --cflags gtkmm-3.0`
 TSLIB= -pthread #-lmongoclient -L lib -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt
 TSOB= ./src/obj/trueskill.o ./src/obj/matrix.o src/obj/gaussian.o ./src/obj/basemath.o ./src/obj/factorgraph.o
 TSOBN=  trueskill.o matrix.o gaussian.o basemath.o factorgraph.o
@@ -9,16 +9,19 @@ TSOBN=  trueskill.o matrix.o gaussian.o basemath.o factorgraph.o
 
 all: superCuteGrab
 
-superCuteGrab: superCuteGrab.o  hashDB.o  $(TSOBN)
-	$(CC) ./src/obj/superCuteGrab.o ./src/obj/hashDB.o ./src/obj/fileMd5.o  -lstdc++fs  -lcrypto -lssl $(TSOB)   $(TSLIB)  -o cuteGrab 
+superCuteGrab: superCuteGrab.o  hashDB.o window.o $(TSOBN)
+	$(CC) ./src/obj/superCuteGrab.o ./src/obj/hashDB.o ./src/obj/fileMd5.o  ./src/obj/window.o -lstdc++fs  -lcrypto -lssl $(TSOB) $(GTKL) $(GTKC)  $(TSLIB)  -o cuteGrab 
 
-superCuteGrab.o: ./src/superCuteGrab.cpp
-	$(CC) $(CFLAG)  -c ./src/superCuteGrab.cpp -o ./src/obj/superCuteGrab.o  -lcrypto -lssl  
+superCuteGrab.o:  
+	$(CC) $(CFLAG)  -c ./src/superCuteGrab.cpp -o ./src/obj/superCuteGrab.o  -lcrypto -lssl $(GTKC) $(GTKL)
 
-hashDB.o: ./src/hashDB.cpp fileMD5.o
+window.o:  
+	$(CC) $(CFLAG) -c ./src/graphics/window.cpp -o ./src/obj/window.o $(GTKC) $(GTKL)
+
+hashDB.o: 
 	$(CC) $(CFLAG) -c ./src/hashDB.cpp -o ./src/obj/hashDB.o -lstdc++fs  
 
-fileMD5.o: ./src/fileMd5.cpp 
+fileMD5.o:  
 	$(CC) $(CFLAG) -c ./src/fileMd5.cpp -o ./src/obj/fileMd5.o -lcrypto -lssl 
 
 trueskill.o:

@@ -1,5 +1,7 @@
 #include <iostream>
 #include "hashDB.h"
+#include "graphics/window.h"
+#include <gtkmm.h>
 
 
 int main(int argc, char *const argv[])
@@ -10,7 +12,11 @@ int main(int argc, char *const argv[])
 	db.scanDirectory("test");
 	db.writeCSV();
 
-	return 0;
+	auto app = Gtk::Application::create();
+	auto builder = Gtk::Builder::create_from_file("window.glade");
+	
+	Window w(builder);
+	return app->run(*w.getWindow());
 }
 
 
