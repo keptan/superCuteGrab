@@ -35,8 +35,8 @@ std::filesystem::path ThumbDB :: generateThumb (const Image& image)
 	const int height = sourcePBuf->get_height(); 
 	const float ratio = (float) width / (float) height; 
 
-	const int outHeight = 200;
-	const int outWidth = 200 / ratio; 
+	const int outHeight = 100;
+	const int outWidth = 100 / ratio; 
 
 	auto scaledPBuf = sourcePBuf->scale_simple(
 					outHeight, outWidth,

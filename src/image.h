@@ -14,6 +14,7 @@ struct PathMetaData
 	Hash hash;
 
 	PathMetaData (unsigned long , unsigned long, const Hash&);
+	PathMetaData (void);
 
 };
 
@@ -23,6 +24,7 @@ struct Image
 	const PathMetaData pData; 
 
 	Image (const std::filesystem::path l, const PathMetaData p);
+	Image (void) {};
 };
 }
 

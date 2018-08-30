@@ -1,7 +1,9 @@
 #pragma once 
 
 #include <gtkmm.h> 
+#include <memory>
 #include <string>
+#include "../image.h"
 
 class Window 
 {
@@ -35,6 +37,8 @@ class Window
 	Window (const Glib::RefPtr<Gtk::Builder>); 
 	virtual ~Window (void); 
 	void addMember (const std::string&, const std::optional<std::string>& , const int);
+	void addMember (const std::shared_ptr<cute::Image> i, const std::string& t);
+
 	Gtk::Window* getWindow (void);
 
 	protected: 
@@ -46,14 +50,14 @@ class Window
 		public:
 		Columns  (void)
 		{
-			add(m_col_id); 
 			add(m_col_name); 
 			add(m_col_pixbuf);
+			add(m_col_image);
 		}
 
-		Gtk::TreeModelColumn<unsigned int> m_col_id;
 		Gtk::TreeModelColumn<Glib::ustring> m_col_name; 
 		Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf>> m_col_pixbuf;
+		Gtk::TreeModelColumn< std::shared_ptr<cute::Image>> m_col_image;
 	};
 
 	Columns m_Columns; 

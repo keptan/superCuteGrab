@@ -35,10 +35,19 @@ void Window::on_button_quit (void)
 void Window :: addMember ( const std::string& name, const std::optional<std::string>& icon, const int id)
 {
 	Gtk::TreeModel::Row r = *(m_refTreeModel->append());
-	r[m_Columns.m_col_id] = id; 
 	r[m_Columns.m_col_name] = name.c_str(); 
 	r[m_Columns.m_col_pixbuf] = Gdk::Pixbuf::create_from_file( icon.value_or("icon.png"));
 }
+
+void Window :: addMember (const std::shared_ptr<cute::Image> i, const std::string& t)
+{
+	Gtk::TreeModel::Row r = *(m_refTreeModel->append());
+
+	r[m_Columns.m_col_name] = i->location.string();
+	r[m_Columns.m_col_pixbuf] = Gdk::Pixbuf::create_from_file( t.c_str());
+	r[m_Columns.m_col_image] = i;
+}	
+
 
 Gtk::Window* Window :: getWindow (void)
 {

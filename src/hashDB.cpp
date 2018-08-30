@@ -2,6 +2,7 @@
 #include "fileMd5.h"
 #include <iomanip>
 #include <cassert>
+#include <set>
 
 namespace cute {
 
@@ -51,6 +52,9 @@ void HashDB :: scanDirectory (std::filesystem::path p)
 {
 	for(auto& f : std::filesystem::directory_iterator(p))
 	{
+
+		if(!conformingFileType(f.path())) continue;
+
 		const auto rawTime = std::filesystem::last_write_time(f);
 		const auto epoch = rawTime.time_since_epoch();
 		const auto value = std::chrono::duration_cast<std::chrono::seconds>(epoch);

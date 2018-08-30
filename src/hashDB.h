@@ -7,6 +7,7 @@
 #include <fstream>
 #include <string>
 #include "image.h"
+#include "filetypes.h"
 
 
 namespace cute {
