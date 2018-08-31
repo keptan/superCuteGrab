@@ -4,11 +4,16 @@
 #include <memory>
 #include <string>
 #include "../image.h"
+#include "../thumbDB.h"
+#include "../compMan.h"
+#include "../collectionMan.h"
 
 class Window 
 {
 	struct ScalingImage
 	{
+		std::shared_ptr<cute::Image> cuteImage; 
+
 		std::string path;
 		Glib::RefPtr<Gdk::Pixbuf> sourcePBuf; 
 
@@ -24,7 +29,8 @@ class Window
 		ScalingImage (void){};
 
 		void setImage	(std::string);
-		void scaleImage (Gtk::Allocation&);
+		void setImage (const std::shared_ptr<cute::Image> i);
+		void scaleImage (Gtk::Allocation);
 	};
 		
 	private:
@@ -32,18 +38,22 @@ class Window
 	Gtk::Window* window;
 	ScalingImage leftImage, rightImage;
 
+	cute::CollectionMan& collection;
+	cute::ThumbDB thumbnails;
+	bool lastSize;
 
 	public:
-	Window (const Glib::RefPtr<Gtk::Builder>); 
-	virtual ~Window (void); 
-	void addMember (const std::string&, const std::optional<std::string>& , const int);
-	void addMember (const std::shared_ptr<cute::Image> i, const std::string& t);
+
+	Window (const Glib::RefPtr<Gtk::Builder>, cute::CollectionMan&); 
+	void addMember (const std::shared_ptr<cute::Image> i);
 
 	Gtk::Window* getWindow (void);
 
 	protected: 
 	//signal handlers 
 	void on_button_quit (void); 
+	void selected (const Gtk::TreeModel::Path& path);
+	bool onKeyPress (GdkEventKey *event);
 	
 	class Columns : public Gtk::TreeModel::ColumnRecord 
 	{
