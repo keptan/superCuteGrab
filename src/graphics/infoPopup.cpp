@@ -6,7 +6,7 @@
 
 InfoPopup :: InfoPopup ( const Glib::RefPtr<Gtk::Builder> b 
 					   , cute::CollectionMan& c
-					   , std::shared_ptr< cute::Image> i )
+					   , std::shared_ptr< cute::Image> i)
 
    :  image(i), collection(c), builder(b)
    , infoImage(builder, "infoAspect", "infoScroll", "infoImage")
@@ -14,38 +14,65 @@ InfoPopup :: InfoPopup ( const Glib::RefPtr<Gtk::Builder> b
 	m_refTreeModel = Gtk::ListStore::create(m_Columns);
 		
 	builder->get_widget("infoWindow", window);
+	builder->get_widget("scoreLabel", scoreLabel);
+	builder->get_widget("infoTags", tagTree);
+
+	tagTree->set_model(m_refTreeModel);
 	infoImage.setImage( image);
+	setImage(image);
 	
-	window->show_all_children();
-	window->show();
 }
 
+InfoPopup :: ~InfoPopup (void)
+{
+	window->hide();
+}
 
 Gtk::Window* InfoPopup :: getWindow (void)
 {
 	return window; 
 }
 
+void InfoPopup :: setImage (std::shared_ptr< cute::Image> i)
+{
+	image = i;
+	infoImage.setImage(i);
+	scoreLabel->set_text( "IdentityScore: "  + std::to_string( collection.getSkill(i).mu));
 
+	m_refTreeModel->clear();
+	Gtk::TreeModel::Row r = *(m_refTreeModel->append());
+	r[m_Columns.m_col_name] = i->location.string();
+}
+
+	
 BrowseWindow :: BrowseWindow 
 ( const Glib::RefPtr<Gtk::Builder> b , cute::CollectionMan& c, cute::HashDB& h)
-	: fight(b,c), builder(b), collection(c), hash(h), thumbnails("thumbnails")
+	: fight(b,c), builder(b),  collection(c), hash(h), thumbnails("thumbnails")
 {
 	m_refTreeModel = Gtk::ListStore::create(m_Columns);
 	builder->get_widget("browseWindow", window);
+
+	Gtk::ScrolledWindow* scroll;
+	builder->get_widget("browseScroll", scroll);
+	scroll->add(view);
+	view.show();
 	
-	Gtk::IconView* view; 
-	builder->get_widget("browseIcon", view);
-	view->set_model(m_refTreeModel);
-	view->set_pixbuf_column(m_Columns.m_col_pixbuf);
-	view->set_markup_column(m_Columns.m_col_name);
-	view->signal_item_activated().connect( sigc::mem_fun(*this, &BrowseWindow::selected));
+	//builder->get_widget("browseIcon", view);
+	view.set_model(m_refTreeModel);
+	view.set_pixbuf_column(m_Columns.m_col_pixbuf);
+	view.set_markup_column(m_Columns.m_col_name);
+	view.signal_item_activated().connect( sigc::mem_fun(*this, &BrowseWindow::selected));
 
 	Gtk::Button* button; 
 	builder->get_widget("importButton", button);
 	button->signal_clicked().connect(sigc::mem_fun(*this, 
 				&BrowseWindow::import_folder) );
 
+	view.signal_image().connect(sigc::mem_fun(*this, &BrowseWindow::callback));
+
+
+
+	iPop = std::make_unique<InfoPopup>( builder, collection, collection.getImages().back());
 
 	for(auto &i : collection.getImages())
 		addMember(i);
@@ -60,6 +87,30 @@ void BrowseWindow :: addMember (const std::shared_ptr<cute::Image> i)
 	r[m_Columns.m_col_pixbuf] = Gdk::Pixbuf::create_from_file( thumbnails.getThumbPath(*i).c_str());
 	r[m_Columns.m_col_image] = i;
 }	
+
+
+	
+
+void BrowseWindow :: callback (const std::vector<Gtk::TreeModel::Path> paths)
+{
+	if(paths.size())
+	{
+	const auto path = paths.back();
+
+	std::cout << "received signal" << std::endl;
+	auto iter = m_refTreeModel->get_iter(path);
+	auto row = *iter; 
+
+	std::shared_ptr<cute::Image>  image = row[m_Columns.m_col_image];
+	std::cout << image->location << '\n';
+
+	iPop->setImage(image);
+	iPop->getWindow()->show_all_children();
+	iPop->getWindow()->show();
+
+
+	}
+}
 
 Gtk::Window* BrowseWindow :: getWindow (void)
 {
@@ -96,7 +147,7 @@ void BrowseWindow :: import_folder (void)
 		  std::cout << "Select clicked." << std::endl;
 		  std::cout << "Folder selected: " << dialog.get_filename()
 			  << std::endl;
-		  hashDB.scanDirectory(dialog.get_filename());
+		  hash.scanDirectory(dialog.get_filename());
 
 		  auto i = collection.getImages();
 
@@ -105,10 +156,13 @@ void BrowseWindow :: import_folder (void)
 			for(auto &f : std::filesystem::directory_iterator(dialog.get_filename()))
 			{
 				if(!cute::conformingFileType(f.path())) continue;
-				i.push_back( std::make_shared<cute::Image> (f.path(), hashDb.retrieveData(f.path())));
+				i.push_back( std::make_shared<cute::Image> (f.path(), hash.retrieveData(f.path())));
 			}
 
 			collection.setImages(i);
+			m_refTreeModel->clear();
+			for(auto &i : collection.getImages())
+				addMember(i);
 
 
 

@@ -8,6 +8,10 @@ CollectionMan :: CollectionMan (IdentityRank& i, std::vector< std::shared_ptr< I
 	freshImages();
 }
 
+void CollectionMan :: setImages (const std::vector< std::shared_ptr<Image>> i)
+{
+	filtered = i;
+}
 std::vector< std::shared_ptr< Image>>
 CollectionMan :: getImages (void)
 {
@@ -20,10 +24,7 @@ CollectionMan :: getImages (void)
 }
 
 
-void CollectionMan :: setImages (const std::vector<std::shared_ptr< Image>>> i)
-{
-	filtered = i;
-}
+
 
 void CollectionMan :: freshImages (void)
 {
@@ -97,6 +98,11 @@ void CollectionMan :: setLeftImage ( std::shared_ptr< Image> i)
 {
 	leftImage = i;
 	rightImage = matchingImage(i);
+}
+
+SkillDatum CollectionMan :: getSkill (std::shared_ptr< Image> i)
+{
+	return ident.getSkill(*i);
 }
 
 std::shared_ptr< Image> CollectionMan :: getRightImage (void)

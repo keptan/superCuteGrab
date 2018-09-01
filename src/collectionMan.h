@@ -32,10 +32,12 @@ class CollectionMan
 	std::shared_ptr< Image> getRightImage (void); 
 	std::shared_ptr< Image> getLeftImage  (void);
 	std::vector< std::shared_ptr< Image>> getImages (void); 
-//	void  setImages (const std::vector<std::shared_ptr< Image>>);
+	void  setImages (const std::vector<std::shared_ptr< Image>>);
 
 	void setRightImage ( std::shared_ptr< Image>);
 	void setLeftImage  ( std::shared_ptr< Image>);
+
+	SkillDatum getSkill (std::shared_ptr< Image>);
 
 	void leftVictory  (void);
 	void rightVictory (void);

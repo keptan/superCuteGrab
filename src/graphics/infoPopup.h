@@ -9,7 +9,9 @@
 #include "../hashDB.h"
 #include "../collectionMan.h"
 #include "window.h"
+#include <sigc++/sigc++.h>
 #include "scalingImage.h"
+#include "imageIcons.h"
 
 class InfoPopup 
 {
@@ -21,13 +23,17 @@ class InfoPopup
 
 	//widgets and gtkmm pointers 
 	Gtk::Window* window; 
+	Gtk::Label* scoreLabel;
+	Gtk::TreeView* tagTree;
 	Glib::RefPtr<Gtk::Builder> builder; 
 
 	//scaling image struct 
 	ScalingImage infoImage;
 
 	public: 
-	InfoPopup ( const Glib::RefPtr<Gtk::Builder>, cute::CollectionMan&, std::shared_ptr<cute::Image >);
+	InfoPopup ( const Glib::RefPtr<Gtk::Builder>, cute::CollectionMan&, std::shared_ptr< cute::Image>);
+	virtual ~InfoPopup (void);
+	void setImage (std::shared_ptr< cute::Image>);
 
 	Gtk::Window* getWindow (void);
 
@@ -53,14 +59,17 @@ class InfoPopup
 };
 
 		
-class BrowseWindow 
+class BrowseWindow : public sigc::trackable 
 {
 
 	FightWindow fight;
 	private:
 	const Glib::RefPtr<Gtk::Builder> builder;
 	Gtk::Window* window; 
+	ImageIcons view;
+	Gtk::Menu menuPopup;
 
+	std::unique_ptr<InfoPopup> iPop;
 	cute::ThumbDB thumbnails; 
 	cute::CollectionMan& collection; 
 	cute::HashDB& hash;
@@ -73,6 +82,9 @@ class BrowseWindow
 	void selected (const Gtk::TreeModel::Path&);
 	void addMember (const std::shared_ptr<cute::Image> i);
 	void import_folder (void);
+
+
+	void callback (const std::vector<Gtk::TreeModel::Path>);
 
 
 	class Columns : public Gtk::TreeModel::ColumnRecord 

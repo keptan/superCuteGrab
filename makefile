@@ -10,19 +10,22 @@ OBJ= ./src/obj/
 
 all: superCuteGrab
 
-superCuteGrab: $(OBJ)superCuteGrab.o  $(OBJ)cskill_instance.o $(OBJ)collectionMan.o $(OBJ)hashDB.o $(OBJ)infoPopup.o $(OBJ)window.o $(OBJ)tagSet.o $(OBJ)tag.o $(OBJ)image.o $(OBJ)thumbDB.o $(OBJ)tagDB.o $(OBJ)filetypes.o $(OBJ)scoreDB.o $(OBJ)fileMd5.o $(OBJ)compMan.o $(OBJ)scalingImage.o $(TSOBN)
-	$(CC) ./src/obj/superCuteGrab.o ./src/obj/cskill_instance.o ./src/obj/hashDB.o ./src/obj/collectionMan.o ./src/obj/thumbDB.o ./src/obj/scoreDB.o ./src/obj/fileMd5.o ./src/obj/infoPopup.o  ./src/obj/window.o ./src/obj/image.o ./src/obj/tag.o ./src/obj/tagSet.o ./src/obj/tagDB.o ./src/obj/filetypes.o ./src/obj/compMan.o ./src/obj/scalingImage.o -lstdc++fs  -lcrypto -lssl $(TSOB) $(GTKL) $(GTKC)  $(TSLIB)  -o cuteGrab 
+superCuteGrab: $(OBJ)superCuteGrab.o  $(OBJ)cskill_instance.o $(OBJ)collectionMan.o $(OBJ)hashDB.o $(OBJ)imageIcons.o  $(OBJ)infoPopup.o $(OBJ)window.o $(OBJ)tagSet.o $(OBJ)tag.o $(OBJ)image.o $(OBJ)thumbDB.o $(OBJ)tagDB.o $(OBJ)filetypes.o $(OBJ)scoreDB.o $(OBJ)fileMd5.o $(OBJ)compMan.o $(OBJ)scalingImage.o $(TSOBN)
+	$(CC) ./src/obj/superCuteGrab.o ./src/obj/cskill_instance.o ./src/obj/hashDB.o ./src/obj/collectionMan.o ./src/obj/thumbDB.o ./src/obj/scoreDB.o ./src/obj/imageIcons.o ./src/obj/fileMd5.o ./src/obj/infoPopup.o  ./src/obj/window.o ./src/obj/image.o ./src/obj/tag.o ./src/obj/tagSet.o ./src/obj/tagDB.o ./src/obj/filetypes.o ./src/obj/compMan.o ./src/obj/scalingImage.o -lstdc++fs  -lcrypto -lssl $(TSOB) $(GTKL) $(GTKC)  $(TSLIB)  -o cuteGrab 
 
 $(OBJ)superCuteGrab.o: ./src/superCuteGrab.cpp 
 	$(CC) $(CFLAG)  -c ./src/superCuteGrab.cpp -o ./src/obj/superCuteGrab.o  -lcrypto -lssl $(GTKC) $(GTKL)
 
-$(OBJ)infoPopup.o: ./src/graphics/infoPopup.cpp ./src/graphics/infoPopup.h $(OBJ)collectionMan.o $(OBJ)thumbDB.o $(OBJ)image.o $(OBJ)window.o $(OBJ)scalingImage.o $(OBJ)hashDB.o
+$(OBJ)infoPopup.o: ./src/graphics/infoPopup.cpp ./src/graphics/infoPopup.h $(OBJ)collectionMan.o $(OBJ)thumbDB.o $(OBJ)image.o $(OBJ)window.o $(OBJ)scalingImage.o $(OBJ)hashDB.o  $(OBJ)imageIcons.o 
 	$(CC) $(CFLAG) -c ./src/graphics/infoPopup.cpp -o ./src/obj/infoPopup.o $(GTKC) $(GTKL)
 
-$(OBJ)window.o: ./src/graphics/window.cpp ./src/graphics/window.h $(OBJ)collectionMan.o $(OBJ)thumbDB.o $(OBJ)image.o $(OBJ)scalingImage.o
+$(OBJ)window.o: ./src/graphics/window.cpp ./src/graphics/window.h $(OBJ)collectionMan.o $(OBJ)thumbDB.o $(OBJ)image.o $(OBJ)scalingImage.o $(OBJ)imageIcons.o 
 	$(CC) $(CFLAG) -c ./src/graphics/window.cpp -o ./src/obj/window.o $(GTKC) $(GTKL)
 
-$(OBJ)scalingImage.o: ./src/graphics/scalingImage.cpp ./src/graphics/scalingImage.h $(image.o) $(thumbDB.o)
+$(OBJ)imageIcons.o: ./src/graphics/imageIcons.cpp ./src/graphics/imageIcons.h $(OBJ)image.o 
+	$(CC) $(CFLAG) -c ./src/graphics/imageIcons.cpp -o ./src/obj/imageIcons.o $(GTKC) $(GTKL)
+
+$(OBJ)scalingImage.o: ./src/graphics/scalingImage.cpp ./src/graphics/scalingImage.h $(OBJ)image.o $(OBJ)thumbDB.o
 	$(CC) $(CFLAG) -c ./src/graphics/scalingImage.cpp -o ./src/obj/scalingImage.o $(GTKC) $(GTKL)
 
 $(OBJ)collectionMan.o: ./src/collectionMan.cpp ./src/collectionMan.h  $(OBJ)compMan.o 
