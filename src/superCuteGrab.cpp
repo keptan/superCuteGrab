@@ -8,6 +8,7 @@
 #include "cskill_instance.h"
 #include "collectionMan.h"
 #include "compMan.h"
+#include "graphics/infoPopup.h"
 #include <gtkmm.h>
 #include <memory>
 
@@ -37,7 +38,8 @@ int main(int argc, char *const argv[])
 
 	cute::CollectionMan collection ( idRank, images);
 
-	Window w(builder, collection);
+//	Window w(builder, collection);
+	BrowseWindow w(builder, collection, hashDb);
 
 	return app->run(*w.getWindow());
 

@@ -21,7 +21,6 @@ void CSkillInstance :: eatVector (void)
 		auto it = idTags.find(p[4]);
 		if( it != idTags.end())
 		{
-			std::cout << "mu: " << p[0] << '\n';
 			scores.insertScore( it->second, SkillDatum(p[0], p[1]));
 		}
 	}

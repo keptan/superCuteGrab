@@ -21,6 +21,8 @@ class CollectionMan
 	std::shared_ptr< Image> leftImage; 
 	std::shared_ptr< Image> rightImage; 
 
+	std::set< std::shared_ptr< Image>> history;
+
 	int leftStreak, rightStreak;
 
 	public:
@@ -30,6 +32,7 @@ class CollectionMan
 	std::shared_ptr< Image> getRightImage (void); 
 	std::shared_ptr< Image> getLeftImage  (void);
 	std::vector< std::shared_ptr< Image>> getImages (void); 
+//	void  setImages (const std::vector<std::shared_ptr< Image>>);
 
 	void setRightImage ( std::shared_ptr< Image>);
 	void setLeftImage  ( std::shared_ptr< Image>);
@@ -42,7 +45,7 @@ class CollectionMan
 
 	private:
 
-	std::shared_ptr< Image> matchingImage ( std::shared_ptr< Image>);
+	std::shared_ptr< Image> matchingImage ( std::shared_ptr< Image>, int winStreak = 0);
 
 
 };
