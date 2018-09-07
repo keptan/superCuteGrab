@@ -18,6 +18,7 @@ InfoPopup :: InfoPopup ( const Glib::RefPtr<Gtk::Builder> b
 	builder->get_widget("infoTags", tagTree);
 
 	tagTree->set_model(m_refTreeModel);
+	tagTree->show();
 	infoImage.setImage( image);
 	setImage(image);
 	
@@ -42,6 +43,7 @@ void InfoPopup :: setImage (std::shared_ptr< cute::Image> i)
 	m_refTreeModel->clear();
 	Gtk::TreeModel::Row r = *(m_refTreeModel->append());
 	r[m_Columns.m_col_name] = i->location.string();
+	std::cout << i->location.string() << "set" << std::endl;
 }
 
 	
@@ -129,6 +131,12 @@ void BrowseWindow :: selected (const Gtk::TreeModel::Path& path)
 	fight.refresh();
 	fight.getWindow()->show_all_children();
 	fight.getWindow()->show();
+
+	m_refTreeModel->clear();
+	for(auto &i : collection.getImages())
+		addMember(i);
+
+
 }
 
 void BrowseWindow :: import_folder (void)
