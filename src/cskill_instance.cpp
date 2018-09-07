@@ -162,6 +162,11 @@ void CSkillInstance :: runScores (int winner)
 		if (team1.size() == 0 || team2.size() == 0)
 			return;
 
+		if (team1.size() == 1 && team2.size() == 1 && winner == 3)
+		{
+			if(players[0][0] == 100 && players[1][0] == 100 && players[0][1] == 33 && players[1][1] == 33) return;
+		}
+
 		rate(players, ranks, teams);
 		eatVector();
 }
