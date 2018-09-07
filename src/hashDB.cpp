@@ -2,6 +2,7 @@
 #include "fileMd5.h"
 #include <iomanip>
 #include <cassert>
+#include <iostream>
 #include <set>
 
 namespace cute {
@@ -72,9 +73,12 @@ void HashDB :: scanDirectory (std::filesystem::path p)
 			if(it->second.file_size == size && it->second.write_time == time)
 			{
 				localPathMap.insert_or_assign(absolute, it->second);
+
+				std::cout << "using stored metadata for " << f.path().string() << '\n'; 
 				continue;
 			}
 		}
+		std::cout << "stored metadata for " << f.path().string() << " was no longer valid\n"; 
 
 		//if the stored metadata is no longer accurate we replace the store metadata and rehash the file
 		const Hash hash = hashFile(absolute);
@@ -82,6 +86,8 @@ void HashDB :: scanDirectory (std::filesystem::path p)
 		pathMap.insert_or_assign( absolute,  PathMetaData(size, time, hash));
 		localPathMap.insert_or_assign(absolute, PathMetaData(size, time, hash));
 	}
+
+	writeCSV();
 }
 
 bool HashDB :: contains (const std::filesystem::path p)
