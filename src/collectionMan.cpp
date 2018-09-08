@@ -68,6 +68,8 @@ void CollectionMan :: leftVictory (void)
 
 	//rightImage = matchingImage(leftImage, leftStreak);
 	rightImage = matchingELO( leftImage);
+	std::cout << "left ELO is currently: " << ident.getSkill(*leftImage).mu << std::endl;
+	std::cout << "right ELO is currently: " << ident.getSkill(*rightImage).mu << std::endl;
 
 }
 
@@ -84,6 +86,8 @@ void CollectionMan :: rightVictory (void)
 
 //	leftImage= matchingImage( rightImage, rightStreak);
 	leftImage = matchingELO( rightImage);
+	std::cout << "left ELO is currently: " << ident.getSkill(*leftImage).mu << std::endl;
+	std::cout << "right ELO is currently: " << ident.getSkill(*rightImage).mu << std::endl;
 
 }
 
@@ -130,8 +134,12 @@ std::shared_ptr< Image> CollectionMan :: matchingImage (std::shared_ptr< Image> 
 
 	std::sort (filtered.begin(), filtered.end(), 
 				[&](const auto a, const auto b) {
-					return ident.getSkill(*a).mu > ident.getSkill(*b).mu;
+					return ident.getSkill(*a).mu < ident.getSkill(*b).mu;
 				});
+
+	std::cout << "matching image" << std::endl;
+	std::cout << ident.getSkill(**filtered.begin()).mu << std::endl;
+	std::cout << ident.getSkill(**(filtered.end() -1)).mu << std::endl;
 
 	const int tenPercent = (filtered.size() - 1) / 10;
 
@@ -163,11 +171,15 @@ std::shared_ptr< Image> CollectionMan :: matchingELO (std::shared_ptr< Image> i)
 
 	std::sort (filtered.begin(), filtered.end(), 
 				[&](const auto a, const auto b) {
-					return ident.getSkill(*a).mu > ident.getSkill(*b).mu;
+					return ident.getSkill(*a).mu < ident.getSkill(*b).mu;
 				});
 
+	std::cout << "matching image" << std::endl;
+	std::cout << ident.getSkill(**filtered.begin()).mu << std::endl;
+	std::cout << ident.getSkill(**(filtered.end() -1)).mu << std::endl;
 
-	const int twoPercent = std::max<int>( (filtered.size() - 1 / 50), 2);
+
+	const int twoPercent = std::max<int>( ((filtered.size() - 1  ) / 20), 5);
 
 	auto climbBottom = std::find( filtered.begin(), filtered.end(), i) - twoPercent;
 	auto climbTop = climbBottom + (twoPercent * 2);
@@ -177,6 +189,12 @@ std::shared_ptr< Image> CollectionMan :: matchingELO (std::shared_ptr< Image> i)
 	if(climbBottom < filtered.begin()) climbBottom = filtered.begin(); 
 
 	if(climbBottom >= filtered.end() - 15) climbBottom = filtered.end() - 15;
+
+
+	std::cout << "matching image between ";
+	std::cout << ident.getSkill(**(climbBottom)).mu << " and ";
+	std::cout << ident.getSkill(**(climbTop)).mu << std::endl;
+
 
 
 	std::uniform_int_distribution<int> dist (0, std::abs(climbTop - climbBottom));
