@@ -48,6 +48,7 @@ class CollectionMan
 	private:
 
 	std::shared_ptr< Image> matchingImage ( std::shared_ptr< Image>, int winStreak = 0);
+	std::shared_ptr< Image> matchingELO   ( std::shared_ptr< Image>);
 
 
 };

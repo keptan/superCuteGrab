@@ -28,6 +28,9 @@ CollectionMan :: getImages (void)
 
 void CollectionMan :: freshImages (void)
 {
+	rightStreak = 0;
+	leftStreak = 0;
+
 	ident.saveTags();
 	std::random_device dev;
 	std::mt19937 gen (dev());
@@ -63,7 +66,8 @@ void CollectionMan :: leftVictory (void)
 	if(leftStreak >= 10)
 		return freshImages();
 
-	rightImage = matchingImage(leftImage, leftStreak);
+	//rightImage = matchingImage(leftImage, leftStreak);
+	rightImage = matchingELO( leftImage);
 
 }
 
@@ -78,7 +82,8 @@ void CollectionMan :: rightVictory (void)
 	if(rightStreak >= 10)
 		return freshImages();
 
-	leftImage= matchingImage( rightImage, rightStreak);
+//	leftImage= matchingImage( rightImage, rightStreak);
+	leftImage = matchingELO( rightImage);
 
 }
 
@@ -131,11 +136,13 @@ std::shared_ptr< Image> CollectionMan :: matchingImage (std::shared_ptr< Image> 
 	const int tenPercent = (filtered.size() - 1) / 10;
 
 	auto climbBottom = std::find( filtered.begin(), filtered.end(), i);
-	auto climbTop = climbBottom + tenPercent;
+	auto climbTop = climbBottom + tenPercent + (winStreak * (tenPercent / 2));
 
+	if(climbBottom - tenPercent > filtered.begin()) climbBottom = climbBottom - (tenPercent / 2);
 	if(climbTop >= filtered.end()) climbTop = filtered.end() - 1;
-	if(climbBottom >= filtered.end() - 20) climbBottom = (climbTop - 25 + winStreak);
+	if(climbBottom >= filtered.end() - tenPercent) climbBottom = (climbTop - 25 + winStreak);
 	if(climbBottom >= filtered.end() - 5) climbBottom = (climbTop - 5);
+
 
 	std::uniform_int_distribution<int> dist (0, std::abs(climbTop - climbBottom));
 
@@ -147,6 +154,45 @@ std::shared_ptr< Image> CollectionMan :: matchingImage (std::shared_ptr< Image> 
 			return out;
 	}
 }
+
+std::shared_ptr< Image> CollectionMan :: matchingELO (std::shared_ptr< Image> i)
+{
+	std::shared_ptr< Image> out = nullptr; 
+	std::random_device dev; 
+	std::mt19937 gen (dev()); 
+
+	std::sort (filtered.begin(), filtered.end(), 
+				[&](const auto a, const auto b) {
+					return ident.getSkill(*a).mu > ident.getSkill(*b).mu;
+				});
+
+
+	const int twoPercent = std::max<int>( (filtered.size() - 1 / 50), 2);
+
+	auto climbBottom = std::find( filtered.begin(), filtered.end(), i) - twoPercent;
+	auto climbTop = climbBottom + (twoPercent * 2);
+
+
+	if(climbTop >= filtered.end()) climbTop = filtered.end() - 1;
+	if(climbBottom < filtered.begin()) climbBottom = filtered.begin(); 
+
+	if(climbBottom >= filtered.end() - 15) climbBottom = filtered.end() - 15;
+
+
+	std::uniform_int_distribution<int> dist (0, std::abs(climbTop - climbBottom));
+
+	while(true)
+	{
+		out = *(climbBottom + dist(gen));
+		if(out != i)
+			return out;
+	}
+}
+
+
+
+
+
 
 }
 
