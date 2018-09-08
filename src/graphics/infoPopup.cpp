@@ -1,4 +1,6 @@
 #include "infoPopup.h" 
+#include <glib.h>
+#include <glib/gi18n.h>
 
 
 
@@ -51,8 +53,17 @@ BrowseWindow :: BrowseWindow
 ( const Glib::RefPtr<Gtk::Builder> b , cute::CollectionMan& c, cute::HashDB& h)
 	: fight(b,c), builder(b),  collection(c), hash(h), thumbnails("thumbnails")
 {
+	//set up drag and drop 
+
 	m_refTreeModel = Gtk::ListStore::create(m_Columns);
 	builder->get_widget("browseWindow", window);
+
+	std::vector<Gtk::TargetEntry> listTargets; 
+	listTargets.push_back(Gtk::TargetEntry("text/uri-list")); 
+	window->drag_dest_set(listTargets);
+	window->signal_drag_data_received().connect(sigc::mem_fun(*this, &BrowseWindow::on_dropped_file)); 
+
+
 
 	Gtk::ScrolledWindow* scroll;
 	builder->get_widget("browseScroll", scroll);
@@ -64,6 +75,13 @@ BrowseWindow :: BrowseWindow
 	view.set_pixbuf_column(m_Columns.m_col_pixbuf);
 	view.set_markup_column(m_Columns.m_col_name);
 	view.signal_item_activated().connect( sigc::mem_fun(*this, &BrowseWindow::selected));
+
+	std::vector<Gtk::TargetEntry> listSources; 
+	listSources.push_back(Gtk::TargetEntry("text/uri-list")); 
+	view.drag_source_set( listSources); 
+	view.signal_drag_data_get().connect(sigc::mem_fun(*this, &BrowseWindow::get_selected_data));
+
+
 
 	Gtk::Button* button; 
 	builder->get_widget("importButton", button);
@@ -193,4 +211,51 @@ void BrowseWindow :: import_folder (void)
 		return;
 }
 
+
+void BrowseWindow :: on_dropped_file(const Glib::RefPtr<Gdk::DragContext>& context, int x, int y, const Gtk::SelectionData& selection_data, guint info, guint time)
+{
+	if ((selection_data.get_length() >= 0) && (selection_data.get_format() == 8))
+	 {
+			 std::vector<Glib::ustring> file_list;
+	 
+			 file_list = selection_data.get_uris();
+	 
+		 if (file_list.size() > 0)
+		 {
+			 for(auto &file : file_list)
+			 {
+				 Glib::ustring path = Glib::filename_from_uri(file);
+				 std::cout << "we received a file " << path << std::endl;
+				 //do something here with the 'filename'. eg open the file for reading
+				 context->drag_finish(true, false, time);
+			 }
+			 return;
+		 }
+	 }
+ 
+	 context->drag_finish(false, false, time);
+}
+
+void BrowseWindow :: get_selected_data (
+		   const Glib::RefPtr<Gdk::DragContext>& context, 
+			Gtk::SelectionData& selection_data, guint info, guint time)
+{
+	std::vector<Glib::ustring> paths; 
+
+
+	const auto selection = view.get_selected_items(); 
+	if(selection.size() > 0)
+	{
+		auto iter = m_refTreeModel->get_iter(selection[0]);
+		auto row = *iter; 
+
+		std::shared_ptr<cute::Image> image = row[m_Columns.m_col_image];
+
+		paths.push_back(  g_filename_to_uri( std::filesystem::absolute(image->location).string().c_str(), NULL, NULL));
+		selection_data.set_pixbuf( row[m_Columns.m_col_pixbuf]);
+		selection_data.set_uris(paths);
+		std::cout << g_filename_to_uri( std::filesystem::absolute(image->location).string().c_str(), NULL, NULL) << std::endl;
+	}
+
+}
 

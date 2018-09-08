@@ -83,6 +83,12 @@ class BrowseWindow : public sigc::trackable
 	void addMember (const std::shared_ptr<cute::Image> i);
 	void import_folder (void);
 
+	void on_dropped_file(const Glib::RefPtr<Gdk::DragContext>& context,
+	  int x, int y, const Gtk::SelectionData& selection_data, guint info, guint time);
+
+	void get_selected_data (
+		   const Glib::RefPtr<Gdk::DragContext>& context, 
+			Gtk::SelectionData& selection_data, guint info, guint time);	   
 
 	void callback (const std::vector<Gtk::TreeModel::Path>);
 
