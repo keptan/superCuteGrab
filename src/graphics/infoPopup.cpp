@@ -225,7 +225,6 @@ void BrowseWindow :: on_dropped_file(const Glib::RefPtr<Gdk::DragContext>& conte
 			 for(auto &file : file_list)
 			 {
 				 Glib::ustring path = Glib::filename_from_uri(file);
-				 std::cout << "we received a file " << path << std::endl;
 				 //do something here with the 'filename'. eg open the file for reading
 				 context->drag_finish(true, false, time);
 			 }
@@ -254,7 +253,6 @@ void BrowseWindow :: get_selected_data (
 		paths.push_back(  g_filename_to_uri( std::filesystem::absolute(image->location).string().c_str(), NULL, NULL));
 		selection_data.set_pixbuf( row[m_Columns.m_col_pixbuf]);
 		selection_data.set_uris(paths);
-		std::cout << g_filename_to_uri( std::filesystem::absolute(image->location).string().c_str(), NULL, NULL) << std::endl;
 	}
 
 }

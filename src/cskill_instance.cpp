@@ -89,7 +89,6 @@ void CSkillInstance :: runScores (int winner)
 	{
 		idTags.insert(std::make_pair( idIt, t));
 		addPlayer( scores.retrieveData(t), 1, idIt);
-		std::cout << "retrieved: " << scores.retrieveData(t).mu << '\n';
 		idIt++;
 	}
 
@@ -97,7 +96,6 @@ void CSkillInstance :: runScores (int winner)
 	{
 		idTags.insert(std::make_pair( idIt, t));
 		addPlayer( scores.retrieveData(t), 2, idIt);
-		std::cout << "retrieved: " << scores.retrieveData(t).mu << '\n';
 		idIt++;
 	}
 
@@ -144,6 +142,7 @@ void CSkillInstance :: runScores (int winner)
 
 		int teams = team3.size() == 0 ? 2 : 3;
 
+		/*
 		for(auto& t: team1)
 		{
 			std::cout << t.tag << '\n';
@@ -158,6 +157,7 @@ void CSkillInstance :: runScores (int winner)
 		{
 			std::cout << t.tag << '\n';
 		}
+		*/
 
 		if (team1.size() == 0 || team2.size() == 0)
 			return;
