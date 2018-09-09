@@ -5,7 +5,7 @@ namespace cute  {
 CollectionMan :: CollectionMan (IdentityRank& i, std::vector< std::shared_ptr< Image>> c)
 	: ident(i), collection(c), filtered(c), leftStreak(0), rightStreak(0) 
 {
-	freshImages();
+	//freshImages();
 }
 
 void CollectionMan :: setImages (const std::vector< std::shared_ptr<Image>> i)
@@ -67,7 +67,7 @@ void CollectionMan :: leftVictory (void)
 		return freshImages();
 
 	//rightImage = matchingImage(leftImage, leftStreak);
-	rightImage = matchingELO( leftImage);
+	rightImage = matchingELO( leftImage, leftStreak);
 	std::cout << "left ELO is currently: " << ident.getSkill(*leftImage).mu << std::endl;
 	std::cout << "right ELO is currently: " << ident.getSkill(*rightImage).mu << std::endl;
 
@@ -85,7 +85,7 @@ void CollectionMan :: rightVictory (void)
 		return freshImages();
 
 //	leftImage= matchingImage( rightImage, rightStreak);
-	leftImage = matchingELO( rightImage);
+	leftImage = matchingELO( rightImage, rightStreak);
 	std::cout << "left ELO is currently: " << ident.getSkill(*leftImage).mu << std::endl;
 	std::cout << "right ELO is currently: " << ident.getSkill(*rightImage).mu << std::endl;
 
@@ -137,10 +137,6 @@ std::shared_ptr< Image> CollectionMan :: matchingImage (std::shared_ptr< Image> 
 					return ident.getSkill(*a).mu < ident.getSkill(*b).mu;
 				});
 
-	std::cout << "matching image" << std::endl;
-	std::cout << ident.getSkill(**filtered.begin()).mu << std::endl;
-	std::cout << ident.getSkill(**(filtered.end() -1)).mu << std::endl;
-
 	const int tenPercent = (filtered.size() - 1) / 10;
 
 	auto climbBottom = std::find( filtered.begin(), filtered.end(), i);
@@ -163,7 +159,7 @@ std::shared_ptr< Image> CollectionMan :: matchingImage (std::shared_ptr< Image> 
 	}
 }
 
-std::shared_ptr< Image> CollectionMan :: matchingELO (std::shared_ptr< Image> i)
+std::shared_ptr< Image> CollectionMan :: matchingELO (std::shared_ptr< Image> i, int streak )
 {
 	std::shared_ptr< Image> out = nullptr; 
 	std::random_device dev; 
@@ -182,7 +178,7 @@ std::shared_ptr< Image> CollectionMan :: matchingELO (std::shared_ptr< Image> i)
 	const int twoPercent = std::max<int>( ((filtered.size() - 1  ) / 20), 5);
 
 	auto climbBottom = std::find( filtered.begin(), filtered.end(), i) - twoPercent;
-	auto climbTop = climbBottom + (twoPercent * 2);
+	auto climbTop = climbBottom + (twoPercent * (streak / 2 + 1));
 
 
 	if(climbTop >= filtered.end()) climbTop = filtered.end() - 1;

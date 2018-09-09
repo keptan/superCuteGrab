@@ -92,7 +92,7 @@ BrowseWindow :: BrowseWindow
 
 
 
-	iPop = std::make_unique<InfoPopup>( builder, collection, collection.getImages().back());
+	iPop = nullptr;
 
 	for(auto &i : collection.getImages())
 		addMember(i);
@@ -123,6 +123,10 @@ void BrowseWindow :: callback (const std::vector<Gtk::TreeModel::Path> paths)
 
 	std::shared_ptr<cute::Image>  image = row[m_Columns.m_col_image];
 	std::cout << image->location << '\n';
+
+
+	if(iPop == nullptr)
+		iPop = std::make_unique<InfoPopup>( builder, collection, image);
 
 	iPop->setImage(image);
 	iPop->getWindow()->show_all_children();

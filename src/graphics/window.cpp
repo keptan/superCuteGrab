@@ -14,8 +14,10 @@ FightWindow :: FightWindow ( const Glib::RefPtr<Gtk::Builder> b, cute::Collectio
 	Gtk::IconView* view;
 	window->signal_key_press_event().connect(sigc::mem_fun(*this, &FightWindow::onKeyPress), false);
 
+	/*
 	leftImage.setImage( collection.getLeftImage());
 	rightImage.setImage( collection.getRightImage());
+	*/
 
 }
 

@@ -24,17 +24,19 @@ int main(int argc, char *const argv[])
 	cute::TagDB tagDB("tags.csv");
 	cute::IdentityRank idRank;
 
-	hashDb.scanDirectory("test");
-	hashDb.writeCSV();
+//	hashDb.scanDirectory("test");
+//	hashDb.writeCSV();
 
 	std::vector< std::shared_ptr<cute::Image>> images;
 
 
+	/*
 	for(auto &f : std::filesystem::directory_iterator("test"))
 	{
 		if(!cute::conformingFileType(f.path())) continue;
 		images.push_back( std::make_shared<cute::Image> (f.path(), hashDb.retrieveData(f.path())));
 	}
+	*/
 
 	cute::CollectionMan collection ( idRank, images);
 
