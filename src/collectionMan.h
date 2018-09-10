@@ -12,7 +12,7 @@ namespace cute		{
 
 class CollectionMan 
 {
-	IdentityRank ident; 
+	IdentityRank& ident; 
 	//other rankers here 
 	
 	std::vector< std::shared_ptr< Image>> collection; 
