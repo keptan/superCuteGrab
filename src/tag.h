@@ -18,8 +18,11 @@ struct SkillDatum
 	double mu; 
 	double sigma; 
 
+	double skill (void);
+
 	SkillDatum (const double m = 100, const double s = 33);
 	SkillDatum (const std::vector<double>& );
+
 };
 
 }

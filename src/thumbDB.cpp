@@ -17,6 +17,7 @@ std::filesystem::path ThumbDB :: getThumbPath (const Image& image)
 	const auto it = items.find(image.pData.hash);
 
 	if(it != items.end()) return it->second;
+	std::cout << "generating new thumbnail for: " << image.location << std::endl;
 
 	const auto newPath = generateThumb(image);
 	items.insert( std::make_pair(image.pData.hash, newPath));

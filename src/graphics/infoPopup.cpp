@@ -40,7 +40,7 @@ void InfoPopup :: setImage (std::shared_ptr< cute::Image> i)
 {
 	image = i;
 	infoImage.setImage(i);
-	scoreLabel->set_text( "IdentityScore: "  + std::to_string( collection.getSkill(i).mu));
+	scoreLabel->set_text( "IdentityScore: "  + std::to_string( collection.getSkill(i).skill()));
 
 	m_refTreeModel->clear();
 	Gtk::TreeModel::Row r = *(m_refTreeModel->append());
@@ -89,6 +89,10 @@ BrowseWindow :: BrowseWindow
 				&BrowseWindow::import_folder) );
 
 	view.signal_image().connect(sigc::mem_fun(*this, &BrowseWindow::callback));
+
+	builder->get_widget("importButton2", button);
+	button->signal_clicked().connect(sigc::mem_fun(*this, 
+				&BrowseWindow::import_folder_recursive) );
 
 
 
@@ -196,6 +200,57 @@ void BrowseWindow :: import_folder (void)
 
 
 
+
+
+		  break;
+		}
+		case(Gtk::RESPONSE_CANCEL):
+		{
+		  std::cout << "Cancel clicked." << std::endl;
+		  break;
+		}
+		default:
+		{
+		  std::cout << "Unexpected button clicked." << std::endl;
+		  break;
+		}
+	  }
+
+		return;
+}
+
+void BrowseWindow :: import_folder_recursive (void)
+{
+	  Gtk::FileChooserDialog dialog("Please choose a folder", Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
+	  dialog.set_transient_for(*window);
+
+	  dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
+	  dialog.add_button("Select", Gtk::RESPONSE_OK);
+
+	  int result = dialog.run();
+	switch(result)
+	  {
+		case(Gtk::RESPONSE_OK):
+		{
+		  std::cout << "Select clicked." << std::endl;
+		  std::cout << "Folder selected: " << dialog.get_filename()
+			  << std::endl;
+		  hash.scanDirectoryRecursive(dialog.get_filename());
+
+		  auto i = collection.getImages();
+
+
+
+			for(auto &f : std::filesystem::recursive_directory_iterator(dialog.get_filename()))
+			{
+				if(!cute::conformingFileType(f.path())) continue;
+				i.push_back( std::make_shared<cute::Image> (f.path(), hash.retrieveData(f.path())));
+			}
+
+			collection.setImages(i);
+			m_refTreeModel->clear();
+			for(auto &i : collection.getImages())
+				addMember(i);
 
 
 		  break;

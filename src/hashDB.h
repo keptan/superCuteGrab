@@ -31,6 +31,7 @@ public:
 	void writeCSV (void);
 	
 	void scanDirectory (std::filesystem::path p);
+	void scanDirectoryRecursive (std::filesystem::path p);
 
 	bool contains (const std::filesystem::path p);
 	PathMetaData retrieveData (const std::filesystem::path p);
