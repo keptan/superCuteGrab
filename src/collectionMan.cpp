@@ -39,20 +39,8 @@ void CollectionMan :: freshImages (void)
 				[&](const auto a, const auto b) {
 					return ident.getSkill(*a).sigma > ident.getSkill(*b).sigma;
 				});
-
-
-	//get climb iters ready, the first ten percent of sigma images 
-	const int tenPercent = (filtered.size() - 1) / 10;
-
-	auto climbBottom = filtered.begin();
-	auto climbTop = climbBottom + tenPercent; 
-
-	while(climbTop >= filtered.end()) climbTop--;
-
-	std::uniform_int_distribution<int> dist (0, tenPercent);
-	leftImage  = *(climbBottom + dist(gen));
+	leftImage  = *(filtered.begin());
 	rightImage = matchingImage(leftImage);
-
 }
 	
 void CollectionMan :: leftVictory (void)
