@@ -24,6 +24,7 @@ class CollectionMan
 	std::set< std::shared_ptr< Image>> history;
 
 	int leftStreak, rightStreak;
+	bool runningFresh;
 
 	public:
 	CollectionMan (IdentityRank&, std::vector< std::shared_ptr< Image>> c);

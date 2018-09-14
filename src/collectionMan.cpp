@@ -3,7 +3,7 @@
 namespace cute  {
 
 CollectionMan :: CollectionMan (IdentityRank& i, std::vector< std::shared_ptr< Image>> c)
-	: ident(i), collection(c), filtered(c), leftStreak(0), rightStreak(0) 
+	: ident(i), collection(c), filtered(c), leftStreak(0), rightStreak(0), runningFresh(false)
 {
 	//freshImages();
 }
@@ -41,6 +41,11 @@ void CollectionMan :: freshImages (void)
 				});
 	leftImage  = *(filtered.begin());
 	rightImage = matchingImage(leftImage);
+
+	if( ident.getSkill(*leftImage).sigma > 20) 
+		runningFresh = true; 
+	else 
+		runningFresh = false; 
 }
 	
 void CollectionMan :: leftVictory (void)
@@ -51,14 +56,10 @@ void CollectionMan :: leftVictory (void)
 	leftStreak++;
 	rightStreak = 0;
 
-	if(leftStreak >= 10)
+	if(leftStreak > 12)
 		return freshImages();
 
-	//rightImage = matchingImage(leftImage, leftStreak);
 	rightImage = matchingELO( leftImage, leftStreak);
-	std::cout << "left ELO is currently: " << ident.getSkill(*leftImage).skill()   << std::endl;
-	std::cout << "right ELO is currently: " << ident.getSkill(*rightImage).skill() << std::endl;
-
 }
 
 void CollectionMan :: rightVictory (void)
@@ -66,22 +67,36 @@ void CollectionMan :: rightVictory (void)
 
 	ident.runImages(*leftImage, *rightImage, 2);
 
+	if(runningFresh) 
+	{
+		leftStreak++;
+		if(leftStreak > 12) 
+			return freshImages(); 
+
+		rightImage = matchingELO( leftImage, leftStreak); 
+		return; 
+	}
+
 	leftStreak = 0;
 	rightStreak++;
 
-	if(rightStreak >= 10)
+	if(rightStreak > 12)
 		return freshImages();
 
-//	leftImage= matchingImage( rightImage, rightStreak);
 	leftImage = matchingELO( rightImage, rightStreak);
-	std::cout << "left ELO is currently: " << ident.getSkill(*leftImage).skill() << std::endl;
-	std::cout << "right ELO is currently: " << ident.getSkill(*rightImage).skill() << std::endl;
-
 }
 
 void CollectionMan :: tieVictory (void)
 {
 	ident.runImages(*leftImage, *rightImage, 3);
+
+	if(runningFresh && leftStreak < 12)
+	{
+		leftStreak++;
+		rightImage = matchingELO( leftImage, leftStreak);
+		return; 
+	}
+
 	freshImages();
 }
 
@@ -159,12 +174,14 @@ std::shared_ptr< Image> CollectionMan :: matchingELO (std::shared_ptr< Image> i,
 				});
 
 
-	const int twoPercent = std::max<int>( ((filtered.size() - 1  ) / 20), 5);
+	const int twoPercent = std::max<int>( ((filtered.size() - 1  ) / 50), 5);
 
 	auto climbBottom = std::find( filtered.begin(), filtered.end(), i) - twoPercent;
-	auto climbTop = climbBottom + (twoPercent * (streak / 2 + 1));
+	auto climbTop = climbBottom + (twoPercent * 2);
 
 
+	if(!runningFresh) climbBottom += (twoPercent * (streak / 3 + 1));
+	if(!runningFresh) climbTop += (twoPercent * (streak / 2));
 	if(climbTop >= filtered.end()) climbTop = filtered.end() - 1;
 	if(climbBottom < filtered.begin()) climbBottom = filtered.begin(); 
 
@@ -173,7 +190,7 @@ std::shared_ptr< Image> CollectionMan :: matchingELO (std::shared_ptr< Image> i,
 
 	std::cout << "matching image between ";
 	std::cout << ident.getSkill(**(climbBottom)).skill() << " and ";
-	std::cout << ident.getSkill(**(climbTop)).skill() << std::endl;
+	std::cout << ident.getSkill(**(climbTop)).skill() << "range of: " << (climbTop - climbBottom) << std::endl;
 
 
 

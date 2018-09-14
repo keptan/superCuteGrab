@@ -1,4 +1,5 @@
 #include "infoPopup.h" 
+#include <algorithm>
 #include <glib.h>
 #include <glib/gi18n.h>
 
@@ -94,6 +95,13 @@ BrowseWindow :: BrowseWindow
 	button->signal_clicked().connect(sigc::mem_fun(*this, 
 				&BrowseWindow::import_folder_recursive) );
 
+	builder->get_widget("tleft", button); 
+	button->signal_clicked().connect(sigc::mem_fun(*this, 
+				&BrowseWindow::terminate_left) ); 
+
+	builder->get_widget("tright", button); 
+	button->signal_clicked().connect(sigc::mem_fun(*this, 
+				&BrowseWindow::terminate_right) ); 
 
 
 	iPop = nullptr;
@@ -315,4 +323,45 @@ void BrowseWindow :: get_selected_data (
 	}
 
 }
+
+void BrowseWindow :: terminate_left (void) 
+{
+	auto i = collection.getImages(); 
+	const auto left = collection.getLeftImage();
+	
+	i.erase( std::remove(i.begin(), i.end(), left), i.end()); 
+	std::filesystem::rename( left->location, std::filesystem::path("./exile")/left->location.filename() );
+	collection.setImages(i); 
+
+	for(auto &row : m_refTreeModel->children())
+	{
+		auto rowImage = row.get_value(m_Columns.m_col_image);
+		if(rowImage == left) m_refTreeModel->erase(row);
+	}
+
+	collection.freshImages(); 
+	fight.refresh();
+}
+	
+void BrowseWindow :: terminate_right (void) 
+{
+	auto i = collection.getImages(); 
+	const auto right = collection.getRightImage();
+	
+	i.erase( std::remove(i.begin(), i.end(), right), i.end()); 
+	std::filesystem::rename( right->location, std::filesystem::path("./exile")/right->location.filename() );
+	collection.setImages(i); 
+
+	for(auto &row : m_refTreeModel->children())
+	{
+		auto rowImage = row.get_value(m_Columns.m_col_image);
+
+		if(rowImage == right) m_refTreeModel->erase(row);
+	}
+
+	collection.freshImages(); 
+	fight.refresh();
+}
+
+
 

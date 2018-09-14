@@ -83,6 +83,8 @@ class BrowseWindow : public sigc::trackable
 	void addMember (const std::shared_ptr<cute::Image> i);
 	void import_folder (void);
 	void import_folder_recursive (void);
+	void terminate_left  (void); 
+	void terminate_right (void);
 
 	void on_dropped_file(const Glib::RefPtr<Gdk::DragContext>& context,
 	  int x, int y, const Gtk::SelectionData& selection_data, guint info, guint time);
