@@ -40,49 +40,55 @@ void CollectionMan :: freshImages (void)
 					return ident.getSkill(*a).sigma > ident.getSkill(*b).sigma;
 				});
 	leftImage  = *(filtered.begin());
-	rightImage = matchingImage(leftImage);
+	rightImage = matchingELO(leftImage);
 
-	if( ident.getSkill(*leftImage).sigma > 20) 
-		runningFresh = true; 
-	else 
-		runningFresh = false; 
+	runningFresh = ident.getSkill(*leftImage).sigma > 15 ? true : false; 
+	std::cout << "running fresh: " << runningFresh << std::endl;
 }
 	
 void CollectionMan :: leftVictory (void)
 {
-
 	ident.runImages(*leftImage, *rightImage, 1);
-
-	leftStreak++;
 	rightStreak = 0;
+	leftStreak++;
 
-	if(leftStreak > 12)
+	const bool leftUncertain  = ident.getSkill(*leftImage).sigma  > 9; 
+	const bool rightUncertain = ident.getSkill(*rightImage).sigma > 9; 
+
+	if(rightStreak > 10 || leftStreak > 10)
 		return freshImages();
+
+	if(leftUncertain && runningFresh) 
+	{
+		rightImage = matchingELO(leftImage, 0); 
+		return;
+	}
 
 	rightImage = matchingELO( leftImage, leftStreak);
 }
 
 void CollectionMan :: rightVictory (void)
 {
-
 	ident.runImages(*leftImage, *rightImage, 2);
+	rightStreak++;
 
-	if(runningFresh) 
+	const bool leftUncertain  = ident.getSkill(*leftImage).sigma  > 9; 
+	const bool rightUncertain = ident.getSkill(*rightImage).sigma > 9; 
+
+	if(rightStreak > 10 || leftStreak > 10)
+	{
+		leftStreak = 0;
+		return freshImages();
+	}
+
+	if(leftUncertain && runningFresh) 
 	{
 		leftStreak++;
-		if(leftStreak > 12) 
-			return freshImages(); 
-
-		rightImage = matchingELO( leftImage, leftStreak); 
+		rightImage = matchingELO(leftImage, 0); 
 		return; 
 	}
 
 	leftStreak = 0;
-	rightStreak++;
-
-	if(rightStreak > 12)
-		return freshImages();
-
 	leftImage = matchingELO( rightImage, rightStreak);
 }
 
@@ -90,10 +96,14 @@ void CollectionMan :: tieVictory (void)
 {
 	ident.runImages(*leftImage, *rightImage, 3);
 
-	if(runningFresh && leftStreak < 12)
+	const bool leftUncertain  = ident.getSkill(*leftImage).sigma  > 9; 
+	const bool rightUncertain = ident.getSkill(*rightImage).sigma > 9; 
+
+
+	if(runningFresh && leftUncertain  && leftStreak < 10)
 	{
 		leftStreak++;
-		rightImage = matchingELO( leftImage, leftStreak);
+		rightImage = matchingELO( leftImage, 0);
 		return; 
 	}
 
@@ -103,13 +113,13 @@ void CollectionMan :: tieVictory (void)
 void CollectionMan :: setRightImage ( std::shared_ptr< Image> i) 
 {
 	rightImage = i;
-	leftImage = matchingImage(i);
+	leftImage = matchingELO(i);
 }
 
 void CollectionMan :: setLeftImage ( std::shared_ptr< Image> i) 
 {
 	leftImage = i;
-	rightImage = matchingImage(i);
+	rightImage = matchingELO(i);
 }
 
 SkillDatum CollectionMan :: getSkill (std::shared_ptr< Image> i)
@@ -191,6 +201,7 @@ std::shared_ptr< Image> CollectionMan :: matchingELO (std::shared_ptr< Image> i,
 	std::cout << "matching image between ";
 	std::cout << ident.getSkill(**(climbBottom)).skill() << " and ";
 	std::cout << ident.getSkill(**(climbTop)).skill() << "range of: " << (climbTop - climbBottom) << std::endl;
+	std::cout << "left image, mu: " << ident.getSkill(*(leftImage)).mu << " sigma: " << ident.getSkill(*(leftImage)).sigma << std::endl;
 
 
 
