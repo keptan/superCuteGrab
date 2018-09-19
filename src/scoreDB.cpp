@@ -31,7 +31,7 @@ void ScoreDB :: readCSV (void)
 		is >> std::quoted(t) >> mu >> sigma; 
 
 		//decay sigma every boot 
-		if(sigma < 12) sigma = std::min<double>( sigma + 3, 12.0);
+		if(sigma < 20) sigma = std::min<double>( sigma + 1, 20.0);
 
 		scoreMap.insert( std::make_pair( 
 				Tag(t), SkillDatum(mu, sigma)));
