@@ -16,9 +16,9 @@ class CompMan
 class IdentityRank : public CompMan 
 {
 
-	public:
 	ScoreDB scores; 
 
+	public:
 	IdentityRank (void);
 	void runImages (const Image& , const Image& , int );
 	void saveTags (void);
@@ -27,4 +27,15 @@ class IdentityRank : public CompMan
 
 };
 
-}
+class PathRank : public CompMan 
+{
+	ScoreDB scores;
+
+	public:
+	PathRank (void);
+	void runImages (const Image&, const Image&, int );
+	void saveTags (void);
+
+	SkillDatum getSkill (const Image&);
+};
+					}
