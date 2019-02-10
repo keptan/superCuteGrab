@@ -8,27 +8,50 @@
 
 
 InfoPopup :: InfoPopup ( const Glib::RefPtr<Gtk::Builder> b 
-					   , cute::CollectionMan& c
-					   , std::shared_ptr< cute::Image> i)
+					   , cute::ThumbDB& t, cute::CollectionMan& c)
 
-   :  image(i), collection(c), builder(b)
+   :   thumbnails(t), collection(c), builder(b)
    , infoImage(builder, "infoAspect", "infoScroll", "infoImage")
 {
-	m_refTreeModel = Gtk::ListStore::create(m_Columns);
-		
+	//setup builder widgets
 	builder->get_widget("infoWindow", window);
 	builder->get_widget("infoTags", tagTree);
+	builder->get_widget("addTag", addTag);
+	builder->get_widget("infoAspect", frame);
+	builder->get_widget("infoIconScroll", scroll);
 
-	tagTree->set_model(m_refTreeModel);
-	tagTree->append_column("ID", m_Columns.m_col_name);
-	tagTree->append_column("score", m_Columns.m_col_score);
+	//setup iconView and tagTree view models
+	//tagTree is a list of all the tags and scores of selected images
+	//iconTreeModel is an optionally displayed icon view, for when we select more than one image
+	tagTreeModel = Gtk::ListStore::create(tagColumns);
+	iconTreeModel = Gtk::ListStore::create( iconColumns);
 
-	
+		
+	//setup the columns for the tagTree list and iconView
+	tagTree->set_model(tagTreeModel);
+	tagTree->append_column("ID", tagColumns.m_col_name);
+	tagTree->append_column("score", tagColumns.m_col_score);
+	icons.set_model(iconTreeModel);
+	icons.set_pixbuf_column(iconColumns.m_col_pixbuf);
+
+	scroll->add(icons);
+
+	//setting up autocomplete for the user tag entry
+	auto completion = Gtk::EntryCompletion::create();
+	addTag->set_completion(completion);
+
+	auto refCompletionModel = Gtk::ListStore::create(c_Columns);
+	completion->set_model(refCompletionModel);
+
+	//appending a test item, placeholder
+	Gtk::TreeModel::Row row = *(refCompletionModel->append());
+	row[c_Columns.m_col_id] = 1;
+	row[c_Columns.m_col_name] = "test";
+	completion->set_text_column(c_Columns.m_col_name);
 
 	tagTree->show();
-	infoImage.setImage( image);
-	setImage(image);
-	
+
+	//insert the icons widget into the scrollbar
 }
 
 InfoPopup :: ~InfoPopup (void)
@@ -41,6 +64,7 @@ Gtk::Window* InfoPopup :: getWindow (void)
 	return window; 
 }
 
+/*
 void InfoPopup :: setImage (std::shared_ptr< cute::Image> i)
 {
 	image = i;
@@ -51,43 +75,87 @@ void InfoPopup :: setImage (std::shared_ptr< cute::Image> i)
 	Gtk::TreeModel::Row r = *(m_refTreeModel->append());
 	r[m_Columns.m_col_name]		= i->location.filename().string();
 	r[m_Columns.m_col_score]	= collection.getSkill(i).skill();
+
+	infoImage.show();
+	scroll->hide();
+}
+*/
+
+void InfoPopup :: setImages (const std::vector< std::shared_ptr< cute::Image>> i)
+{
+	selected = i;
+
+	//clear the iconview of all icons
+	iconTreeModel->clear();
+	if(!selected.size()) return;
+
+	infoImage.setImage( i[0]);
+
+	//if only one image, show the large preview instead of the icon view
+	if(selected.size() == 1)
+	{
+		//set the image to the first image
+		infoImage.show();
+		scroll->hide();
+		icons.hide();
+		return;
+	}
+
+	for(const auto im : i)
+	{
+		//append all the images into the iconView widget
+		Gtk::TreeModel::Row r = *(iconTreeModel->append());
+
+		r[iconColumns.m_col_name] = im->location.string();
+		r[iconColumns.m_col_pixbuf] = Gdk::Pixbuf::create_from_file( thumbnails.getThumbPath(*im).c_str());
+		r[iconColumns.m_col_image] = im; 
+	}
+
+	scroll->show();
+	infoImage.hide();
+	icons.show();
 }
 
 	
 BrowseWindow :: BrowseWindow 
 ( const Glib::RefPtr<Gtk::Builder> b , cute::CollectionMan& c, cute::HashDB& h)
-	: fight(b,c), builder(b),  collection(c), hash(h), thumbnails("thumbnails")
+	: fight(b,c), builder(b),  collection(c), hash(h), thumbnails("thumbnails"), iPop(nullptr)
 {
-	//set up drag and drop 
-
-	m_refTreeModel = Gtk::ListStore::create(m_Columns);
+	//setup a pointer to our own window
 	builder->get_widget("browseWindow", window);
 
+	//we use the window pointer to help setup drag and drop
 	std::vector<Gtk::TargetEntry> listTargets; 
 	listTargets.push_back(Gtk::TargetEntry("text/uri-list")); 
 	window->drag_dest_set(listTargets);
 	window->signal_drag_data_received().connect(sigc::mem_fun(*this, &BrowseWindow::on_dropped_file)); 
 
+	//setting up the refTreeModel for the icons 
+	m_refTreeModel = Gtk::ListStore::create(m_Columns);
 
-
+	//add our icon view to the scrollbox
 	Gtk::ScrolledWindow* scroll;
 	builder->get_widget("browseScroll", scroll);
 	scroll->add(view);
-	view.show();
-	
-	//builder->get_widget("browseIcon", view);
+
+	//setup the icon view columns, and show it
 	view.set_model(m_refTreeModel);
 	view.set_pixbuf_column(m_Columns.m_col_pixbuf);
 	view.set_markup_column(m_Columns.m_col_name);
+
+	//callbacks and drag and drop out
 	view.signal_item_activated().connect( sigc::mem_fun(*this, &BrowseWindow::selected));
 
+	//further setup for drag and drop
 	std::vector<Gtk::TargetEntry> listSources; 
 	listSources.push_back(Gtk::TargetEntry("text/uri-list")); 
 	view.drag_source_set( listSources); 
 	view.signal_drag_data_get().connect(sigc::mem_fun(*this, &BrowseWindow::get_selected_data));
 
+	//show the icon view here
+	view.show();
 
-
+	//setup some callbacks for different buttons
 	Gtk::Button* button; 
 	builder->get_widget("importButton", button);
 	button->signal_clicked().connect(sigc::mem_fun(*this, 
@@ -107,53 +175,54 @@ BrowseWindow :: BrowseWindow
 	button->signal_clicked().connect(sigc::mem_fun(*this, 
 				&BrowseWindow::terminate_right) ); 
 
-
-	iPop = nullptr;
-
 	for(auto &i : collection.getImages())
 		addMember(i);
 
 }
 
+//add a image to the icon view
 void BrowseWindow :: addMember (const std::shared_ptr<cute::Image> i)
 {
+
 	Gtk::TreeModel::Row r = *(m_refTreeModel->append());
 
+	//basic treeModel column stuff we do all the time
 	r[m_Columns.m_col_name] = i->location.string();
 	r[m_Columns.m_col_pixbuf] = Gdk::Pixbuf::create_from_file( thumbnails.getThumbPath(*i).c_str());
 	r[m_Columns.m_col_image] = i;
 }	
 
+//callback for the right click 'info' menu
 void BrowseWindow :: callback (const std::vector<Gtk::TreeModel::Path> paths)
 {
-	if(paths.size())
+	//vector we fill with images
+	//wish I knew how to pass around ref columns themselves or something 
+	std::vector< std::shared_ptr< cute::Image>> images;
+
+	for(const auto p : paths)
 	{
-	const auto path = paths.back();
+		auto iter = m_refTreeModel->get_iter(p);
+		auto row = *iter; 
 
-	std::cout << "received signal" << std::endl;
-	auto iter = m_refTreeModel->get_iter(path);
-	auto row = *iter; 
-
-	std::shared_ptr<cute::Image>  image = row[m_Columns.m_col_image];
-	std::cout << image->location << '\n';
-
-
-	if(iPop == nullptr)
-		iPop = std::make_unique<InfoPopup>( builder, collection, image);
-
-	iPop->setImage(image);
-	iPop->getWindow()->show_all_children();
-	iPop->getWindow()->show();
-
-
+		std::shared_ptr<cute::Image>  image = row[m_Columns.m_col_image];
+		images.push_back(image);
 	}
+
+	//if a window isn't setup yet, we make one
+	if(iPop == nullptr)
+		iPop = std::make_unique<InfoPopup>( builder, thumbnails, collection);
+
+	iPop->setImages(images);
+	iPop->getWindow()->show();
 }
 
+//get a pointer to our window
 Gtk::Window* BrowseWindow :: getWindow (void)
 {
 	return window; 
 }
 
+//callback for when we select an image, opens the fight window
 void BrowseWindow :: selected (const Gtk::TreeModel::Path& path)
 {
 	auto iter = m_refTreeModel->get_iter(path);
@@ -174,6 +243,7 @@ void BrowseWindow :: selected (const Gtk::TreeModel::Path& path)
 
 }
 
+//importing every image in a directory
 void BrowseWindow :: import_folder (void)
 {
 	  Gtk::FileChooserDialog dialog("Please choose a folder", Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);

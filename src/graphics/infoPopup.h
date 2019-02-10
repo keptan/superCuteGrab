@@ -13,38 +13,70 @@
 #include "scalingImage.h"
 #include "imageIcons.h"
 
+#include <iostream>
+
+class Columns : public Gtk::TreeModel::ColumnRecord 
+{
+	public:
+	Columns (void)
+	{
+		add(m_col_name);
+		add(m_col_pixbuf);
+		add(m_col_image);
+	}
+
+
+	Gtk::TreeModelColumn<Glib::ustring> m_col_name; 
+	Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf>> m_col_pixbuf;
+	Gtk::TreeModelColumn< std::shared_ptr<cute::Image>> m_col_image;
+};
+
+
+
 class InfoPopup 
 {
 
+	//thumbnail DB, and the collection manager
+	//that we need to actually append tags 
+	cute::ThumbDB& thumbnails;
+	cute::CollectionMan& collection;
+	
+	
+	//builder that contains the widgets we'll use 
+	Glib::RefPtr<Gtk::Builder> builder; 
 
 	//image databases ect 
-	std::shared_ptr<cute::Image > image;
-	cute::CollectionMan& collection;
+	std::vector< std::shared_ptr< cute::Image>> selected;
 
 	//widgets and gtkmm pointers 
 	Gtk::Window* window; 
 	Gtk::TreeView* tagTree;
-	Glib::RefPtr<Gtk::Builder> builder; 
+	Gtk::Entry* addTag;
+	Gtk::AspectFrame* frame;
+	Gtk::ScrolledWindow* scroll;
+
 
 	//scaling image struct 
 	ScalingImage infoImage;
 
+	//icon viewer
+	ImageIcons icons;
+
 	public: 
-	InfoPopup ( const Glib::RefPtr<Gtk::Builder>, cute::CollectionMan&, std::shared_ptr< cute::Image>);
+	InfoPopup ( const Glib::RefPtr<Gtk::Builder>, cute::ThumbDB&, cute::CollectionMan&);
 	virtual ~InfoPopup (void);
-	void setImage (std::shared_ptr< cute::Image>);
+
+	void setImages (const std::vector< std::shared_ptr< cute::Image>>);
 
 	Gtk::Window* getWindow (void);
 
 	protected: 
 	//handlers 
 
-
-
-	class Columns : public Gtk::TreeModel::ColumnRecord 
+	class TagColumns : public Gtk::TreeModel::ColumnRecord 
 	{
 		public: 
-		Columns (void)
+		TagColumns (void)
 		{
 			add(m_col_name);
 			add(m_col_score);
@@ -54,8 +86,28 @@ class InfoPopup
 		Gtk::TreeModelColumn<int> m_col_score;
 	};
 
-	Columns m_Columns;
-	Glib::RefPtr<Gtk::ListStore> m_refTreeModel;
+	Glib::RefPtr<Gtk::ListStore> tagTreeModel;
+	TagColumns tagColumns;
+
+	class CompleteCol : public Gtk::TreeModel::ColumnRecord
+	{
+		public:
+		CompleteCol (void)
+		{
+			add(m_col_name);
+			add(m_col_id);
+		}
+		Gtk::TreeModelColumn<Glib::ustring> m_col_name; 
+		Gtk::TreeModelColumn<int> m_col_id;
+	};
+
+	CompleteCol c_Columns;
+	std::map<int, Glib::ustring> m_CompleteActions;
+
+	Glib::RefPtr<Gtk::ListStore> iconTreeModel;
+	Columns iconColumns;
+
+
 };
 
 		
@@ -96,24 +148,9 @@ class BrowseWindow : public sigc::trackable
 	void callback (const std::vector<Gtk::TreeModel::Path>);
 
 
-	class Columns : public Gtk::TreeModel::ColumnRecord 
-	{
-		public:
-		Columns (void)
-		{
-			add(m_col_name);
-			add(m_col_pixbuf);
-			add(m_col_image);
-		}
-
-
-		Gtk::TreeModelColumn<Glib::ustring> m_col_name; 
-		Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf>> m_col_pixbuf;
-		Gtk::TreeModelColumn< std::shared_ptr<cute::Image>> m_col_image;
-	};
-
-	Columns m_Columns;
 	Glib::RefPtr<Gtk::ListStore> m_refTreeModel;
+	Columns m_Columns;
+
 };
 
 
