@@ -5,6 +5,10 @@ namespace cute {
 TagSet :: TagSet (void)
 {}
 
+TagSet :: TagSet (const Tag& t)
+	: res({t})
+{}
+
 TagSet :: TagSet (const TagSet& t)
 	: res(t.res)
 {}
@@ -16,6 +20,12 @@ TagSet :: TagSet (const std::set<Tag>& set)
 TagSet& TagSet :: operator += (const Tag t)
 {
 	res.insert(t);
+	return *this;
+}
+
+TagSet& TagSet :: operator += (const TagSet& t)
+{
+	res.insert(t.begin(), t.end());
 	return *this;
 }
 

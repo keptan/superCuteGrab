@@ -18,8 +18,10 @@ class TagSet
 	public:
 	TagSet (void);
 	TagSet (const TagSet&);
+	TagSet (const Tag&);
 
 	TagSet& operator += (const Tag t); 
+	TagSet& operator += (const TagSet&);
 	friend TagSet operator & (const TagSet&, const TagSet&);
 	friend TagSet operator | (const TagSet&, const TagSet&);
 	friend TagSet operator + (const TagSet&,  const TagSet&);
