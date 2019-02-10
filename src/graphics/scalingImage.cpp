@@ -50,4 +50,18 @@ void ScalingImage :: scaleImage (Gtk::Allocation allocation)
 	return; 
 }
 
+void ScalingImage :: show (void)
+{
+	scrollView->show();
+	aspectFrame->show();
+	image->show();
+}
+
+void ScalingImage :: hide (void)
+{
+	scrollView->hide();
+	aspectFrame->hide();
+	image->hide();
+}
+
 

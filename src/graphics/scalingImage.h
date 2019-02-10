@@ -17,7 +17,7 @@
 		Gtk::Image* image; 
 
 		ScalingImage (Gtk::ScrolledWindow*, Gtk::AspectFrame*, Gtk::Image*);
-		ScalingImage (const Glib::RefPtr<Gtk::Builder> builder, 
+		ScalingImage (const Glib::RefPtr<Gtk::Builder> builder,
 		const std::string& aspect, const std::string& scroll, const std::string& image);
 
 		ScalingImage (void){};
@@ -25,6 +25,9 @@
 		void setImage	(std::string);
 		void setImage (const std::shared_ptr<cute::Image> i);
 		void scaleImage (Gtk::Allocation);
+
+		void show (void);
+		void hide (void);
 	};
 
 
