@@ -18,11 +18,13 @@ class TagDB
 
 public: 
 	TagDB (std::filesystem::path); 
+	~TagDB (void);
 
 	void readCSV  (void); 
 	void writeCSV (void);
 //	bool contains (const Hash&); 
 	TagSet retrieveData (const Hash&);
+	TagSet retrieveData (void);
 	void insertTags (const Hash&, const TagSet&);
 };
 

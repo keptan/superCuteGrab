@@ -10,6 +10,11 @@ TagDB :: TagDB (std::filesystem::path p)
 	readCSV();
 }
 
+TagDB :: ~TagDB (void)
+{
+	writeCSV();
+}
+
 void TagDB :: readCSV (void)
 {
 	std::fstream fs(dbFile); 
@@ -66,6 +71,16 @@ void TagDB :: insertTags (const Hash& h, const TagSet& t)
 TagSet TagDB :: retrieveData (const Hash& h)
 {
 	return tagMap.find(h)->second; 
+}
+
+TagSet TagDB :: retrieveData (void)
+{
+	TagSet tags; 
+
+	for(const auto t: tagMap)
+	{
+		tags += t.second;
+	}
 }
 
 			}
