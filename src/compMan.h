@@ -2,6 +2,7 @@
 #include "tagDB.h"
 #include "scoreDB.h" 
 #include "image.h" 
+#include "tagDB.h"
 
 namespace cute		{
 
@@ -38,4 +39,20 @@ class PathRank : public CompMan
 
 	SkillDatum getSkill (const Image&);
 };
+
+class UserTags : public CompMan
+{
+
+	TagDB tags;
+	ScoreDB scores;
+
+	public:
+	UserTags (void);
+	void runImages (const Image&, const Image&, int);
+	void saveTags (void);
+
+	TagSet getTags (const Image&);
+	void insert (const Image&, const TagSet&);
+};
+
 					}
