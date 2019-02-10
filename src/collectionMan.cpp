@@ -2,8 +2,8 @@
 
 namespace cute  {
 
-CollectionMan :: CollectionMan (IdentityRank& i, std::vector< std::shared_ptr< Image>> c)
-	: ident(i),collection(c), leftStreak(0), rightStreak(0), runningFresh(false)
+CollectionMan :: CollectionMan (IdentityRank& i, PathRank& p, UserTags& t, std::vector< std::shared_ptr< Image>> c)
+	: ident(i), path(p), tags(t), collection(c), leftStreak(0), rightStreak(0), runningFresh(false)
 {
 	//freshImages();
 }
@@ -31,7 +31,8 @@ void CollectionMan :: freshImages (void)
 	rightStreak = 0;
 	leftStreak = 0;
 
-	ident.saveTags();
+	saveTags();
+
 	std::random_device dev;
 	std::mt19937 gen (dev());
 
@@ -48,7 +49,7 @@ void CollectionMan :: freshImages (void)
 	
 void CollectionMan :: leftVictory (void)
 {
-	ident.runImages(*leftImage, *rightImage, 1);
+	runImages(1);
 	rightStreak = 0;
 	leftStreak++;
 
@@ -69,7 +70,7 @@ void CollectionMan :: leftVictory (void)
 
 void CollectionMan :: rightVictory (void)
 {
-	ident.runImages(*leftImage, *rightImage, 2);
+	runImages(2);
 	rightStreak++;
 
 	const bool leftUncertain  = ident.getSkill(*leftImage).sigma  > 9; 
@@ -94,7 +95,7 @@ void CollectionMan :: rightVictory (void)
 
 void CollectionMan :: tieVictory (void)
 {
-	ident.runImages(*leftImage, *rightImage, 3);
+	runImages(3);
 
 	const bool leftUncertain  = ident.getSkill(*leftImage).sigma  > 9; 
 	const bool rightUncertain = ident.getSkill(*rightImage).sigma > 9; 
@@ -215,7 +216,21 @@ std::shared_ptr< Image> CollectionMan :: matchingELO (std::shared_ptr< Image> i,
 	}
 }
 
+void CollectionMan :: runImages (const int winner)
+{
 
+	ident.runImages(*leftImage, *rightImage, winner);
+	path.runImages(*leftImage, *rightImage, winner);
+	tags.runImages(*leftImage, *rightImage, winner);
+
+}
+
+void CollectionMan :: saveTags (void)
+{
+	ident.saveTags();
+	path.saveTags();
+	tags.saveTags();
+}
 
 
 

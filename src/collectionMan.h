@@ -13,6 +13,8 @@ namespace cute		{
 class CollectionMan 
 {
 	IdentityRank& ident; 
+	PathRank& path;
+
 	//other rankers here 
 	
 	//all the images we can accecss, and a filtered version that we look for potential comparisons in 
@@ -29,8 +31,9 @@ class CollectionMan
 	bool runningFresh;
 
 	public:
-	CollectionMan (IdentityRank&, std::vector< std::shared_ptr< Image>>);
+	CollectionMan (IdentityRank&, PathRank&, UserTags&, std::vector< std::shared_ptr< Image>>);
 
+	UserTags& tags;
 	void freshImages (void); //set left and right to clean images
 	std::shared_ptr< Image> getRightImage (void); 
 	std::shared_ptr< Image> getLeftImage  (void);
@@ -47,12 +50,16 @@ class CollectionMan
 	void rightVictory (void);
 	void tieVictory   (void);
 
+
 	//pin image, ect 
 
 	private:
 
 	std::shared_ptr< Image> matchingImage ( std::shared_ptr< Image>, int winStreak = 0);
 	std::shared_ptr< Image> matchingELO   ( std::shared_ptr< Image>, int streak = 0);
+
+	void runImages (const int);
+	void saveTags (void);
 
 
 };
