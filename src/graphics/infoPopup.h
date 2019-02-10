@@ -67,8 +67,8 @@ class InfoPopup
 	virtual ~InfoPopup (void);
 
 	void setImages (const std::vector< std::shared_ptr< cute::Image>>);
-
 	Gtk::Window* getWindow (void);
+	void insertTag (void);
 
 	protected: 
 	//handlers 

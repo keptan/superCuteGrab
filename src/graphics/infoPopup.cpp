@@ -39,6 +39,8 @@ InfoPopup :: InfoPopup ( const Glib::RefPtr<Gtk::Builder> b
 	//setting up autocomplete for the user tag entry
 	auto completion = Gtk::EntryCompletion::create();
 	addTag->set_completion(completion);
+	addTag->signal_activate().connect(sigc::mem_fun(*this,
+      &InfoPopup::insertTag) );
 
 	auto refCompletionModel = Gtk::ListStore::create(c_Columns);
 	completion->set_model(refCompletionModel);
@@ -62,6 +64,18 @@ InfoPopup :: ~InfoPopup (void)
 Gtk::Window* InfoPopup :: getWindow (void)
 {
 	return window; 
+}
+
+void InfoPopup :: insertTag (void)
+{
+	const cute::Tag t = addTag->get_text().raw();
+	std::cout << t.tag << std::endl;
+	addTag->set_text("");
+
+	for(const auto i : selected)
+	{
+		collection.tags.insert(*i, t);
+	}
 }
 
 /*
@@ -91,6 +105,19 @@ void InfoPopup :: setImages (const std::vector< std::shared_ptr< cute::Image>> i
 
 	infoImage.setImage( i[0]);
 
+
+	cute::TagSet acc; 
+	for( auto im : i) acc += collection.tags.getTags(*im);
+
+	tagTreeModel->clear();
+	for(const auto t : acc)
+	{
+		Gtk::TreeModel::Row r = *(tagTreeModel->append());
+		r[tagColumns.m_col_name]		= t.tag;
+		r[tagColumns.m_col_score]	= collection.tags.scores.retrieveData(t).skill();
+	}
+
+
 	//if only one image, show the large preview instead of the icon view
 	if(selected.size() == 1)
 	{
@@ -110,6 +137,8 @@ void InfoPopup :: setImages (const std::vector< std::shared_ptr< cute::Image>> i
 		r[iconColumns.m_col_pixbuf] = Gdk::Pixbuf::create_from_file( thumbnails.getThumbPath(*im).c_str());
 		r[iconColumns.m_col_image] = im; 
 	}
+
+
 
 	scroll->show();
 	infoImage.hide();
