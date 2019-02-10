@@ -9,6 +9,10 @@ ImageIcons :: ImageIcons (void)
 
 	m_Menu_Popup.append(*item);
 
+	//enable multiple selected
+	set_selection_mode(Gtk::SELECTION_MULTIPLE);	
+
+
 	m_Menu_Popup.accelerate(*this);
 	m_Menu_Popup.show_all();
 }
