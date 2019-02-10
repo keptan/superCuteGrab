@@ -46,9 +46,14 @@ InfoPopup :: InfoPopup ( const Glib::RefPtr<Gtk::Builder> b
 	completion->set_model(refCompletionModel);
 
 	//appending a test item, placeholder
-	Gtk::TreeModel::Row row = *(refCompletionModel->append());
-	row[c_Columns.m_col_id] = 1;
-	row[c_Columns.m_col_name] = "test";
+	int i = 0;
+	for(const auto t : collection.tags.tags.retrieveData())
+	{
+		Gtk::TreeModel::Row row = *(refCompletionModel->append());
+		row[c_Columns.m_col_id] = i++;
+		row[c_Columns.m_col_name] = t.tag;
+	}
+
 	completion->set_text_column(c_Columns.m_col_name);
 
 	tagTree->show();
@@ -71,6 +76,10 @@ void InfoPopup :: insertTag (void)
 	const cute::Tag t = addTag->get_text().raw();
 	std::cout << t.tag << std::endl;
 	addTag->set_text("");
+
+	Gtk::TreeModel::Row r = *(tagTreeModel->append());
+	r[tagColumns.m_col_name]		= t.tag;
+	r[tagColumns.m_col_score]		= collection.tags.scores.retrieveData(t).skill();
 
 	for(const auto i : selected)
 	{
@@ -106,8 +115,8 @@ void InfoPopup :: setImages (const std::vector< std::shared_ptr< cute::Image>> i
 	infoImage.setImage( i[0]);
 
 
-	cute::TagSet acc; 
-	for( auto im : i) acc += collection.tags.getTags(*im);
+	cute::TagSet acc = collection.tags.getTags(*i[0]); 
+	for( auto im : i) acc = acc & collection.tags.getTags(*im);
 
 	tagTreeModel->clear();
 	for(const auto t : acc)
