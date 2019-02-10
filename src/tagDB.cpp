@@ -24,18 +24,40 @@ void TagDB :: readCSV (void)
 
 	while( std::getline(fs, line))
 	{
-		std::istringstream is(line); 
 
-		std::string h, t; 
 
-		is >> std::quoted(h) >> std::quoted(t);
+		std::string head; 
+		std::string acc;
+		TagSet tags;
+		auto i = line.begin();
 
-		std::istringstream tags(t);
-		std::string tag1, tag2;
-		//weewooweeewoo
-		tags >> std::quoted(tag1) >> std::quoted(tag2);
+		for(; *i != ',' ;i++)
+		{
+			head += *i;
+		}
+		i++;
+
+		bool inQuote = false;
+
+		for(; i != line.end(); i++)
+		{
+		
+			if(*i == ',')
+			{
+				tags += acc;
+				acc = "";
+				continue;
+			}
+
+			acc += *i;
+		}
+
+		tags += acc;
+
+		tagMap.insert( std::make_pair(head, tags));
 
 	}
+
 }
 
 void TagDB :: writeCSV (void)
@@ -45,11 +67,21 @@ void TagDB :: writeCSV (void)
 	for( auto& pair : tagMap)
 	{
 		std::ostringstream tagString; 
+		tagString << pair.first;
+
 
 		for(auto& t : pair.second)
-			tagString << std::quoted(t.tag) <<  '	';
+		{
+			std::string acc = t.tag;
+			acc.erase(std::remove_if(acc.begin(), acc.end(), 
+						[](const auto c){ if(c == ',' || c == '"') return true; return false;}), acc.end());
 
-		fs << std::quoted(pair.first) << '	' << std::quoted(tagString.str()) << '\n';
+			tagString << ',' << acc;
+		}
+
+
+
+		fs << tagString.str() << '\n';
 	}
 }
 
@@ -63,14 +95,18 @@ void TagDB :: insertTags (const Hash& h, const TagSet& t)
 		return;
 	}
 	
-	it->second = t;
+	it->second += t;
 }
 			
 	
 
 TagSet TagDB :: retrieveData (const Hash& h)
 {
-	return tagMap.find(h)->second; 
+	const auto f = tagMap.find(h);
+
+	if(f == tagMap.end()) return TagSet();
+
+	return f->second; 
 }
 
 TagSet TagDB :: retrieveData (void)
@@ -81,6 +117,8 @@ TagSet TagDB :: retrieveData (void)
 	{
 		tags += t.second;
 	}
+
+	return tags;
 }
 
 			}
