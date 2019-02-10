@@ -23,7 +23,6 @@ class InfoPopup
 
 	//widgets and gtkmm pointers 
 	Gtk::Window* window; 
-	Gtk::Label* scoreLabel;
 	Gtk::TreeView* tagTree;
 	Glib::RefPtr<Gtk::Builder> builder; 
 
@@ -48,10 +47,11 @@ class InfoPopup
 		Columns (void)
 		{
 			add(m_col_name);
-			//add(m_col_score);
+			add(m_col_score);
 		}
 
 		Gtk::TreeModelColumn<Glib::ustring> m_col_name; 
+		Gtk::TreeModelColumn<int> m_col_score;
 	};
 
 	Columns m_Columns;

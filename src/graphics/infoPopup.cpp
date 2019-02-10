@@ -17,10 +17,14 @@ InfoPopup :: InfoPopup ( const Glib::RefPtr<Gtk::Builder> b
 	m_refTreeModel = Gtk::ListStore::create(m_Columns);
 		
 	builder->get_widget("infoWindow", window);
-	builder->get_widget("scoreLabel", scoreLabel);
 	builder->get_widget("infoTags", tagTree);
 
 	tagTree->set_model(m_refTreeModel);
+	tagTree->append_column("ID", m_Columns.m_col_name);
+	tagTree->append_column("score", m_Columns.m_col_score);
+
+	
+
 	tagTree->show();
 	infoImage.setImage( image);
 	setImage(image);
@@ -41,12 +45,12 @@ void InfoPopup :: setImage (std::shared_ptr< cute::Image> i)
 {
 	image = i;
 	infoImage.setImage(i);
-	scoreLabel->set_text( "IdentityScore: "  + std::to_string( collection.getSkill(i).skill()));
 
 	m_refTreeModel->clear();
+
 	Gtk::TreeModel::Row r = *(m_refTreeModel->append());
-	r[m_Columns.m_col_name] = i->location.string();
-	std::cout << i->location.string() << "set" << std::endl;
+	r[m_Columns.m_col_name]		= i->location.filename().string();
+	r[m_Columns.m_col_score]	= collection.getSkill(i).skill();
 }
 
 	
@@ -119,9 +123,6 @@ void BrowseWindow :: addMember (const std::shared_ptr<cute::Image> i)
 	r[m_Columns.m_col_pixbuf] = Gdk::Pixbuf::create_from_file( thumbnails.getThumbPath(*i).c_str());
 	r[m_Columns.m_col_image] = i;
 }	
-
-
-	
 
 void BrowseWindow :: callback (const std::vector<Gtk::TreeModel::Path> paths)
 {

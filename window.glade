@@ -285,6 +285,17 @@
         <property name="n_rows">2</property>
         <property name="n_columns">2</property>
         <child>
+          <object class="GtkTreeView" id="infoTags">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+          </object>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="right_attach">2</property>
+            <property name="bottom_attach">2</property>
+          </packing>
+        </child>
+        <child>
           <object class="GtkAspectFrame" id="infoAspect">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
@@ -313,30 +324,6 @@
             </child>
           </object>
           <packing>
-            <property name="bottom_attach">2</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkLabel" id="scoreLabel">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="label" translatable="yes">ELO 153.8</property>
-            <property name="single_line_mode">True</property>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="right_attach">2</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkTreeView" id="infoTags">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="right_attach">2</property>
-            <property name="top_attach">1</property>
             <property name="bottom_attach">2</property>
           </packing>
         </child>
