@@ -1,5 +1,6 @@
 #include "compMan.h" 
 #include "cskill_instance.h"
+#include <iostream>
 
 namespace cute {
 
@@ -83,10 +84,7 @@ TagSet UserTags :: getTags (const Image& i)
 void UserTags :: insert (const Image& i, const TagSet& s)
 {
 	tags.insertTags(i.pData.hash, s);
+	tags.writeCSV();
 }
-
-
-
-
 
 			}

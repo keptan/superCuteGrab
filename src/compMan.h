@@ -42,17 +42,19 @@ class PathRank : public CompMan
 
 class UserTags : public CompMan
 {
+	public:
 
 	TagDB tags;
 	ScoreDB scores;
 
-	public:
 	UserTags (void);
 	void runImages (const Image&, const Image&, int);
 	void saveTags (void);
 
 	TagSet getTags (const Image&);
+
 	void insert (const Image&, const TagSet&);
+	
 };
 
 					}
