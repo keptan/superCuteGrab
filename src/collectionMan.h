@@ -19,6 +19,7 @@ class CollectionMan
 	
 	//all the images we can accecss, and a filtered version that we look for potential comparisons in 
 	std::vector< std::shared_ptr< Image>> collection; 
+	std::vector< std::shared_ptr< Image>> filtered;
 
 	//current images being compared
 	std::shared_ptr< Image> leftImage; 
@@ -49,6 +50,9 @@ class CollectionMan
 	void leftVictory  (void);
 	void rightVictory (void);
 	void tieVictory   (void);
+
+	void filter (void);
+	void filter (const std::string&);
 
 
 	//pin image, ect 
