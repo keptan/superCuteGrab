@@ -120,6 +120,7 @@ class BrowseWindow : public sigc::trackable
 	Gtk::Window* window; 
 	ImageIcons view;
 	Gtk::Menu menuPopup;
+	Gtk::Entry* filterSearch;
 
 	std::unique_ptr<InfoPopup> iPop;
 	cute::ThumbDB thumbnails; 
@@ -137,6 +138,7 @@ class BrowseWindow : public sigc::trackable
 	void import_folder_recursive (void);
 	void terminate_left  (void); 
 	void terminate_right (void);
+	void filter (void);
 
 	void on_dropped_file(const Glib::RefPtr<Gdk::DragContext>& context,
 	  int x, int y, const Gtk::SelectionData& selection_data, guint info, guint time);

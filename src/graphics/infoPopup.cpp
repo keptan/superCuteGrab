@@ -213,6 +213,9 @@ BrowseWindow :: BrowseWindow
 	button->signal_clicked().connect(sigc::mem_fun(*this, 
 				&BrowseWindow::terminate_right) ); 
 
+	builder->get_widget("filterSearch", filterSearch);
+	filterSearch->signal_activate().connect(sigc::mem_fun(*this, &BrowseWindow::filter) );
+
 	for(auto &i : collection.getImages())
 		addMember(i);
 
@@ -471,6 +474,17 @@ void BrowseWindow :: terminate_right (void)
 	collection.freshImages(); 
 	fight.refresh();
 }
+
+void BrowseWindow :: filter (void)
+{
+	const std::string str = filterSearch->get_text().raw();
+
+	collection.filter(str);
+
+	m_refTreeModel->clear();
+	for(auto &i : collection.getImages()) addMember(i);
+}
+	
 
 
 
