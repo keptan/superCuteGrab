@@ -36,11 +36,10 @@
                 <property name="can_focus">False</property>
                 <child>
                   <object class="GtkButton" id="importButton">
-                    <property name="label">gtk-open</property>
+                    <property name="label">Import Folder</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="use_stock">True</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -50,11 +49,10 @@
                 </child>
                 <child>
                   <object class="GtkButton" id="importButton2">
-                    <property name="label">gtk-open</property>
+                    <property name="label">Import Recursive</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="use_stock">True</property>
                     <property name="image_position">right</property>
                   </object>
                   <packing>
@@ -65,7 +63,7 @@
                 </child>
                 <child>
                   <object class="GtkButton" id="button3">
-                    <property name="label" translatable="yes">button</property>
+                    <property name="label" translatable="yes">Refresh Images</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
@@ -163,7 +161,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="entry1">
+                  <object class="GtkEntry" id="filterSearch">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="text" translatable="yes">search</property>
@@ -283,47 +281,102 @@
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="n_rows">2</property>
-        <property name="n_columns">2</property>
+        <property name="n_columns">3</property>
         <child>
-          <object class="GtkTreeView" id="infoTags">
+          <object class="GtkVBox" id="vbox1">
             <property name="visible">True</property>
-            <property name="can_focus">True</property>
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkTreeView" id="infoTags">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="addTag">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="shadow_type">none</property>
+                <property name="primary_icon_activatable">False</property>
+                <property name="secondary_icon_activatable">False</property>
+                <property name="primary_icon_sensitive">True</property>
+                <property name="secondary_icon_sensitive">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="pack_type">end</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
           </object>
           <packing>
-            <property name="left_attach">1</property>
-            <property name="right_attach">2</property>
+            <property name="left_attach">2</property>
+            <property name="right_attach">3</property>
             <property name="bottom_attach">2</property>
           </packing>
         </child>
         <child>
-          <object class="GtkAspectFrame" id="infoAspect">
+          <object class="GtkHBox" id="hbox3">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="label_xalign">0</property>
-            <property name="shadow_type">none</property>
             <child>
-              <object class="GtkScrolledWindow" id="infoScroll">
-                <property name="visible">True</property>
+              <object class="GtkScrolledWindow" id="infoIconScroll">
                 <property name="can_focus">True</property>
                 <property name="hscrollbar_policy">automatic</property>
                 <property name="vscrollbar_policy">automatic</property>
                 <child>
-                  <object class="GtkViewport" id="infoView">
+                  <placeholder/>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkAspectFrame" id="infoAspect">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
+                <child>
+                  <object class="GtkScrolledWindow" id="infoScroll">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
+                    <property name="can_focus">True</property>
+                    <property name="hscrollbar_policy">automatic</property>
+                    <property name="vscrollbar_policy">automatic</property>
                     <child>
-                      <object class="GtkImage" id="infoImage">
+                      <object class="GtkViewport" id="infoView">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="stock">gtk-missing-image</property>
+                        <child>
+                          <object class="GtkImage" id="infoImage">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="stock">gtk-missing-image</property>
+                          </object>
+                        </child>
                       </object>
                     </child>
                   </object>
                 </child>
               </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
             </child>
           </object>
           <packing>
+            <property name="right_attach">2</property>
             <property name="bottom_attach">2</property>
           </packing>
         </child>
