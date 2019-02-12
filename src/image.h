@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <string>
+#include <memory>
 
 namespace cute {
 
@@ -26,6 +27,9 @@ struct Image
 	Image (const std::filesystem::path l, const PathMetaData p);
 	Image (void) {};
 };
+
+
+using SharedImage = std::shared_ptr< Image>; 
 }
 
 
