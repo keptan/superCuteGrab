@@ -8,6 +8,10 @@ Tag :: Tag (const std::string& t)
 	: tag(t)
 {}
 
+Tag :: Tag (const Tag& t)
+	: tag(t.tag)
+{}
+
 bool Tag :: operator < (const Tag& a) const 
 {
 	return tag < a.tag;

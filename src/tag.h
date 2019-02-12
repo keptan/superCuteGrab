@@ -7,9 +7,10 @@ namespace cute {
 
 struct Tag 
 {
-	const std::string tag; 
+	std::string tag; 
 
 	Tag (const std::string&);
+	Tag (const Tag&);
 	bool operator < (const Tag& a) const; 
 };
 
