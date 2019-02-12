@@ -15,10 +15,13 @@
 
 #include <iostream>
 
-class Columns : public Gtk::TreeModel::ColumnRecord 
+namespace graphics
+{
+
+class IconColumns : public Gtk::TreeModel::ColumnRecord 
 {
 	public:
-	Columns (void)
+	IconColumns (void)
 	{
 		add(m_col_name);
 		add(m_col_pixbuf);
@@ -30,6 +33,21 @@ class Columns : public Gtk::TreeModel::ColumnRecord
 	Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf>> m_col_pixbuf;
 	Gtk::TreeModelColumn< std::shared_ptr<cute::Image>> m_col_image;
 };
+
+class TagColumns : public Gtk::TreeModel::ColumnRecord 
+{
+	public: 
+	TagColumns (void)
+	{
+		add(m_col_name);
+		add(m_col_score);
+	}
+
+	Gtk::TreeModelColumn<Glib::ustring> m_col_name; 
+	Gtk::TreeModelColumn<int> m_col_score;
+};
+
+
 
 
 
@@ -73,19 +91,6 @@ class InfoPopup
 	protected: 
 	//handlers 
 
-	class TagColumns : public Gtk::TreeModel::ColumnRecord 
-	{
-		public: 
-		TagColumns (void)
-		{
-			add(m_col_name);
-			add(m_col_score);
-		}
-
-		Gtk::TreeModelColumn<Glib::ustring> m_col_name; 
-		Gtk::TreeModelColumn<int> m_col_score;
-	};
-
 	Glib::RefPtr<Gtk::ListStore> tagTreeModel;
 	TagColumns tagColumns;
 
@@ -105,7 +110,7 @@ class InfoPopup
 	std::map<int, Glib::ustring> m_CompleteActions;
 
 	Glib::RefPtr<Gtk::ListStore> iconTreeModel;
-	Columns iconColumns;
+	IconColumns iconColumns;
 
 
 };
@@ -119,13 +124,16 @@ class BrowseWindow : public sigc::trackable
 	const Glib::RefPtr<Gtk::Builder> builder;
 	Gtk::Window* window; 
 	ImageIcons view;
+
 	Gtk::Menu menuPopup;
 	Gtk::Entry* filterSearch;
+	Gtk::TreeView* tagTree;
 
 	std::unique_ptr<InfoPopup> iPop;
 	cute::ThumbDB thumbnails; 
 	cute::CollectionMan& collection; 
 	cute::HashDB& hash;
+
 
 	public:
 	BrowseWindow( const Glib::RefPtr<Gtk::Builder>, cute::CollectionMan&, cute::HashDB&);
@@ -136,9 +144,10 @@ class BrowseWindow : public sigc::trackable
 	void addMember (const std::shared_ptr<cute::Image> i);
 	void import_folder (void);
 	void import_folder_recursive (void);
-	void terminate_left  (void); 
-	void terminate_right (void);
 	void filter (void);
+	void refreshTagTree (void);
+	void filterTagTree (void);
+	void refresh (void);
 
 	void on_dropped_file(const Glib::RefPtr<Gdk::DragContext>& context,
 	  int x, int y, const Gtk::SelectionData& selection_data, guint info, guint time);
@@ -151,8 +160,12 @@ class BrowseWindow : public sigc::trackable
 
 
 	Glib::RefPtr<Gtk::ListStore> m_refTreeModel;
-	Columns m_Columns;
+	IconColumns m_Columns;
+
+	Glib::RefPtr<Gtk::ListStore> tagTreeModel;
+	TagColumns tagColumns;
 
 };
 
+}
 

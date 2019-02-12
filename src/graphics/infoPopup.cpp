@@ -5,7 +5,8 @@
 
 
 
-
+namespace graphics
+{
 
 InfoPopup :: InfoPopup ( const Glib::RefPtr<Gtk::Builder> b 
 					   , cute::ThumbDB& t, cute::CollectionMan& c)
@@ -31,6 +32,7 @@ InfoPopup :: InfoPopup ( const Glib::RefPtr<Gtk::Builder> b
 	tagTree->set_model(tagTreeModel);
 	tagTree->append_column("ID", tagColumns.m_col_name);
 	tagTree->append_column("score", tagColumns.m_col_score);
+
 	icons.set_model(iconTreeModel);
 	icons.set_pixbuf_column(iconColumns.m_col_pixbuf);
 
@@ -126,7 +128,7 @@ void InfoPopup :: setImages (const std::vector< std::shared_ptr< cute::Image>> i
 	{
 		Gtk::TreeModel::Row r     = *(tagTreeModel->append());
 		r[tagColumns.m_col_name]  = i[0]->location.filename().string();
-		r[tagColumns.m_col_score] = collection.getSkill(i[0]).skill();
+		r[tagColumns.m_col_score] = collection.identityRanker.getSkill(*i[0]).skill();
 	}
 
 	for(const auto t : acc)
@@ -172,6 +174,18 @@ BrowseWindow :: BrowseWindow
 	//setup a pointer to our own window
 	builder->get_widget("browseWindow", window);
 
+	//setup the tagTree and tagEntry which we dont use until later
+	builder->get_widget("tagTree", tagTree);
+
+	tagTreeModel = Gtk::ListStore::create(tagColumns);
+	tagTree->set_model(tagTreeModel);
+	tagTree->append_column("ID", tagColumns.m_col_name);
+	tagTree->append_column("score", tagColumns.m_col_score);
+	auto sel = tagTree->get_selection();
+	sel->set_mode(Gtk::SELECTION_MULTIPLE);
+
+	//tagTree->signal_row_activated().connect( sigc::mem_fun(*this, &BrowseWindow::on_dropped_file));
+
 	//we use the window pointer to help setup drag and drop
 	std::vector<Gtk::TargetEntry> listTargets; 
 	listTargets.push_back(Gtk::TargetEntry("text/uri-list")); 
@@ -189,7 +203,7 @@ BrowseWindow :: BrowseWindow
 	//setup the icon view columns, and show it
 	view.set_model(m_refTreeModel);
 	view.set_pixbuf_column(m_Columns.m_col_pixbuf);
-	view.set_markup_column(m_Columns.m_col_name);
+	view.set_markup_column(-1);
 
 	//callbacks and drag and drop out
 	view.signal_item_activated().connect( sigc::mem_fun(*this, &BrowseWindow::selected));
@@ -215,13 +229,13 @@ BrowseWindow :: BrowseWindow
 	button->signal_clicked().connect(sigc::mem_fun(*this, 
 				&BrowseWindow::import_folder_recursive) );
 
-	builder->get_widget("tleft", button); 
+	builder->get_widget("filterTag", button); 
 	button->signal_clicked().connect(sigc::mem_fun(*this, 
-				&BrowseWindow::terminate_left) ); 
+				&BrowseWindow::filterTagTree) ); 
 
-	builder->get_widget("tright", button); 
+	builder->get_widget("clearTag", button); 
 	button->signal_clicked().connect(sigc::mem_fun(*this, 
-				&BrowseWindow::terminate_right) ); 
+				&BrowseWindow::refresh) ); 
 
 	builder->get_widget("filterSearch", filterSearch);
 	filterSearch->signal_activate().connect(sigc::mem_fun(*this, &BrowseWindow::filter) );
@@ -237,8 +251,11 @@ void BrowseWindow :: addMember (const std::shared_ptr<cute::Image> i)
 
 	Gtk::TreeModel::Row r = *(m_refTreeModel->append());
 
+	const std::string loc = i->location.filename().string();
+	const std::string cut = loc.size() > 25 ? loc.substr(0,24) : loc;
+
 	//basic treeModel column stuff we do all the time
-	r[m_Columns.m_col_name] = i->location.filename().string();
+	r[m_Columns.m_col_name] = cut;
 	r[m_Columns.m_col_pixbuf] = Gdk::Pixbuf::create_from_file( thumbnails.getThumbPath(*i).c_str());
 	r[m_Columns.m_col_image] = i;
 }	
@@ -290,9 +307,9 @@ void BrowseWindow :: selected (const Gtk::TreeModel::Path& path)
 	m_refTreeModel->clear();
 	for(auto &i : collection.getImages())
 		addMember(i);
-
-
 }
+
+//void BrowseWindow :: tagSelect (const Gtk::TreeModel::Path& path)
 
 //importing every image in a directory
 void BrowseWindow :: import_folder (void)
@@ -346,6 +363,8 @@ void BrowseWindow :: import_folder (void)
 		}
 	  }
 
+		refresh();
+
 		return;
 }
 
@@ -397,6 +416,8 @@ void BrowseWindow :: import_folder_recursive (void)
 		}
 	  }
 
+		refresh();
+
 		return;
 }
 
@@ -446,25 +467,9 @@ void BrowseWindow :: get_selected_data (
 
 }
 
-void BrowseWindow :: terminate_left (void) 
-{
-	auto i = collection.getImages(); 
-	const auto left = collection.getLeftImage();
-	
-	i.erase( std::remove(i.begin(), i.end(), left), i.end()); 
-	std::filesystem::rename( left->location, std::filesystem::path("./exile")/left->location.filename() );
-	collection.setImages(i); 
 
-	for(auto &row : m_refTreeModel->children())
-	{
-		auto rowImage = row.get_value(m_Columns.m_col_image);
-		if(rowImage == left) m_refTreeModel->erase(row);
-	}
-
-	collection.freshImages(); 
-	fight.refresh();
-}
 	
+/*
 void BrowseWindow :: terminate_right (void) 
 {
 	auto i = collection.getImages(); 
@@ -484,6 +489,7 @@ void BrowseWindow :: terminate_right (void)
 	collection.freshImages(); 
 	fight.refresh();
 }
+*/
 
 void BrowseWindow :: filter (void)
 {
@@ -493,8 +499,66 @@ void BrowseWindow :: filter (void)
 
 	m_refTreeModel->clear();
 	for(auto &i : collection.getImages()) addMember(i);
+	refreshTagTree();
 }
-	
+
+void BrowseWindow :: refreshTagTree (void)
+{
+	const auto images = collection.getImages();
+	if(!images.size()) return;
+
+	cute::TagSet tags;
+	for( auto im : images) tags += collection.tags.getTags(*im);
+
+	tagTreeModel->clear();
+	std::vector<cute::Tag> sortedView;
+	sortedView.insert(sortedView.begin(), tags.begin(), tags.end());
+	std::sort(sortedView.begin(), sortedView.end(), 
+		[&](const auto a, const auto b)
+		{ return collection.tags.scores.retrieveData(a).skill() > collection.tags.scores.retrieveData(b).skill();});
+
+	for(const auto t : sortedView)
+	{
+		Gtk::TreeModel::Row r = *(tagTreeModel->append());
+		r[tagColumns.m_col_name]		= t.tag;
+		r[tagColumns.m_col_score]	= collection.tags.scores.retrieveData(t).skill();
+	}
+}
 
 
+void BrowseWindow :: filterTagTree (void)
+{
+	auto sel = tagTree->get_selection();
+	auto paths = sel->get_selected_rows();
 
+	std::string search;
+
+	for(const auto p : paths)
+	{
+		auto iter = tagTreeModel->get_iter(p);
+		auto row = *iter;
+
+		search += ",";
+		const Glib::ustring ustr = row[tagColumns.m_col_name];
+		search += ustr.raw();
+
+	}
+
+	collection.filter(search);
+	m_refTreeModel->clear();
+	for(auto &i : collection.getImages()) addMember(i);
+	refreshTagTree();
+
+}
+
+void BrowseWindow :: refresh (void)
+{
+	collection.filter();
+
+	m_refTreeModel->clear();
+	for(auto &i : collection.getImages()) addMember(i);
+	refreshTagTree();
+}
+
+
+}
