@@ -12,39 +12,43 @@ namespace cute		{
 
 class CollectionMan 
 {
-	IdentityRank& ident; 
-	PathRank& path;
 
-	//other rankers here 
-	
 	//all the images we can accecss, and a filtered version that we look for potential comparisons in 
-	std::vector< std::shared_ptr< Image>> collection; 
-	std::vector< std::shared_ptr< Image>> filtered;
+	//passing around shared pts same cost as passing around iterators but 
+	//without invalidation
+	std::vector< SharedImage> collection; 
+	std::vector< SharedImage> filtered;
 
 	//current images being compared
-	std::shared_ptr< Image> leftImage; 
-	std::shared_ptr< Image> rightImage; 
+	SharedImage leftImage; 
+	SharedImage rightImage; 
 
 	//will be a log of images we ranked already, so we can not compare them again 
-	std::set< std::shared_ptr< Image>> history;
+	std::set< SharedImage> history;
 
 	int leftStreak, rightStreak;
 	bool runningFresh;
 
 	public:
-	CollectionMan (IdentityRank&, PathRank&, UserTags&, std::vector< std::shared_ptr< Image>>);
+	CollectionMan (IdentityRank&, PathRank&, UserTags&, std::vector< SharedImage> = {});
 
-	UserTags& tags;
+	IdentityRank& identityRanker;
+	PathRank&	  pathRanker;
+	UserTags&	  tags; 
+	/*
+	UserTags&	  artist;
+	UserTags&	  character;
+	*/
+
 	void freshImages (void); //set left and right to clean images
-	std::shared_ptr< Image> getRightImage (void); 
-	std::shared_ptr< Image> getLeftImage  (void);
-	std::vector< std::shared_ptr< Image>> getImages (void); //get the collection
-	void  setImages (const std::vector<std::shared_ptr< Image>>); //set the collection
+	SharedImage getRightImage (void); 
+	SharedImage getLeftImage  (void);
 
-	void setRightImage ( std::shared_ptr< Image>); //override left or right image
-	void setLeftImage  ( std::shared_ptr< Image>);
+	std::vector< SharedImage> getImages (void); //get the collection
+	void  setImages (const std::vector<SharedImage>); //set the collection
 
-	SkillDatum getSkill (std::shared_ptr< Image>); //get the skill of an image
+	void setRightImage ( SharedImage); //override left or right image
+	void setLeftImage  ( SharedImage);
 
 	//run image scores
 	void leftVictory  (void);
@@ -59,8 +63,8 @@ class CollectionMan
 
 	private:
 
-	std::shared_ptr< Image> matchingImage ( std::shared_ptr< Image>, int winStreak = 0);
-	std::shared_ptr< Image> matchingELO   ( std::shared_ptr< Image>, int streak = 0);
+	SharedImage matchingImage ( SharedImage, int winStreak = 0);
+	SharedImage matchingELO   ( SharedImage, int streak = 0);
 
 	void runImages (const int);
 	void saveTags (void);
