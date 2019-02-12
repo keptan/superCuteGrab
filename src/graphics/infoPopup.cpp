@@ -108,6 +108,8 @@ void InfoPopup :: setImages (const std::vector< std::shared_ptr< cute::Image>> i
 {
 	selected = i;
 
+
+
 	//clear the iconview of all icons
 	iconTreeModel->clear();
 	if(!selected.size()) return;
@@ -119,6 +121,14 @@ void InfoPopup :: setImages (const std::vector< std::shared_ptr< cute::Image>> i
 	for( auto im : i) acc = acc & collection.tags.getTags(*im);
 
 	tagTreeModel->clear();
+
+	if(selected.size() == 1)
+	{
+		Gtk::TreeModel::Row r     = *(tagTreeModel->append());
+		r[tagColumns.m_col_name]  = i[0]->location.filename().string();
+		r[tagColumns.m_col_score] = collection.getSkill(i[0]).skill();
+	}
+
 	for(const auto t : acc)
 	{
 		Gtk::TreeModel::Row r = *(tagTreeModel->append());
