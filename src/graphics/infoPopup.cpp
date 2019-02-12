@@ -238,7 +238,7 @@ void BrowseWindow :: addMember (const std::shared_ptr<cute::Image> i)
 	Gtk::TreeModel::Row r = *(m_refTreeModel->append());
 
 	//basic treeModel column stuff we do all the time
-	r[m_Columns.m_col_name] = i->location.string();
+	r[m_Columns.m_col_name] = i->location.filename().string();
 	r[m_Columns.m_col_pixbuf] = Gdk::Pixbuf::create_from_file( thumbnails.getThumbPath(*i).c_str());
 	r[m_Columns.m_col_image] = i;
 }	
