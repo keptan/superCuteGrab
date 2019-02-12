@@ -11,6 +11,12 @@ ImageIcons :: ImageIcons (void)
 
 	//enable multiple selected
 	set_selection_mode(Gtk::SELECTION_MULTIPLE);	
+	/*
+	set_row_spacing(0);
+	set_column_spacing(0);
+	set_item_padding(0);
+	set_spacing(0);
+	*/
 
 
 	m_Menu_Popup.accelerate(*this);
