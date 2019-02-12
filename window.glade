@@ -4,8 +4,8 @@
   <!-- interface-naming-policy project-wide -->
   <object class="GtkWindow" id="browseWindow">
     <property name="can_focus">False</property>
-    <property name="default_width">440</property>
-    <property name="default_height">250</property>
+    <property name="default_width">1000</property>
+    <property name="default_height">750</property>
     <child>
       <object class="GtkVBox" id="vbox2">
         <property name="visible">True</property>
@@ -246,8 +246,8 @@
   </object>
   <object class="GtkWindow" id="infoWindow">
     <property name="can_focus">False</property>
-    <property name="default_width">440</property>
-    <property name="default_height">250</property>
+    <property name="default_width">1000</property>
+    <property name="default_height">750</property>
     <child>
       <object class="GtkTable" id="table1">
         <property name="visible">True</property>
