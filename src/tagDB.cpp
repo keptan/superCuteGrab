@@ -31,6 +31,8 @@ void TagDB :: readCSV (void)
 		TagSet tags;
 		auto i = line.begin();
 
+		if(line.size() < 3) continue;
+
 		for(; *i != ',' ;i++)
 		{
 			head += *i;
@@ -66,6 +68,7 @@ void TagDB :: writeCSV (void)
 
 	for( auto& pair : tagMap)
 	{
+		if(!pair.second.size()) continue;
 		std::ostringstream tagString; 
 		tagString << pair.first;
 
