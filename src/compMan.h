@@ -40,14 +40,14 @@ class PathRank : public CompMan
 	SkillDatum getSkill (const Image&);
 };
 
-class UserTags : public CompMan
+class ComTags : public CompMan
 {
 	public:
 
 	TagDB tags;
 	ScoreDB scores;
 
-	UserTags (void);
+	ComTags (const std::string&, const std::string&);
 	void runImages (const Image&, const Image&, int);
 	void saveTags (void);
 
@@ -56,5 +56,6 @@ class UserTags : public CompMan
 	void insert (const Image&, const TagSet&);
 	
 };
+
 
 					}

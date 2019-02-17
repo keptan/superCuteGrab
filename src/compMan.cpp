@@ -57,11 +57,11 @@ SkillDatum PathRank :: getSkill (const Image& i)
 	return scores.retrieveData( i.location.parent_path().string());
 }
 
-UserTags :: UserTags (void)
-	: tags("data/userTags.csv"), scores("data/userTagScores.csv")
+ComTags :: ComTags (const std::string& t, const std::string& s)
+	: tags(t), scores(s)
 {}
 
-void UserTags :: runImages (const Image& p1, const Image& p2, int winner)
+void ComTags :: runImages (const Image& p1, const Image& p2, int winner)
 {
 	TagSet player1 = tags.retrieveData( p1.pData.hash);
 	TagSet player2 = tags.retrieveData( p2.pData.hash);
@@ -71,17 +71,17 @@ void UserTags :: runImages (const Image& p1, const Image& p2, int winner)
 	cskill.runScores(winner);
 }
 
-void UserTags :: saveTags (void)
+void ComTags :: saveTags (void)
 {
 	scores.writeCSV();
 }
 
-TagSet UserTags :: getTags (const Image& i)
+TagSet ComTags :: getTags (const Image& i)
 {
 	return tags.retrieveData( i.pData.hash);
 } 
 
-void UserTags :: insert (const Image& i, const TagSet& s)
+void ComTags :: insert (const Image& i, const TagSet& s)
 {
 	tags.insertTags(i.pData.hash, s);
 	tags.writeCSV();
