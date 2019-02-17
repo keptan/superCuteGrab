@@ -28,17 +28,19 @@ class CollectionMan
 
 	int leftStreak, rightStreak;
 	bool runningFresh;
+	std::array<ComTags*, 4> allTags;
 
 	public:
-	CollectionMan (IdentityRank&, PathRank&, UserTags&, std::vector< SharedImage> = {});
+	CollectionMan (IdentityRank&, PathRank&, ComTags&, ComTags&, ComTags&, ComTags&,
+				   std::vector< SharedImage> = {});
 
-	IdentityRank& identityRanker;
-	PathRank&	  pathRanker;
-	UserTags&	  tags; 
-	/*
-	UserTags&	  artist;
-	UserTags&	  character;
-	*/
+	IdentityRank&    identityRanker;
+	PathRank&		 pathRanker;
+	ComTags&		 userTags;
+	ComTags&		 booruTags;
+	ComTags&		 artistTags;
+	ComTags&		 charTags;
+
 
 	void freshImages (void); //set left and right to clean images
 	SharedImage getRightImage (void); 
@@ -58,11 +60,16 @@ class CollectionMan
 	void filter (void);
 	void filter (const std::string&);
 
+	//different accesses for the tags 
+	TagSet retrieveTags	(void);
+	TagSet retrieveTags ( SharedImage );
+	TagSet retrieveTags (const std::vector< SharedImage>&);
 
-	//pin image, ect 
+	std::vector< std::tuple<Tag, SkillDatum>> tagsWithScores (void);
+	std::vector< std::tuple<Tag, SkillDatum>> tagsWithScores ( SharedImage);
+	std::vector< std::tuple<Tag, SkillDatum>> tagsWithScores ( const std::vector< SharedImage>&);
 
 	private:
-
 	SharedImage matchingImage ( SharedImage, int winStreak = 0);
 	SharedImage matchingELO   ( SharedImage, int streak = 0);
 

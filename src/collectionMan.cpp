@@ -2,8 +2,10 @@
 
 namespace cute  {
 
-CollectionMan :: CollectionMan (IdentityRank& i, PathRank& p, UserTags& t, std::vector< SharedImage> c)
-	: collection(c), identityRanker(i), pathRanker(p), tags(t), filtered(c), leftStreak(0), rightStreak(0), runningFresh(false)
+CollectionMan :: CollectionMan (IdentityRank& id, PathRank& path, ComTags& u, ComTags& b, ComTags& a, ComTags& c,
+				   std::vector< SharedImage> i)
+			  : collection(i), identityRanker(id), pathRanker(path), userTags(u), booruTags(b), artistTags(a), 
+			    charTags(c), allTags({ &a, &c, &u, &b})
 {
 	//freshImages();
 }
@@ -12,6 +14,7 @@ void CollectionMan :: setImages (const std::vector< SharedImage> i)
 {
 	collection = i;
 }
+
 std::vector< SharedImage>
 CollectionMan :: getImages (void)
 {
@@ -138,6 +141,7 @@ SharedImage CollectionMan :: getLeftImage (void)
 
 SharedImage CollectionMan :: matchingImage (SharedImage i, int winStreak)
 {
+	std::cout << "finding matching image" << std::endl;
 	SharedImage out = nullptr;
 
 	std::random_device dev;
@@ -218,7 +222,12 @@ void CollectionMan :: runImages (const int winner)
 
 	identityRanker.runImages(*leftImage, *rightImage, winner);
 	pathRanker.runImages(*leftImage, *rightImage, winner);
-	tags.runImages(*leftImage, *rightImage, winner);
+
+
+	for(auto t : allTags)
+	{
+		t->runImages(*leftImage, *rightImage, winner);
+	}
 
 }
 
@@ -226,7 +235,11 @@ void CollectionMan :: saveTags (void)
 {
 	identityRanker.saveTags();
 	pathRanker.saveTags();
-	tags.saveTags();
+
+	for(auto t : allTags)
+	{
+		t->saveTags();
+	}
 }
 
 void CollectionMan :: filter (void)
@@ -269,22 +282,126 @@ void CollectionMan :: filter (const std::string& str)
 
 	for(const auto i : collection)
 	{
-		bool found = true;
-		auto itags = tags.tags.retrieveData( i->pData.hash);
+		bool found = false;
+		auto itags = [&](void)
+		{
+			TagSet acc;
+
+			for(auto db : allTags)
+			{
+				acc += db->tags.retrieveData( i->pData.hash);
+			}
+
+			return acc;
+		}();
 
 		for(const auto t : tokens)
 		{
-			if(!found) break; 
-			if(!itags.contains(t)) found = false;
+			found = itags.contains(t);
 		}
 		for(const auto t : anti_tokens)
 		{
-			if(!found) break;
-			if(itags.contains(t)) found = false;
+			found = !itags.contains(t);
 		}
 
 		if(found) filtered.push_back(i);
 	}
+}
+
+
+TagSet CollectionMan :: retrieveTags (void)
+{
+	TagSet acc;
+
+	for(auto db : allTags)
+	{
+		acc += db->tags.retrieveData();
+	}
+
+	return acc;
+}
+
+TagSet CollectionMan :: retrieveTags (SharedImage i)
+{
+	TagSet acc;
+
+	for(auto db : allTags)
+	{
+		acc += db->tags.retrieveData( i->pData.hash);
+	}
+
+	return acc;
+}
+
+TagSet CollectionMan :: retrieveTags (const std::vector<SharedImage>& images)
+{
+	TagSet acc;
+
+	for(auto db : allTags)
+	{
+		for(const auto i : images) acc += db->tags.retrieveData( i->pData.hash);
+	}
+
+	return acc;
+}
+
+std::vector< std::tuple<Tag, SkillDatum>> CollectionMan :: tagsWithScores (void)
+{
+	std::vector< std::tuple<Tag, SkillDatum>> acc;
+
+	for(auto db : allTags)
+	{
+		const auto tags = db->tags.retrieveData();
+		for(const auto t : tags)
+		{
+			acc.push_back( std::make_tuple( t, db->scores.retrieveData(t)));
+		}
+	}
+
+	return acc;
+}
+
+std::vector< std::tuple<Tag, SkillDatum>> CollectionMan :: tagsWithScores (SharedImage i)
+{
+	std::vector< std::tuple<Tag, SkillDatum>> acc;
+
+	for(auto db : allTags)
+	{
+		const auto tags = db->tags.retrieveData( i->pData.hash);
+		for(const auto t : tags)
+		{
+			acc.push_back( std::make_tuple( t, db->scores.retrieveData(t)));
+		}
+	}
+
+	return acc;
+}
+
+std::vector< std::tuple<Tag, SkillDatum>> CollectionMan :: tagsWithScores (const std::vector<SharedImage>& images)
+{
+	std::map< Tag, SkillDatum> acc;
+	std::vector< std::tuple<Tag, SkillDatum>> out;
+
+	for(auto db : allTags)
+	{
+		for(const auto i : images)
+		{
+			const auto tags = db->tags.retrieveData( i->pData.hash);
+			for(const auto t : tags)
+			{
+				acc.insert( std::make_pair( t, db->scores.retrieveData(t)));
+			}
+		}
+	}
+
+
+	for(const auto p : acc)
+	{
+		out.push_back( std::make_tuple( p.first, p.second));
+	}
+
+
+	return out;
 }
 
 
