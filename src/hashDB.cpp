@@ -146,4 +146,16 @@ PathMetaData HashDB :: retrieveData (const std::filesystem::path p)
 	return localPathMap.find(absolute)->second;
 }
 
+std::map<std::filesystem::path, PathMetaData>::const_iterator HashDB :: begin (void) const
+{
+	return localPathMap.begin();
+}
+
+
+std::map<std::filesystem::path, PathMetaData>::const_iterator HashDB :: end   (void) const
+{
+	return localPathMap.end();
+}
+
+
 }
