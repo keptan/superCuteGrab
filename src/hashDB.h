@@ -36,6 +36,9 @@ public:
 	bool contains (const std::filesystem::path p);
 	PathMetaData retrieveData (const std::filesystem::path p);
 
+	std::map<std::filesystem::path, PathMetaData>::const_iterator  begin (void) const;
+	std::map<std::filesystem::path, PathMetaData>::const_iterator  end   (void) const;
+
 };
 }
 #endif
