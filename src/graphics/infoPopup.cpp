@@ -30,8 +30,8 @@ InfoPopup :: InfoPopup ( const Glib::RefPtr<Gtk::Builder> b
 		
 	//setup the columns for the tagTree list and iconView
 	tagTree->set_model(tagTreeModel);
-	tagTree->append_column("ID", tagColumns.m_col_name);
 	tagTree->append_column("score", tagColumns.m_col_score);
+	tagTree->append_column("ID", tagColumns.m_col_name);
 
 	icons.set_model(iconTreeModel);
 	icons.set_pixbuf_column(iconColumns.m_col_pixbuf);
@@ -49,7 +49,7 @@ InfoPopup :: InfoPopup ( const Glib::RefPtr<Gtk::Builder> b
 
 	//appending a test item, placeholder
 	int i = 0;
-	for(const auto t : collection.tags.tags.retrieveData())
+	for(const auto t : collection.retrieveTags())
 	{
 		Gtk::TreeModel::Row row = *(refCompletionModel->append());
 		row[c_Columns.m_col_id] = i++;
@@ -81,13 +81,15 @@ void InfoPopup :: insertTag (void)
 
 	Gtk::TreeModel::Row r = *(tagTreeModel->append());
 	r[tagColumns.m_col_name]		= t.tag;
-	r[tagColumns.m_col_score]		= collection.tags.scores.retrieveData(t).skill();
+	r[tagColumns.m_col_score]		= collection.userTags.scores.retrieveData(t).skill();
 
 	for(const auto i : selected)
 	{
-		collection.tags.insert(*i, t);
+		collection.userTags.insert(*i, t);
 	}
 }
+
+
 
 /*
 void InfoPopup :: setImage (std::shared_ptr< cute::Image> i)
@@ -119,8 +121,8 @@ void InfoPopup :: setImages (const std::vector< std::shared_ptr< cute::Image>> i
 	infoImage.setImage( i[0]);
 
 
-	cute::TagSet acc = collection.tags.getTags(*i[0]); 
-	for( auto im : i) acc = acc & collection.tags.getTags(*im);
+	cute::TagSet acc = collection.userTags.getTags(*i[0]); 
+	for( auto im : i) acc = acc & collection.userTags.getTags(*im);
 
 	tagTreeModel->clear();
 
@@ -135,7 +137,7 @@ void InfoPopup :: setImages (const std::vector< std::shared_ptr< cute::Image>> i
 	{
 		Gtk::TreeModel::Row r = *(tagTreeModel->append());
 		r[tagColumns.m_col_name]		= t.tag;
-		r[tagColumns.m_col_score]	= collection.tags.scores.retrieveData(t).skill();
+		r[tagColumns.m_col_score]	= collection.userTags.scores.retrieveData(t).skill();
 	}
 
 
@@ -179,8 +181,9 @@ BrowseWindow :: BrowseWindow
 
 	tagTreeModel = Gtk::ListStore::create(tagColumns);
 	tagTree->set_model(tagTreeModel);
-	tagTree->append_column("ID", tagColumns.m_col_name);
 	tagTree->append_column("score", tagColumns.m_col_score);
+	tagTree->append_column("ID", tagColumns.m_col_name);
+
 	auto sel = tagTree->get_selection();
 	sel->set_mode(Gtk::SELECTION_MULTIPLE);
 
@@ -507,21 +510,18 @@ void BrowseWindow :: refreshTagTree (void)
 	const auto images = collection.getImages();
 	if(!images.size()) return;
 
-	cute::TagSet tags;
-	for( auto im : images) tags += collection.tags.getTags(*im);
+	auto tags	= collection.tagsWithScores(images);
+	std::sort(tags.begin(), tags.end(),
+			[](const auto a, const auto b)
+			{ return std::get<1>(a).skill() > std::get<1>(b).skill();});
 
 	tagTreeModel->clear();
-	std::vector<cute::Tag> sortedView;
-	sortedView.insert(sortedView.begin(), tags.begin(), tags.end());
-	std::sort(sortedView.begin(), sortedView.end(), 
-		[&](const auto a, const auto b)
-		{ return collection.tags.scores.retrieveData(a).skill() > collection.tags.scores.retrieveData(b).skill();});
 
-	for(const auto t : sortedView)
+	for(const auto t : tags)
 	{
 		Gtk::TreeModel::Row r = *(tagTreeModel->append());
-		r[tagColumns.m_col_name]		= t.tag;
-		r[tagColumns.m_col_score]	= collection.tags.scores.retrieveData(t).skill();
+		r[tagColumns.m_col_name]		= std::get<0>(t).tag;
+		r[tagColumns.m_col_score]	= std::get<1>(t).skill();
 	}
 }
 
