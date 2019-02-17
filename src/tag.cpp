@@ -34,7 +34,7 @@ SkillDatum :: SkillDatum ( const std::vector<double>& p)
 		sigma = 1;
 }
 
-double SkillDatum :: skill (void)
+double SkillDatum :: skill (void) const
 {
 	return mu - (3 * sigma); 
 }
