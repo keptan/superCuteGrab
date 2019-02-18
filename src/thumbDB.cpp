@@ -14,23 +14,31 @@ ThumbDB :: ThumbDB (std::filesystem::path p)
 
 std::filesystem::path ThumbDB :: getThumbPath (const Image& image)
 {
-	const auto it = items.find(image.pData.hash);
+	return getThumbPath(image.pData.hash, image.location);
+}
+
+
+std::filesystem::path ThumbDB :: getThumbPath (const Hash& hash, const std::filesystem::path& path)
+{
+
+	const auto it = items.find(hash);
 
 	if(it != items.end()) return it->second;
-	std::cout << "generating new thumbnail for: " << image.location << std::endl;
-
-	const auto newPath = generateThumb(image);
-	items.insert( std::make_pair(image.pData.hash, newPath));
+	const auto newPath = generateThumb(hash, path);
+	items.insert( std::make_pair(hash, newPath));
 
 	return newPath;
 }
 
 
-
-
 std::filesystem::path ThumbDB :: generateThumb (const Image& image)
 {
-	auto sourcePBuf = Gdk::Pixbuf::create_from_file(image.location.c_str());
+	return generateThumb(image.pData.hash, image.location);
+}
+
+std::filesystem::path ThumbDB :: generateThumb (const Hash& hash, const std::filesystem::path& path)
+{
+	auto sourcePBuf = Gdk::Pixbuf::create_from_file(path.c_str());
 
 	const int width = sourcePBuf->get_width();
 	const int height = sourcePBuf->get_height(); 
@@ -43,9 +51,9 @@ std::filesystem::path ThumbDB :: generateThumb (const Image& image)
 					outHeight, outWidth,
 					Gdk::INTERP_BILINEAR);
 
-	scaledPBuf->save( (thumbDir / image.pData.hash).c_str(), "jpeg");
+	scaledPBuf->save( (thumbDir / hash).c_str(), "jpeg");
 
-	return std::filesystem::absolute(thumbDir/ image.pData.hash);
+	return std::filesystem::absolute(thumbDir/hash);
 }
 
 	
