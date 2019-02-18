@@ -72,6 +72,8 @@ class InfoPopup
 	Gtk::Entry* addTag;
 	Gtk::Entry*	character;
 	Gtk::Entry* artist;
+	Gtk::Entry*	viewCharacter;
+	Gtk::Entry* viewArtist;
 	Gtk::AspectFrame* frame;
 	Gtk::ScrolledWindow* scroll;
 
@@ -88,7 +90,10 @@ class InfoPopup
 
 	void setImages (const std::vector< std::shared_ptr< cute::Image>>);
 	Gtk::Window* getWindow (void);
+
 	void insertTag (void);
+	void insertCharacter (void);
+	void insertArtist (void);
 
 	protected: 
 	//handlers 

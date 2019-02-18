@@ -20,8 +20,11 @@ InfoPopup :: InfoPopup ( const Glib::RefPtr<Gtk::Builder> b
 	builder->get_widget("addTag", addTag);
 	builder->get_widget("infoAspect", frame);
 	builder->get_widget("infoIconScroll", scroll);
+
 	builder->get_widget("character", character);
 	builder->get_widget("artist", artist);
+	builder->get_widget("viewCharacter", viewCharacter);
+	builder->get_widget("viewArtist", viewArtist);
 
 	//setup iconView and tagTree view models
 	//tagTree is a list of all the tags and scores of selected images
@@ -41,13 +44,26 @@ InfoPopup :: InfoPopup ( const Glib::RefPtr<Gtk::Builder> b
 	scroll->add(icons);
 
 	//setting up autocomplete for the user tag entry
-	auto completion = Gtk::EntryCompletion::create();
-	addTag->set_completion(completion);
+	auto completion1 = Gtk::EntryCompletion::create();
+	auto completion2 = Gtk::EntryCompletion::create();
+	auto completion3 = Gtk::EntryCompletion::create();
+
+	addTag->set_completion(completion1);
 	addTag->signal_activate().connect(sigc::mem_fun(*this,
       &InfoPopup::insertTag) );
 
+	artist->set_completion(completion2);
+	artist->signal_activate().connect(sigc::mem_fun(*this, 
+	  &InfoPopup::insertArtist) );
+
+	character->set_completion(completion3);
+	character->signal_activate().connect(sigc::mem_fun(*this, 
+	  &InfoPopup::insertCharacter) );
+
 	auto refCompletionModel = Gtk::ListStore::create(c_Columns);
-	completion->set_model(refCompletionModel);
+	completion1->set_model(refCompletionModel);
+	completion2->set_model(refCompletionModel);
+	completion3->set_model(refCompletionModel);
 
 	//appending a test item, placeholder
 	int i = 0;
@@ -58,7 +74,9 @@ InfoPopup :: InfoPopup ( const Glib::RefPtr<Gtk::Builder> b
 		row[c_Columns.m_col_name] = t.tag;
 	}
 
-	completion->set_text_column(c_Columns.m_col_name);
+	completion1->set_text_column(c_Columns.m_col_name);
+	completion2->set_text_column(c_Columns.m_col_name);
+	completion3->set_text_column(c_Columns.m_col_name);
 
 	tagTree->show();
 
@@ -88,6 +106,34 @@ void InfoPopup :: insertTag (void)
 	for(const auto i : selected)
 	{
 		collection.booruTags.insert(*i, t);
+	}
+}
+
+void InfoPopup :: insertArtist (void)
+{
+	const cute::Tag t = artist->get_text().raw();
+	std::cout << t.tag << std::endl;
+	artist->set_text("");
+
+	viewArtist->set_text( viewArtist->get_text().raw() + ", " + t.tag);
+
+	for(const auto i : selected)
+	{
+		collection.artistTags.insert(*i, t);
+	}
+}
+
+void InfoPopup :: insertCharacter (void)
+{
+	const cute::Tag t = character->get_text().raw();
+	std::cout << t.tag << std::endl;
+	character->set_text("");
+
+	viewCharacter->set_text( viewCharacter->get_text().raw() + ", " + t.tag);
+
+	for(const auto i : selected)
+	{
+		collection.characterTags.insert(*i, t);
 	}
 }
 
@@ -161,9 +207,19 @@ void InfoPopup :: setImages (const std::vector< std::shared_ptr< cute::Image>> i
 		std::cout << t.tag << std::endl;
 		charString += t.tag + ',';
 	}
-	
+	viewCharacter->set_text(charString.c_str());
 
-	character->set_text(charString.c_str());
+	//time to get the char tags and stuff
+	std::string artistString;
+	for(const auto t : sortedTagCollection( collection.artistTags))
+	{
+		std::cout << t.tag << std::endl;
+		artistString += t.tag + ',';
+	}
+	viewArtist->set_text(artistString.c_str());
+
+
+
 
 
 	//if only one image, show the large preview instead of the icon view
