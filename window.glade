@@ -43,6 +43,53 @@
                     <property name="position">0</property>
                   </packing>
                 </child>
+              </object>
+              <packing>
+                <property name="resize">False</property>
+                <property name="shrink">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkScrolledWindow" id="browseScroll">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="hscrollbar_policy">automatic</property>
+                <property name="vscrollbar_policy">automatic</property>
+                <child>
+                  <placeholder/>
+                </child>
+              </object>
+              <packing>
+                <property name="resize">True</property>
+                <property name="shrink">True</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkTable" id="table2">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="n_rows">3</property>
+            <property name="n_columns">3</property>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <object class="GtkVBox" id="vbox4">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
                 <child>
                   <object class="GtkButton" id="filterTag">
                     <property name="label" translatable="yes">filter by selected</property>
@@ -53,7 +100,7 @@
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
-                    <property name="position">1</property>
+                    <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
@@ -66,11 +113,11 @@
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
-                    <property name="position">2</property>
+                    <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkHBox" id="hbox1">
+                  <object class="GtkHBox" id="hbox2">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
@@ -106,8 +153,8 @@
                         </child>
                       </object>
                       <packing>
-                        <property name="expand">True</property>
-                        <property name="fill">True</property>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
                         <property name="position">0</property>
                       </packing>
                     </child>
@@ -132,35 +179,76 @@
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
-                    <property name="position">3</property>
+                    <property name="position">2</property>
                   </packing>
                 </child>
               </object>
               <packing>
-                <property name="resize">False</property>
-                <property name="shrink">True</property>
+                <property name="bottom_attach">3</property>
+                <property name="x_options"/>
+                <property name="y_options"/>
               </packing>
             </child>
             <child>
-              <object class="GtkScrolledWindow" id="browseScroll">
+              <placeholder/>
+            </child>
+            <child>
+              <object class="GtkComboBoxText" id="sortBox">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="hscrollbar_policy">automatic</property>
-                <property name="vscrollbar_policy">automatic</property>
-                <child>
-                  <placeholder/>
-                </child>
+                <property name="can_focus">False</property>
+                <property name="active">0</property>
+                <items>
+                  <item translatable="yes">Score</item>
+                  <item translatable="yes">Date</item>
+                  <item translatable="yes">#Characters</item>
+                </items>
               </object>
               <packing>
-                <property name="resize">True</property>
-                <property name="shrink">True</property>
+                <property name="left_attach">1</property>
+                <property name="right_attach">2</property>
+                <property name="top_attach">1</property>
+                <property name="bottom_attach">2</property>
+                <property name="x_options">GTK_FILL</property>
+                <property name="y_options"/>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="label1">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">sort options</property>
+              </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="right_attach">2</property>
+                <property name="top_attach">2</property>
+                <property name="bottom_attach">3</property>
+                <property name="x_options">GTK_FILL</property>
+              </packing>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <object class="GtkHScale" id="hscale1">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="show_fill_level">True</property>
+                <property name="restrict_to_fill_level">False</property>
+                <property name="fill_level">100</property>
+                <property name="round_digits">1</property>
+                <property name="value_pos">left</property>
+              </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="right_attach">2</property>
               </packing>
             </child>
           </object>
           <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">1</property>
           </packing>
         </child>
       </object>
@@ -336,7 +424,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="artist">
+                  <object class="GtkEntry" id="viewArtist">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="editable">False</property>
@@ -354,7 +442,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="entry1">
+                  <object class="GtkEntry" id="artist">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="primary_icon_activatable">False</property>
@@ -395,7 +483,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="character">
+                  <object class="GtkEntry" id="viewCharacter">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="editable">False</property>
@@ -413,7 +501,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="entry2">
+                  <object class="GtkEntry" id="character">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="primary_icon_activatable">False</property>
