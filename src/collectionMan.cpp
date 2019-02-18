@@ -4,9 +4,12 @@ namespace cute  {
 
 CollectionMan :: CollectionMan (IdentityRank& id, PathRank& path,  ComTags& b, ComTags& a, ComTags& c,
 				   std::vector< SharedImage> i)
-			  : collection(i), identityRanker(id), pathRanker(path), booruTags(b), artistTags(a), 
+			  : gen(dev()), collection(i), identityRanker(id), pathRanker(path), booruTags(b), artistTags(a), 
 			    charTags(c), allTags({ &a, &c, &b})
 {
+	leftStreak = 0;
+	rightStreak = 0;
+	runningFresh = false;
 	//freshImages();
 }
 
@@ -36,8 +39,6 @@ void CollectionMan :: freshImages (void)
 
 	saveTags();
 
-	std::random_device dev;
-	std::mt19937 gen (dev());
 	std::uniform_int_distribution<int> dist (0, 3);
 	const bool newImage = !dist(gen);
 	const bool side = dist(gen);
@@ -51,55 +52,72 @@ void CollectionMan :: freshImages (void)
 				});
 
 	std::uniform_int_distribution<int> sizeMatch (0, filtered.size() - 1);
+	std::cout << "sample choice: " << sizeMatch(gen) << std::endl;
 	firstImage  = newImage ? *(filtered.begin()) : *(filtered.begin() + sizeMatch(gen));
 	secondImage = matchingELO(leftImage);
 
 	//randomize side here please!
-	runningFresh = identityRanker.getSkill(*firstImage).sigma > 15 ? true : false; 
+	runningFresh = newImage; 
 }
 	
 void CollectionMan :: leftVictory (void)
 {
 	runImages(1);
 	leftStreak++;
-	rightStreak = 0;
 
 	const bool leftUncertain  = identityRanker.getSkill(*leftImage).sigma  > 11; 
 	const bool rightUncertain = identityRanker.getSkill(*rightImage).sigma > 11; 
 
 	if(rightStreak > 5 || leftStreak > 5) return freshImages();
+
+	std::uniform_int_distribution<int> dist (0, 1);
+	const bool side = dist(gen);
+
 	rightImage = matchingELO( leftImage, leftStreak);
+	if(side)
+	{
+		std::swap(leftImage, rightImage);
+		std::swap(leftStreak, rightStreak);
+	}
 }
 
 void CollectionMan :: rightVictory (void)
 {
 	runImages(2);
 	rightStreak++;
-	leftStreak = 0;
 
-	const bool leftUncertain  = identityRanker.getSkill(*leftImage).sigma  > 9; 
-	const bool rightUncertain = identityRanker.getSkill(*rightImage).sigma > 9; 
+	const bool leftUncertain  = identityRanker.getSkill(*leftImage).sigma  > 11; 
+	const bool rightUncertain = identityRanker.getSkill(*rightImage).sigma > 11; 
 
 	if(rightStreak > 5 || leftStreak > 5) return freshImages();
+
+	std::uniform_int_distribution<int> dist (0, 1);
+	const bool side = dist(gen);
+
 	leftImage = matchingELO( rightImage, rightStreak);
+	if(side)
+	{
+		std::swap(leftImage, rightImage);
+		std::swap(leftStreak, rightStreak);
+	}
 }
 
 void CollectionMan :: tieVictory (void)
 {
 	runImages(3);
 
-	const bool leftUncertain  = identityRanker.getSkill(*leftImage).sigma  > 9; 
-	const bool rightUncertain = identityRanker.getSkill(*rightImage).sigma > 9; 
+	const bool leftUncertain  = identityRanker.getSkill(*leftImage).sigma  > 15; 
+	const bool rightUncertain = identityRanker.getSkill(*rightImage).sigma > 15; 
 
 
-	if(leftUncertain && leftStreak < 5)
+	if(leftUncertain && leftStreak < 3)
 	{
 		leftStreak++;
 		rightImage = matchingELO( leftImage, 0);
 		return; 
 	}
 
-	if(rightUncertain && rightStreak < 5)
+	if(rightUncertain && rightStreak < 3)
 	{
 		rightStreak++;
 		leftImage = matchingELO( rightImage, 0);
@@ -138,8 +156,6 @@ SharedImage CollectionMan :: matchingImage (SharedImage i, int winStreak)
 	std::cout << "finding matching image" << std::endl;
 	SharedImage out = nullptr;
 
-	std::random_device dev;
-	std::mt19937 gen (dev());
 
 	std::sort (filtered.begin(), filtered.end(), 
 				[&](const auto a, const auto b) {
@@ -171,8 +187,6 @@ SharedImage CollectionMan :: matchingImage (SharedImage i, int winStreak)
 SharedImage CollectionMan :: matchingELO (SharedImage i, int streak )
 {
 	SharedImage out = nullptr; 
-	std::random_device dev; 
-	std::mt19937 gen (dev()); 
 
 	std::sort (filtered.begin(), filtered.end(), 
 				[&](const auto a, const auto b) {
@@ -186,12 +200,12 @@ SharedImage CollectionMan :: matchingELO (SharedImage i, int streak )
 	auto climbTop = climbBottom + (twoPercent * 2);
 
 
-	if(!runningFresh) climbBottom += (twoPercent * (streak / 3 + 1));
-	if(!runningFresh) climbTop += (twoPercent * (streak / 2));
+	//if(!runningFresh) climbBottom += (twoPercent * (streak / 3 + 1));
+	//if(!runningFresh) climbTop += (twoPercent * (streak / 2));
 	if(climbTop >= filtered.end()) climbTop = filtered.end() - 1;
 	if(climbBottom < filtered.begin()) climbBottom = filtered.begin(); 
 
-	if(climbBottom >= filtered.end() - 15) climbBottom = filtered.end() - 15;
+	if(climbBottom >= filtered.end() - 15) climbBottom = std::max(filtered.begin(), filtered.end() - 15);
 
 
 	std::cout << "matching image between ";

@@ -13,6 +13,9 @@ namespace cute		{
 class CollectionMan 
 {
 
+	std::random_device dev;
+	std::mt19937 gen;
+
 	//all the images we can accecss, and a filtered version that we look for potential comparisons in 
 	//passing around shared pts same cost as passing around iterators but 
 	//without invalidation
