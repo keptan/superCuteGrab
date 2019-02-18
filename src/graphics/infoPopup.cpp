@@ -388,7 +388,7 @@ void BrowseWindow :: comboSort (std::vector<cute::SharedImage>& images)
 	lamMap["Date"]		    = [&](const auto a, const auto b)
 						   {
 								return std::filesystem::last_write_time(a->location) > 
-									   std::filesystem::last_write_time(a->location);
+									   std::filesystem::last_write_time(b->location);
 						   };
 
 
