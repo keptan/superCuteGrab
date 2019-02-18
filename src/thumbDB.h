@@ -6,6 +6,7 @@
 #include <set>
 #include <cassert>
 #include "hashDB.h"
+#include "thumbDB.h"
 
 namespace cute 
 {
@@ -16,6 +17,7 @@ namespace cute
 		ThumbDB (std::filesystem::path);
 
 		std::filesystem::path getThumbPath (const Image&);
+		std::filesystem::path getThumbPath (const Hash&, const std::filesystem::path&);
 
 
 		private:
@@ -23,6 +25,8 @@ namespace cute
 		std::map<Hash, std::filesystem::path> items; 
 
 		std::filesystem::path generateThumb (const Image&);
+		std::filesystem::path generateThumb (const Hash&, const std::filesystem::path&);
+
 	};
 }
 
