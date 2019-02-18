@@ -70,6 +70,8 @@ class InfoPopup
 	Gtk::Window* window; 
 	Gtk::TreeView* tagTree;
 	Gtk::Entry* addTag;
+	Gtk::Entry*	character;
+	Gtk::Entry* artist;
 	Gtk::AspectFrame* frame;
 	Gtk::ScrolledWindow* scroll;
 
