@@ -2,10 +2,10 @@
 
 namespace cute  {
 
-CollectionMan :: CollectionMan (IdentityRank& id, PathRank& path, ComTags& u, ComTags& b, ComTags& a, ComTags& c,
+CollectionMan :: CollectionMan (IdentityRank& id, PathRank& path,  ComTags& b, ComTags& a, ComTags& c,
 				   std::vector< SharedImage> i)
-			  : collection(i), identityRanker(id), pathRanker(path), userTags(u), booruTags(b), artistTags(a), 
-			    charTags(c), allTags({ &a, &c, &u, &b})
+			  : collection(i), identityRanker(id), pathRanker(path), booruTags(b), artistTags(a), 
+			    charTags(c), allTags({ &a, &c, &b})
 {
 	//freshImages();
 }
@@ -57,8 +57,8 @@ void CollectionMan :: leftVictory (void)
 	rightStreak = 0;
 	leftStreak++;
 
-	const bool leftUncertain  = identityRanker.getSkill(*leftImage).sigma  > 9; 
-	const bool rightUncertain = identityRanker.getSkill(*rightImage).sigma > 9; 
+	const bool leftUncertain  = identityRanker.getSkill(*leftImage).sigma  > 11; 
+	const bool rightUncertain = identityRanker.getSkill(*rightImage).sigma > 11; 
 
 	if(rightStreak > 10 || leftStreak > 10)
 		return freshImages();

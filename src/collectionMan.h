@@ -28,15 +28,14 @@ class CollectionMan
 
 	int leftStreak, rightStreak;
 	bool runningFresh;
-	std::array<ComTags*, 4> allTags;
+	std::array<ComTags*, 3> allTags;
 
 	public:
-	CollectionMan (IdentityRank&, PathRank&, ComTags&, ComTags&, ComTags&, ComTags&,
+	CollectionMan (IdentityRank&, PathRank&, ComTags&, ComTags&, ComTags&,
 				   std::vector< SharedImage> = {});
 
 	IdentityRank&    identityRanker;
 	PathRank&		 pathRanker;
-	ComTags&		 userTags;
 	ComTags&		 booruTags;
 	ComTags&		 artistTags;
 	ComTags&		 charTags;
