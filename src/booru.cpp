@@ -2,14 +2,16 @@
 #include "filetypes.h"
 #include <iostream>
 #include <sstream>
+#include <fstream>
+#include <streambuf>
+#include <sstream>
 
 namespace cute {
 
-DanBooru :: DanBooru (const std::string& hash)
-	: url (std::string("https://danbooru.donmai.us/posts.json?tags=md5:") + hash)
-{
 
-}
+
+DanBooru :: DanBooru (void)
+{}
 
 size_t DanBooru :: handle(char * data, size_t size, size_t nmemb, void * p)
 {
@@ -22,7 +24,7 @@ size_t DanBooru :: handle_impl(char* data, size_t size, size_t nmemb)
 	return size * nmemb;
 }
 
-int DanBooru :: getDoc (void)
+int DanBooru :: getDoc (const std::string& url)
 {
 		CURL *curl;
 		CURLcode res;
@@ -36,16 +38,7 @@ int DanBooru :: getDoc (void)
 
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION,&DanBooru::handle);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
-		/*
-		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-		//curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION,&BooruInterface::handle);
-		curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
-
-		http_code = 0;
-		*/
+	
 		res = curl_easy_perform(curl);
 
 		curl_easy_cleanup(curl);
@@ -89,18 +82,23 @@ int DanBooru :: parseDoc (void)
 
 }
 
-int DanBooru :: genTags (void)
+int DanBooru :: hashQ (const Hash& h)
 {
-	if( getDoc()) return -1;
-	if( parseDoc()) return -1;
-
-	return 0;
+	const std::string request = "https://danbooru.donmai.us/posts.json?tags=md5:";
+	if(getDoc(request + h)) return -1;
+	return parseDoc();
 }
 
-Gelbooru :: Gelbooru (const std::string& hash)
-	: main_url (std::string("https://gelbooru.com//index.php?page=dapi&s=post&q=index&json=1&limit=1&tags=md5:") + hash)
+int DanBooru :: idQ (const std::string& id)
 {
+	const std::string request = "https://danbooru.donmai.us/posts.json?tags=id:";
+	if(getDoc(request + id)) return -1;
+	return parseDoc();
+}
 
+
+Gelbooru :: Gelbooru (void)
+{
 }
 
 size_t Gelbooru :: handle(char * data, size_t size, size_t nmemb, void * p)
@@ -154,19 +152,18 @@ std::string Gelbooru :: getType (std::string tag)
 	return type;
 }
 
-
-int Gelbooru :: parseDoc (std::string inDoc)
+int Gelbooru :: parseDoc ()
 {
 	Json::Reader reader;
 	Json::Value  data;
 
 	std::string tagString;
 
-	if (inDoc == "[][]") return -1;
-	if (inDoc == "[]")   return -1;
-	if (inDoc == "")	   return -1;
+	if (doc == "[][]") return -1;
+	if (doc == "[]")   return -1;
+	if (doc == "")	   return -1;
 
-	if(! reader.parse(inDoc, data)) return -1;
+	if(! reader.parse(doc, data)) return -1;
 
 
 	tagString	 = data[0]["tags"].asString();
@@ -175,6 +172,8 @@ int Gelbooru :: parseDoc (std::string inDoc)
 
 	std::string splitBuf;
 	std::stringstream ss(tagString);
+
+	general += TagSet( std::string("gelbooru"));
 
 	while(ss >> splitBuf) tagVec.push_back(splitBuf);
 
@@ -199,35 +198,96 @@ int Gelbooru :: parseDoc (std::string inDoc)
 	return 0;
 }
 
-int Gelbooru :: genTags (void)
+int Gelbooru :: hashQ (const Hash& h)
 {
-	if( getDoc(main_url)) return -1;
-	if( parseDoc(doc)) return -1;
 
-	return 0;
+	const std::string request = "https://gelbooru.com//index.php?page=dapi&s=post&q=index&json=1&limit=1&tags=md5:";
+	if(getDoc(request + h)) return -1;
+	return parseDoc();
+}
+
+int Gelbooru :: idQ (const std::string& id)
+{
+
+	const std::string request = "https://gelbooru.com//index.php?page=dapi&s=post&q=index&json=1&limit=1&tags=id:";
+	if(getDoc(request + id)) return -1;
+	return parseDoc();
+}
+
+SauceArbiter :: SauceArbiter (std::string key)
+	: sm(key), thumbs("thumbnails")
+{}
+
+int SauceArbiter :: search (const std::filesystem::path& p, const Hash& h)
+{
+	sm.set_image_path( thumbs.getThumbPath(h ,p));
+	sm.fetch_json();
+
+	auto x = sm.get_sauce_res();
+
+	for(auto it = x.begin();it!=x.end();++it)
+	{
+		auto y = *it;
+		bool hasD = (y.danbooru_tag_set.size());
+		bool hasG = (y.gelbooru_tag_set.size());
+
+		if(hasD)
+		{
+			if(y.danbooru_id == "0") return -1;
+			if(y.similarity < 80) continue;
+
+			booru.idQ(y.danbooru_id);
+			artists = booru.artists;
+			characters = booru.characters;
+			general = booru.general;
+
+			return 0;
+		}
+		if(hasG)
+		{
+			if(y.gelbooru_id == "0") return -1;
+			if(y.similarity < 80) continue;
+
+			gbooru.idQ(y.gelbooru_id);
+			artists = gbooru.artists;
+			characters = gbooru.characters;
+			general = gbooru.general;
+
+			return 0;
+		}
+	}
+
+	return -1;
 }
 
 int booruScan (const std::filesystem::path loc, HashDB& hash, TagDB& general, TagDB& artists, TagDB& characters)
 {
-	hash.scanDirectory(loc);
+	hash.scanDirectoryRecursive(loc);
 	int tagged = 0;
 	int files = 0;
 	int alreadyTagged = 0;
+
+	std::ifstream t("saucenao_key");
+	std::string key;
+	t >> key;
+
 
 	for(const auto it : hash)
 	{
 		files++;
 		const auto h = it.second.hash;
-		DanBooru booru(h);
-		Gelbooru gbooru(h);
+		DanBooru booru;
+		Gelbooru gbooru;
+		SauceArbiter arbiter(key);
 
 		const auto c = [&](const auto s){ return general.retrieveData(h).contains(Tag(s));};
 		const auto checkedG = c("no_gelbooru");
 		const auto hasG		= c("gelbooru");
 		const auto checkedD = c("no_danbooru");
 		const auto hasD		= c("danbooru");
+		const auto checkedS = c("no_sauce");
 
-		if(hasG || hasD || ( checkedG && checkedD))
+		if(hasG || hasD || ( checkedG && checkedD && checkedS))
 		{
 
 			std::cout << "already tagged: " << it.first.filename().string() << '\n';
@@ -235,7 +295,7 @@ int booruScan (const std::filesystem::path loc, HashDB& hash, TagDB& general, Ta
 			continue;
 		}
 
-		const auto gotDanbooru = checkedD ? -1 : booru.genTags();
+		const auto gotDanbooru = checkedD ? -1 : booru.hashQ(h);
 
 		if(!checkedD && !gotDanbooru)
 		{
@@ -254,11 +314,10 @@ int booruScan (const std::filesystem::path loc, HashDB& hash, TagDB& general, Ta
 			continue;
 		}
 
-		const auto gotGelbooru = checkedG ? -1 : gbooru.genTags();
+		const auto gotGelbooru = checkedG ? -1 : gbooru.hashQ(h);
 
-		if(!checkedG && !gotGelbooru)
+		if(!checkedG && gotGelbooru)
 		{
-			std::cout << "searched gelbooru" << it.first.filename().string() << '\n';
 			const TagSet t( Tag("no_gelbooru"));
 			general.insertTags(h, t);
 		}
@@ -272,6 +331,23 @@ int booruScan (const std::filesystem::path loc, HashDB& hash, TagDB& general, Ta
 			tagged++;
 			continue;
 		}
+
+		const auto gotSauce = arbiter.search(it.first, h);
+		if(!gotSauce)
+		{
+			std::cout << "found saucenao for: " << it.first.filename().string() << '\n';
+			general.insertTags(h, arbiter.general);
+			artists.insertTags(h, arbiter.artists);
+			characters.insertTags(h, arbiter.characters);
+			tagged++;
+			continue;
+		}
+		if(gotSauce)
+		{
+			const TagSet t( Tag("no_sauce"));
+			general.insertTags(h, t);
+		}
+
 
 
 	}
