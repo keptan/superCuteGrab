@@ -60,16 +60,35 @@ InfoPopup :: InfoPopup ( const Glib::RefPtr<Gtk::Builder> b
 	character->signal_activate().connect(sigc::mem_fun(*this, 
 	  &InfoPopup::insertCharacter) );
 
-	auto refCompletionModel = Gtk::ListStore::create(c_Columns);
-	completion1->set_model(refCompletionModel);
-	completion2->set_model(refCompletionModel);
-	completion3->set_model(refCompletionModel);
+	auto refCompletionModel1 = Gtk::ListStore::create(c_Columns);
+	auto refCompletionModel2 = Gtk::ListStore::create(c_Columns);
+	auto refCompletionModel3 = Gtk::ListStore::create(c_Columns);
+
+	completion1->set_model(refCompletionModel1);
+	completion2->set_model(refCompletionModel2);
+	completion3->set_model(refCompletionModel3);
 
 	//appending a test item, placeholder
 	int i = 0;
-	for(const auto t : collection.retrieveTags())
+	for(const auto t : collection.booruTags.tags.retrieveData())
 	{
-		Gtk::TreeModel::Row row = *(refCompletionModel->append());
+		Gtk::TreeModel::Row row = *(refCompletionModel1->append());
+		row[c_Columns.m_col_id] = i++;
+		row[c_Columns.m_col_name] = t.tag;
+	}
+
+	i = 0;
+	for(const auto t : collection.artistTags.tags.retrieveData())
+	{
+		Gtk::TreeModel::Row row = *(refCompletionModel2->append());
+		row[c_Columns.m_col_id] = i++;
+		row[c_Columns.m_col_name] = t.tag;
+	}
+
+	i = 0;
+	for(const auto t : collection.charTags.tags.retrieveData())
+	{
+		Gtk::TreeModel::Row row = *(refCompletionModel3->append());
 		row[c_Columns.m_col_id] = i++;
 		row[c_Columns.m_col_name] = t.tag;
 	}
@@ -133,7 +152,7 @@ void InfoPopup :: insertCharacter (void)
 
 	for(const auto i : selected)
 	{
-		collection.characterTags.insert(*i, t);
+		collection.charTags.insert(*i, t);
 	}
 }
 
