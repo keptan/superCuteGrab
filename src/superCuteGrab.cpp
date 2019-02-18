@@ -9,42 +9,57 @@
 #include "collectionMan.h"
 #include "compMan.h"
 #include "graphics/infoPopup.h"
+#include "booru.h"
 #include <gtkmm.h>
 #include <memory>
+#include <algorithm>
 
 
 int main(int argc, char *const argv[])
 {
+	//dump args into a vector
+	std::vector<std::string> args = [&](void)
+	{ 
+		std::vector<std::string> acc;
+
+		for(int i = 0; i < argc; i++)
+		{
+			acc.push_back(std::string(argv[i]));
+		}
+
+		return acc;
+	}();
+
+	const auto scan = std::find(args.begin(), args.end(), "-scan");
+	const auto gui  = std::find(args.begin(), args.end(), "-gui");
+
+	if(scan == args.end() && gui == args.end()) return -1;
+
 	auto app = Gtk::Application::create();
 	auto builder = Gtk::Builder::create_from_file("window.glade");
 
-
 	cute::HashDB hashDb("files.csv");
 	cute::ThumbDB thumbDb("thumbnails");
-	cute::TagDB tagDB("tags.csv");
+	
+	cute::ComTags artists("data/artists.csv", "data/artistScores.csv");
+	cute::ComTags characters("data/chars.csv", "data/charScores.csv");
+	cute::ComTags booruTags("data/booru.csv", "data/booruScores.csv");
+
 	cute::IdentityRank idRank;
+	cute::PathRank path;
 
-//	hashDb.scanDirectory("test");
-//	hashDb.writeCSV();
-
-	std::vector< std::shared_ptr<cute::Image>> images;
-
-
-	/*
-	for(auto &f : std::filesystem::directory_iterator("test"))
+	if(scan < args.end() - 1) 
 	{
-		if(!cute::conformingFileType(f.path())) continue;
-		images.push_back( std::make_shared<cute::Image> (f.path(), hashDb.retrieveData(f.path())));
+		return cute::booruScan(*(scan + 1), hashDb, booruTags.tags, artists.tags, characters.tags);
 	}
-	*/
 
-	cute::CollectionMan collection ( idRank, images);
+	if(gui == args.end()) return -1;
 
-//	Window w(builder, collection);
-	BrowseWindow w(builder, collection, hashDb);
+
+	cute::CollectionMan collection ( idRank, path, booruTags, artists, characters);
+	graphics::BrowseWindow w(builder, collection, hashDb);
 
 	return app->run(*w.getWindow());
-
 }
 
 
