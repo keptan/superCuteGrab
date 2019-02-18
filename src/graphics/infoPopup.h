@@ -155,6 +155,7 @@ class BrowseWindow : public sigc::trackable
 	void refreshTagTree (void);
 	void filterTagTree (void);
 	void refresh (void);
+	void comboSort (std::vector<cute::SharedImage>&);
 
 	void on_dropped_file(const Glib::RefPtr<Gdk::DragContext>& context,
 	  int x, int y, const Gtk::SelectionData& selection_data, guint info, guint time);

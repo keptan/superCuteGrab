@@ -341,6 +341,11 @@ BrowseWindow :: BrowseWindow
 	button->signal_clicked().connect(sigc::mem_fun(*this, 
 				&BrowseWindow::refresh) ); 
 
+	Gtk::ComboBoxText* combo;
+	builder->get_widget("sortBox", combo);
+	combo->signal_changed().connect(sigc::mem_fun(*this, 
+				&BrowseWindow::refresh) );
+
 	builder->get_widget("filterSearch", filterSearch);
 	filterSearch->signal_activate().connect(sigc::mem_fun(*this, &BrowseWindow::filter) );
 
@@ -362,9 +367,37 @@ void BrowseWindow :: addMember (const std::shared_ptr<cute::Image> i)
 	r[m_Columns.m_col_name] = cut;
 	r[m_Columns.m_col_pixbuf] = Gdk::Pixbuf::create_from_file( thumbnails.getThumbPath(*i).c_str());
 	r[m_Columns.m_col_image] = i;
-
-
 }	
+
+void BrowseWindow :: comboSort (std::vector<cute::SharedImage>& images)
+{
+	std::map<std::string, std::function< bool (cute::SharedImage, cute::SharedImage)>> lamMap;
+
+	lamMap["Score"]        = [&](const auto a, const auto b)
+						   {
+								return collection.identityRanker.getSkill(*a).skill() > 
+									   collection.identityRanker.getSkill(*b).skill();
+						   };
+
+	lamMap["#Characters"]  = [&](const auto a, const auto b)
+						   {
+								return collection.charTags.getTags(*a).size() < 
+									   collection.charTags.getTags(*b).size();
+						   };
+
+	lamMap["Date"]		    = [&](const auto a, const auto b)
+						   {
+								return std::filesystem::last_write_time(a->location) > 
+									   std::filesystem::last_write_time(a->location);
+						   };
+
+
+	Gtk::ComboBoxText* combo;
+	builder->get_widget("sortBox", combo);
+	const std::string boxStr = combo->get_active_text().raw();
+
+	std::sort(images.begin(), images.end(), lamMap[boxStr]);
+}
 
 //callback for the right click 'info' menu
 void BrowseWindow :: callback (const std::vector<Gtk::TreeModel::Path> paths)
@@ -662,7 +695,9 @@ void BrowseWindow :: refresh (void)
 	collection.filter();
 
 	m_refTreeModel->clear();
-	for(auto &i : collection.getImages()) addMember(i);
+	auto images = collection.getImages();
+	comboSort(images);
+	for(auto &i : images) addMember(i);
 	refreshTagTree();
 }
 
