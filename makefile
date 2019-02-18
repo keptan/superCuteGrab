@@ -2,6 +2,7 @@ CC=g++ -g -O3
 CFLAG= -c  -std=c++17 -I ./lib
 GTKL= `pkg-config --libs gtkmm-3.0`
 GTKC= `pkg-config --cflags gtkmm-3.0`
+
 TSLIB= -pthread #-lmongoclient -L lib -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt
 TSOB= ./src/obj/trueskill.o ./src/obj/matrix.o src/obj/gaussian.o ./src/obj/basemath.o ./src/obj/factorgraph.o
 TSOBN=  $(OBJ)trueskill.o $(OBJ)matrix.o $(OBJ)gaussian.o $(OBJ)basemath.o $(OBJ)factorgraph.o
@@ -10,8 +11,8 @@ OBJ= ./src/obj/
 
 all: superCuteGrab
 
-superCuteGrab: $(OBJ)superCuteGrab.o  $(OBJ)cskill_instance.o $(OBJ)collectionMan.o $(OBJ)hashDB.o $(OBJ)imageIcons.o  $(OBJ)infoPopup.o $(OBJ)window.o $(OBJ)tagSet.o $(OBJ)tag.o $(OBJ)image.o $(OBJ)thumbDB.o $(OBJ)tagDB.o $(OBJ)filetypes.o $(OBJ)scoreDB.o $(OBJ)fileMd5.o $(OBJ)compMan.o $(OBJ)scalingImage.o $(TSOBN)
-	$(CC) ./src/obj/superCuteGrab.o ./src/obj/cskill_instance.o ./src/obj/hashDB.o ./src/obj/collectionMan.o ./src/obj/thumbDB.o ./src/obj/scoreDB.o ./src/obj/imageIcons.o ./src/obj/fileMd5.o ./src/obj/infoPopup.o  ./src/obj/window.o ./src/obj/image.o ./src/obj/tag.o ./src/obj/tagSet.o ./src/obj/tagDB.o ./src/obj/filetypes.o ./src/obj/compMan.o ./src/obj/scalingImage.o -lstdc++fs  -lcrypto -lssl $(TSOB) $(GTKL) $(GTKC)  $(TSLIB)  -o cuteGrab 
+superCuteGrab: $(OBJ)superCuteGrab.o  $(OBJ)cskill_instance.o $(OBJ)collectionMan.o $(OBJ)hashDB.o $(OBJ)imageIcons.o  $(OBJ)booru.o $(OBJ)infoPopup.o $(OBJ)window.o $(OBJ)tagSet.o $(OBJ)tag.o $(OBJ)image.o $(OBJ)thumbDB.o $(OBJ)tagDB.o $(OBJ)filetypes.o $(OBJ)scoreDB.o $(OBJ)fileMd5.o $(OBJ)compMan.o $(OBJ)scalingImage.o $(TSOBN)
+	$(CC) ./src/obj/superCuteGrab.o ./src/obj/cskill_instance.o ./src/obj/hashDB.o ./src/obj/collectionMan.o ./src/obj/thumbDB.o ./src/obj/scoreDB.o ./src/obj/imageIcons.o ./src/obj/fileMd5.o ./src/obj/infoPopup.o  ./src/obj/window.o ./src/obj/image.o ./src/obj/tag.o ./src/obj/tagSet.o ./src/obj/tagDB.o ./src/obj/filetypes.o ./src/obj/compMan.o ./src/obj/scalingImage.o ./src/obj/booru.o -lcurl -ljsoncpp -lstdc++fs  -lcrypto -lssl $(TSOB) $(GTKL) $(GTKC)  $(TSLIB)  -o cuteGrab 
 
 $(OBJ)superCuteGrab.o: ./src/superCuteGrab.cpp 
 	$(CC) $(CFLAG)  -c ./src/superCuteGrab.cpp -o ./src/obj/superCuteGrab.o  -lcrypto -lssl $(GTKC) $(GTKL)
@@ -39,6 +40,9 @@ $(OBJ)cskill_instance.o : ./src/cskill_instance.cpp ./src/cskill_instance.h $(OB
 
 $(OBJ)scoreDB.o : ./src/scoreDB.cpp ./src/scoreDB.h $(OBJ)tagSet.o 
 	$(CC) $(CFLAG) -c ./src/scoreDB.cpp -o ./src/obj/scoreDB.o -lstdc++fs
+
+$(OBJ)booru.o: ./src/booru.cpp ./src/booru.h $(OBJ)tagSet.o $(OBJ)tagDB.o $(OBJ)hashDB.o $(OBJ)thumbDB.o ./sauce/sauce.hpp
+	$(CC) $(CFLAG) -c ./src/booru.cpp -o ./src/obj/booru.o -lcurl -ljsoncpp -lstdc++fs $(GTKC) $(GTKL)
 
 $(OBJ)tagDB.o : ./src/tagDB.cpp ./src/tagDB.h $(OBJ)tagSet.o 
 	$(CC) $(CFLAG) -c ./src/tagDB.cpp -o ./src/obj/tagDB.o -lstdc++fs 
