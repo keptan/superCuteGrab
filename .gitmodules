@@ -1,3 +1,6 @@
 [submodule "lib/fun"]
 	path = lib/fun
 	url = https://github.com/keptan/fun
+[submodule "sauce"]
+	path = sauce
+	url = https://github.com/keptan/sauce
