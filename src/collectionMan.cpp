@@ -38,37 +38,36 @@ void CollectionMan :: freshImages (void)
 
 	std::random_device dev;
 	std::mt19937 gen (dev());
+	std::uniform_int_distribution<int> dist (0, 3);
+	const bool newImage = !dist(gen);
+	const bool side = dist(gen);
+
+	auto& firstImage = side ? leftImage : rightImage;
+	auto& secondImage = side ? rightImage : leftImage;
 
 	std::sort (filtered.begin(), filtered.end(), 
 				[&](const auto a, const auto b) {
 					return identityRanker.getSkill(*a).sigma > identityRanker.getSkill(*b).sigma;
 				});
-	leftImage  = *(filtered.begin());
-	rightImage = matchingELO(leftImage);
+
+	std::uniform_int_distribution<int> sizeMatch (0, filtered.size() - 1);
+	firstImage  = newImage ? *(filtered.begin()) : *(filtered.begin() + sizeMatch(gen));
+	secondImage = matchingELO(leftImage);
 
 	//randomize side here please!
-	runningFresh = identityRanker.getSkill(*leftImage).sigma > 15 ? true : false; 
-	std::cout << "running fresh: " << runningFresh << std::endl;
+	runningFresh = identityRanker.getSkill(*firstImage).sigma > 15 ? true : false; 
 }
 	
 void CollectionMan :: leftVictory (void)
 {
 	runImages(1);
-	rightStreak = 0;
 	leftStreak++;
+	rightStreak = 0;
 
 	const bool leftUncertain  = identityRanker.getSkill(*leftImage).sigma  > 11; 
 	const bool rightUncertain = identityRanker.getSkill(*rightImage).sigma > 11; 
 
-	if(rightStreak > 10 || leftStreak > 10)
-		return freshImages();
-
-	if(leftUncertain && runningFresh) 
-	{
-		rightImage = matchingELO(leftImage, 0); 
-		return;
-	}
-
+	if(rightStreak > 5 || leftStreak > 5) return freshImages();
 	rightImage = matchingELO( leftImage, leftStreak);
 }
 
@@ -76,24 +75,12 @@ void CollectionMan :: rightVictory (void)
 {
 	runImages(2);
 	rightStreak++;
+	leftStreak = 0;
 
 	const bool leftUncertain  = identityRanker.getSkill(*leftImage).sigma  > 9; 
 	const bool rightUncertain = identityRanker.getSkill(*rightImage).sigma > 9; 
 
-	if(rightStreak > 10 || leftStreak > 10)
-	{
-		leftStreak = 0;
-		return freshImages();
-	}
-
-	if(leftUncertain && runningFresh) 
-	{
-		leftStreak++;
-		rightImage = matchingELO(leftImage, 0); 
-		return; 
-	}
-
-	leftStreak = 0;
+	if(rightStreak > 5 || leftStreak > 5) return freshImages();
 	leftImage = matchingELO( rightImage, rightStreak);
 }
 
@@ -105,10 +92,17 @@ void CollectionMan :: tieVictory (void)
 	const bool rightUncertain = identityRanker.getSkill(*rightImage).sigma > 9; 
 
 
-	if(runningFresh && leftUncertain  && leftStreak < 10)
+	if(leftUncertain && leftStreak < 5)
 	{
 		leftStreak++;
 		rightImage = matchingELO( leftImage, 0);
+		return; 
+	}
+
+	if(rightUncertain && rightStreak < 5)
+	{
+		rightStreak++;
+		leftImage = matchingELO( rightImage, 0);
 		return; 
 	}
 
