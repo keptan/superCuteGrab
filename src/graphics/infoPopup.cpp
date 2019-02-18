@@ -20,6 +20,8 @@ InfoPopup :: InfoPopup ( const Glib::RefPtr<Gtk::Builder> b
 	builder->get_widget("addTag", addTag);
 	builder->get_widget("infoAspect", frame);
 	builder->get_widget("infoIconScroll", scroll);
+	builder->get_widget("character", character);
+	builder->get_widget("artist", artist);
 
 	//setup iconView and tagTree view models
 	//tagTree is a list of all the tags and scores of selected images
@@ -81,15 +83,13 @@ void InfoPopup :: insertTag (void)
 
 	Gtk::TreeModel::Row r = *(tagTreeModel->append());
 	r[tagColumns.m_col_name]		= t.tag;
-	r[tagColumns.m_col_score]		= collection.userTags.scores.retrieveData(t).skill();
+	r[tagColumns.m_col_score]		= collection.booruTags.scores.retrieveData(t).skill();
 
 	for(const auto i : selected)
 	{
-		collection.userTags.insert(*i, t);
+		collection.booruTags.insert(*i, t);
 	}
 }
-
-
 
 /*
 void InfoPopup :: setImage (std::shared_ptr< cute::Image> i)
@@ -120,9 +120,23 @@ void InfoPopup :: setImages (const std::vector< std::shared_ptr< cute::Image>> i
 
 	infoImage.setImage( i[0]);
 
+	const auto sortedTagCollection = [&](auto& db)
+	{
+		cute::TagSet acc = db.getTags(*i[0]); 
+		for( auto im : i) acc = acc & db.getTags(*im);
 
-	cute::TagSet acc = collection.userTags.getTags(*i[0]); 
-	for( auto im : i) acc = acc & collection.userTags.getTags(*im);
+		std::vector<cute::Tag> sorted;
+		sorted.insert(sorted.begin(), acc.begin(), acc.end());
+		std::sort(sorted.begin(), sorted.end(),
+			  [&](const auto a, const auto b)
+			  {
+				 return db.scores.retrieveData(a).skill() > 
+				 db.scores.retrieveData(b).skill();
+			});
+
+		return sorted;
+	};
+
 
 	tagTreeModel->clear();
 
@@ -133,12 +147,23 @@ void InfoPopup :: setImages (const std::vector< std::shared_ptr< cute::Image>> i
 		r[tagColumns.m_col_score] = collection.identityRanker.getSkill(*i[0]).skill();
 	}
 
-	for(const auto t : acc)
+	for(const auto t : sortedTagCollection( collection.booruTags))
 	{
 		Gtk::TreeModel::Row r = *(tagTreeModel->append());
 		r[tagColumns.m_col_name]		= t.tag;
-		r[tagColumns.m_col_score]	= collection.userTags.scores.retrieveData(t).skill();
+		r[tagColumns.m_col_score]	= collection.booruTags.scores.retrieveData(t).skill();
 	}
+
+	//time to get the char tags and stuff
+	std::string charString;
+	for(const auto t : sortedTagCollection( collection.charTags))
+	{
+		std::cout << t.tag << std::endl;
+		charString += t.tag + ',';
+	}
+	
+
+	character->set_text(charString.c_str());
 
 
 	//if only one image, show the large preview instead of the icon view
@@ -160,6 +185,7 @@ void InfoPopup :: setImages (const std::vector< std::shared_ptr< cute::Image>> i
 		r[iconColumns.m_col_pixbuf] = Gdk::Pixbuf::create_from_file( thumbnails.getThumbPath(*im).c_str());
 		r[iconColumns.m_col_image] = im; 
 	}
+
 
 
 
@@ -261,6 +287,8 @@ void BrowseWindow :: addMember (const std::shared_ptr<cute::Image> i)
 	r[m_Columns.m_col_name] = cut;
 	r[m_Columns.m_col_pixbuf] = Gdk::Pixbuf::create_from_file( thumbnails.getThumbPath(*i).c_str());
 	r[m_Columns.m_col_image] = i;
+
+
 }	
 
 //callback for the right click 'info' menu
@@ -347,6 +375,7 @@ void BrowseWindow :: import_folder (void)
 			m_refTreeModel->clear();
 			for(auto &i : collection.getImages())
 				addMember(i);
+
 
 
 
@@ -507,6 +536,7 @@ void BrowseWindow :: filter (void)
 
 void BrowseWindow :: refreshTagTree (void)
 {
+
 	const auto images = collection.getImages();
 	if(!images.size()) return;
 
@@ -523,6 +553,7 @@ void BrowseWindow :: refreshTagTree (void)
 		r[tagColumns.m_col_name]		= std::get<0>(t).tag;
 		r[tagColumns.m_col_score]	= std::get<1>(t).skill();
 	}
+
 }
 
 
