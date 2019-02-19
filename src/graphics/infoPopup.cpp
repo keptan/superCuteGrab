@@ -530,7 +530,7 @@ void BrowseWindow :: import_folder_recursive (void)
 
 
 
-			for(auto &f : std::filesystem::recursive_directory_iterator(dialog.get_filename()))
+			for(auto &f : std::filesystem::recursive_directory_iterator(dialog.get_filename(), std::filesystem::directory_options::follow_directory_symlink))
 			{
 				if(!cute::conformingFileType(f.path())) continue;
 				i.push_back( std::make_shared<cute::Image> (f.path(), hash.retrieveData(f.path())));

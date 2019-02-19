@@ -92,7 +92,7 @@ void HashDB :: scanDirectory (std::filesystem::path p)
 
 void HashDB :: scanDirectoryRecursive (std::filesystem::path p)
 {
-	for(auto& f : std::filesystem::recursive_directory_iterator(p))
+	for(auto& f : std::filesystem::recursive_directory_iterator(p, std::filesystem::directory_options::follow_directory_symlink))
 	{
 
 		if(!conformingFileType(f.path())) continue;
