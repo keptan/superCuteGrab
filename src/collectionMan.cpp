@@ -4,7 +4,7 @@ namespace cute  {
 
 CollectionMan :: CollectionMan (IdentityRank& id, PathRank& path,  ComTags& b, ComTags& a, ComTags& c,
 				   std::vector< SharedImage> i)
-			  : gen(dev()), collection(i), identityRanker(id), pathRanker(path), booruTags(b), artistTags(a), 
+			  : dev(), gen(dev()), collection(i), identityRanker(id), pathRanker(path), booruTags(b), artistTags(a), 
 			    charTags(c), allTags({ &a, &c, &b})
 {
 	leftStreak = 0;
