@@ -1,5 +1,5 @@
 # superCuteGrab
-![](https://u.teknik.io/534we.png)
+![](https://raw.githubusercontent.com/keptan/superCuteGrab/master/example.png)
 Booru image tag-fetching and ranking with Microsoft TRUESKILL and ELO.
 
 Use the halo 2 matchmaking algorithm, ripped booru data, and manual labour to objectively rank anime images and boorutagss. 
@@ -12,7 +12,7 @@ Using [Microsoft Trueskill](http://www.moserware.com/2010/03/computing-your-skil
 
 # Features 
 * Rank images in competition
-* Rip image metadata from various booru websites 
+* Rip image metadata from various booru websites, use saucenao to track down tricky images and md5 mismatches
 * Search images with metadata, view statistics on the most performant tags and images 
 
 
