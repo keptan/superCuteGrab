@@ -48,7 +48,7 @@ class CollectionMan
 	SharedImage getRightImage (void); 
 	SharedImage getLeftImage  (void);
 
-	std::vector< SharedImage> getImages (void); //get the collection
+	const std::vector< SharedImage>& getImages (void); //get the collection
 	void  setImages (const std::vector<SharedImage>); //set the collection
 
 	void setRightImage ( SharedImage); //override left or right image

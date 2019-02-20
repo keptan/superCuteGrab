@@ -18,7 +18,7 @@ void CollectionMan :: setImages (const std::vector< SharedImage> i)
 	collection = i;
 }
 
-std::vector< SharedImage>
+const std::vector< SharedImage>&
 CollectionMan :: getImages (void)
 {
 	std::sort (filtered.begin(), filtered.end(), 
