@@ -316,8 +316,10 @@ int booruScan (const std::filesystem::path loc, HashDB& hash, TagDB& general, Ta
 		const auto checkedD = set.contains(Tag("no_danbooru"));
 		const auto hasD		= set.contains(Tag("danbooru"));
 		const auto checkedS = set.contains(Tag("no_sauce"));
+		const auto checkedAll = (checkedG && checkedD) || checkedS;
 
-		if(hasG || hasD || ( checkedG && checkedD && checkedS))
+
+		if(hasG || hasD || checkedAll)
 		{
 
 			std::cout << "already tagged: " << it.first.filename().string() << '\n';
