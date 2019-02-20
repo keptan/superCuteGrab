@@ -96,6 +96,15 @@ int DanBooru :: idQ (const std::string& id)
 	return parseDoc();
 }
 
+void DanBooru :: clear (void)
+{
+	artists = TagSet();
+	characters = TagSet();
+	general = TagSet();
+
+	doc = "";
+}
+
 
 Gelbooru :: Gelbooru (void)
 {
@@ -214,6 +223,15 @@ int Gelbooru :: idQ (const std::string& id)
 	return parseDoc();
 }
 
+void Gelbooru :: clear (void)
+{
+	artists = TagSet();
+	characters = TagSet();
+	general = TagSet();
+
+	doc = "";
+}
+
 SauceArbiter :: SauceArbiter (std::string key)
 	: sm(key), thumbs("thumbnails")
 {}
@@ -260,6 +278,13 @@ int SauceArbiter :: search (const std::filesystem::path& p, const Hash& h)
 	return -1;
 }
 
+void SauceArbiter :: clear (void)
+{
+	artists = TagSet();
+	characters = TagSet();
+	general = TagSet();
+}
+
 int booruScan (const std::filesystem::path loc, HashDB& hash, TagDB& general, TagDB& artists, TagDB& characters)
 {
 	hash.scanDirectoryRecursive(loc);
@@ -272,20 +297,25 @@ int booruScan (const std::filesystem::path loc, HashDB& hash, TagDB& general, Ta
 	t >> key;
 
 
+	DanBooru booru;
+	Gelbooru gbooru;
+	SauceArbiter arbiter(key);
+
 	for(const auto it : hash)
 	{
+		booru.clear();
+		gbooru.clear();
+		arbiter.clear();
+
 		files++;
 		const auto h = it.second.hash;
-		DanBooru booru;
-		Gelbooru gbooru;
-		SauceArbiter arbiter(key);
+		const auto set = general.retrieveData(h);
 
-		const auto c = [&](const auto s){ return general.retrieveData(h).contains(Tag(s));};
-		const auto checkedG = c("no_gelbooru");
-		const auto hasG		= c("gelbooru");
-		const auto checkedD = c("no_danbooru");
-		const auto hasD		= c("danbooru");
-		const auto checkedS = c("no_sauce");
+		const auto checkedG = set.contains(Tag("no_gelbooru"));
+		const auto hasG		= set.contains(Tag("gelbooru"));
+		const auto checkedD = set.contains(Tag("no_danbooru"));
+		const auto hasD		= set.contains(Tag("danbooru"));
+		const auto checkedS = set.contains(Tag("no_sauce"));
 
 		if(hasG || hasD || ( checkedG && checkedD && checkedS))
 		{

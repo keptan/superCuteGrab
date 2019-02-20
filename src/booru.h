@@ -37,6 +37,8 @@ namespace cute
 		TagSet artists;
 		TagSet characters;
 		TagSet general;
+
+		void clear (void);
 	};
 
 	class Gelbooru
@@ -65,6 +67,8 @@ namespace cute
 		TagSet artists;
 		TagSet characters;
 		TagSet general;
+		
+		void clear (void);
 	};
 
 	class SauceArbiter
@@ -84,6 +88,7 @@ namespace cute
 		TagSet characters;
 		TagSet general;
 
+		void clear (void);
 	};
 
 
