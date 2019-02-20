@@ -283,7 +283,30 @@ void SauceArbiter :: clear (void)
 	artists = TagSet();
 	characters = TagSet();
 	general = TagSet();
+	booru.clear();
+	gbooru.clear();
 }
+
+int booruClean (const std::filesystem::path loc, HashDB& hash, TagDB& general, TagDB& artists, TagDB& characters)
+{
+	int files = 0;
+
+	hash.scanDirectoryRecursive(loc);
+	for(const auto it : hash)
+	{
+		files++;
+
+		const auto h = it.second.hash;
+		general.clearTags(h);
+		artists.clearTags(h);
+		characters.clearTags(h);
+	}
+
+	std::cout << "cleared tags from: " << files << " files\n";
+	return 0;
+}
+
+
 
 int booruScan (const std::filesystem::path loc, HashDB& hash, TagDB& general, TagDB& artists, TagDB& characters)
 {
