@@ -30,7 +30,7 @@ class TagSet
 	std::set<Tag>::const_iterator end   (void) const;
 
 	size_t size (void) const;
-	bool contains (const Tag t);
+	bool contains (const Tag t) const;
 };
 
 				}

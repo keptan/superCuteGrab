@@ -77,7 +77,7 @@ size_t TagSet :: size (void) const
 	return res.size();
 }
 
-bool TagSet :: contains (const Tag t)
+bool TagSet :: contains (const Tag t) const
 {
 	const auto i = res.find(t);
 	return i != res.end();
