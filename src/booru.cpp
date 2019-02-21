@@ -387,20 +387,28 @@ int booruScan (const std::filesystem::path loc, HashDB& hash, TagDB& general, Ta
 			continue;
 		}
 
-		const auto gotSauce = arbiter.search(it.first, h);
-		if(!gotSauce)
+		try
 		{
-			std::cout << "found saucenao for: " << it.first.filename().string() << '\n';
-			general.insertTags(h, arbiter.general);
-			artists.insertTags(h, arbiter.artists);
-			characters.insertTags(h, arbiter.characters);
-			tagged++;
-			continue;
+			const auto gotSauce = arbiter.search(it.first, h);
+			if(!gotSauce)
+			{
+				std::cout << "found saucenao for: " << it.first.filename().string() << '\n';
+				general.insertTags(h, arbiter.general);
+				artists.insertTags(h, arbiter.artists);
+				characters.insertTags(h, arbiter.characters);
+				tagged++;
+				continue;
+			}
+			if(gotSauce)
+			{
+				const TagSet t( Tag("no_sauce"));
+				general.insertTags(h, t);
+			}
 		}
-		if(gotSauce)
+		catch(const Gdk::PixbufError& e)
 		{
-			const TagSet t( Tag("no_sauce"));
-			general.insertTags(h, t);
+			std::cout << "broken image: " << it.first.filename() << '\n';
+			continue;
 		}
 
 
