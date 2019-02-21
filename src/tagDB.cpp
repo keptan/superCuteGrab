@@ -101,6 +101,17 @@ void TagDB :: insertTags (const Hash& h, const TagSet& t)
 	it->second += t;
 }
 			
+
+void TagDB :: clearTags (const Hash& h)
+{	
+	const auto it = tagMap.find(h);
+	if(it == tagMap.end())
+	{
+		return;
+	}
+	
+	tagMap.erase(it);
+}
 	
 
 TagSet TagDB :: retrieveData (const Hash& h)

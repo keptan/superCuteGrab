@@ -26,6 +26,7 @@ public:
 	TagSet retrieveData (const Hash&);
 	TagSet retrieveData (void);
 	void insertTags (const Hash&, const TagSet&);
+	void clearTags  (const Hash&);
 };
 
 
