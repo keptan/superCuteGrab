@@ -32,6 +32,8 @@ void ScalingImage :: setImage (const std::shared_ptr<cute::Image> i)
 	image->set(sourcePBuf); 
 	auto a = scrollView->get_allocation();
 	scaleImage(a);
+
+
 }
 
 void ScalingImage :: scaleImage (Gtk::Allocation allocation)
@@ -44,6 +46,7 @@ void ScalingImage :: scaleImage (Gtk::Allocation allocation)
 					allocation.get_width(), 
 					allocation.get_height(),
 					Gdk::INTERP_BILINEAR));
+
 	}
 
 
