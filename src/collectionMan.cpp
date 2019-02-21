@@ -34,22 +34,25 @@ CollectionMan :: getImages (void)
 
 void CollectionMan :: freshImages (void)
 {
+
+	std::sort (filtered.begin(), filtered.end(), 
+				[&](const auto a, const auto b) {
+					return identityRanker.getSkill(*a).sigma > identityRanker.getSkill(*b).sigma;
+				});
+
 	rightStreak = 0;
 	leftStreak = 0;
 
 	saveTags();
 
 	std::uniform_int_distribution<int> dist (0, 3);
-	const bool newImage = !dist(gen);
+
+	const bool newImage = identityRanker.getSkill(**filtered.begin()).sigma == 33 ? true : !dist(gen);
 	const bool side = dist(gen);
 
 	auto& firstImage = side ? leftImage : rightImage;
 	auto& secondImage = side ? rightImage : leftImage;
 
-	std::sort (filtered.begin(), filtered.end(), 
-				[&](const auto a, const auto b) {
-					return identityRanker.getSkill(*a).sigma > identityRanker.getSkill(*b).sigma;
-				});
 
 	std::uniform_int_distribution<int> sizeMatch (0, filtered.size() - 1);
 	std::cout << "sample choice: " << sizeMatch(gen) << std::endl;
