@@ -64,7 +64,7 @@ class InfoPopup
 	Glib::RefPtr<Gtk::Builder> builder; 
 
 	//image databases ect 
-	std::vector< std::shared_ptr< cute::Image>> selected;
+	std::vector< cute::SharedImage> selected;
 
 	//widgets and gtkmm pointers 
 	Gtk::Window* window; 
@@ -83,12 +83,14 @@ class InfoPopup
 
 	//icon viewer
 	ImageIcons icons;
+	bool lastSize;
 
 	public: 
 	InfoPopup ( const Glib::RefPtr<Gtk::Builder>, cute::ThumbDB&, cute::CollectionMan&);
 	virtual ~InfoPopup (void);
 
 	void setImages (const std::vector< std::shared_ptr< cute::Image>>);
+	void setImages (const cute::SharedImage);
 	Gtk::Window* getWindow (void);
 
 	void insertTag (void);
@@ -97,6 +99,12 @@ class InfoPopup
 
 	protected: 
 	//handlers 
+	//
+	bool onKeyPress (GdkEventKey *event);
+	void upScroll (void);
+	void downScroll (void);
+	void scale_in_hell (void);
+
 
 	Glib::RefPtr<Gtk::ListStore> tagTreeModel;
 	TagColumns tagColumns;
@@ -140,6 +148,8 @@ class BrowseWindow : public sigc::trackable
 	cute::ThumbDB thumbnails; 
 	cute::CollectionMan& collection; 
 	cute::HashDB& hash;
+
+	std::map<cute::SharedImage, Glib::RefPtr<Gdk::Pixbuf>> pixCache;
 
 
 	public:

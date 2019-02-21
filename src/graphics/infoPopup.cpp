@@ -12,8 +12,11 @@ InfoPopup :: InfoPopup ( const Glib::RefPtr<Gtk::Builder> b
 					   , cute::ThumbDB& t, cute::CollectionMan& c)
 
    :   thumbnails(t), collection(c), builder(b)
-   , infoImage(builder, "infoAspect", "infoScroll", "infoImage")
+   , infoImage(builder, "infoAspect", "infoScroll", "infoImage"), lastSize(false)
 {
+
+
+
 	//setup builder widgets
 	builder->get_widget("infoWindow", window);
 	builder->get_widget("infoTags", tagTree);
@@ -25,6 +28,9 @@ InfoPopup :: InfoPopup ( const Glib::RefPtr<Gtk::Builder> b
 	builder->get_widget("artist", artist);
 	builder->get_widget("viewCharacter", viewCharacter);
 	builder->get_widget("viewArtist", viewArtist);
+
+	//setup keypresses 
+	window->signal_key_press_event().connect(sigc::mem_fun(*this, &InfoPopup::onKeyPress), false);
 
 	//setup iconView and tagTree view models
 	//tagTree is a list of all the tags and scores of selected images
@@ -156,24 +162,15 @@ void InfoPopup :: insertCharacter (void)
 	}
 }
 
-/*
-void InfoPopup :: setImage (std::shared_ptr< cute::Image> i)
+void InfoPopup :: setImages (const cute::SharedImage i)
 {
-	image = i;
-	infoImage.setImage(i);
+	std::vector<cute::SharedImage> vec;
+	vec.push_back(i);
 
-	m_refTreeModel->clear();
-
-	Gtk::TreeModel::Row r = *(m_refTreeModel->append());
-	r[m_Columns.m_col_name]		= i->location.filename().string();
-	r[m_Columns.m_col_score]	= collection.getSkill(i).skill();
-
-	infoImage.show();
-	scroll->hide();
+	setImages(vec);
 }
-*/
 
-void InfoPopup :: setImages (const std::vector< std::shared_ptr< cute::Image>> i)
+void InfoPopup :: setImages (const std::vector< cute::SharedImage> i)
 {
 	selected = i;
 
@@ -248,6 +245,7 @@ void InfoPopup :: setImages (const std::vector< std::shared_ptr< cute::Image>> i
 		infoImage.show();
 		scroll->hide();
 		icons.hide();
+		scale_in_hell();
 		return;
 	}
 
@@ -256,8 +254,10 @@ void InfoPopup :: setImages (const std::vector< std::shared_ptr< cute::Image>> i
 		//append all the images into the iconView widget
 		Gtk::TreeModel::Row r = *(iconTreeModel->append());
 
+
+
 		r[iconColumns.m_col_name] = im->location.string();
-		r[iconColumns.m_col_pixbuf] = Gdk::Pixbuf::create_from_file( thumbnails.getThumbPath(*im).c_str());
+		r[iconColumns.m_col_pixbuf] =  Gdk::Pixbuf::create_from_file( thumbnails.getThumbPath(*im).c_str());
 		r[iconColumns.m_col_image] = im; 
 	}
 
@@ -269,6 +269,106 @@ void InfoPopup :: setImages (const std::vector< std::shared_ptr< cute::Image>> i
 	icons.show();
 }
 
+void InfoPopup :: downScroll (void)
+{
+	if(selected.size() != 1) return;
+
+	const auto images = collection.getImages();
+	const auto it = std::find(images.begin(), images.end(), selected[0]);
+
+	if( it == images.end()) return;
+	const auto next = it + 1 == images.end() ? images.begin() : it + 1;
+	setImages(*next);
+
+
+}
+
+void InfoPopup :: upScroll (void)
+{
+	if(selected.size() != 1) return;
+
+	const auto images = collection.getImages();
+	const auto it = std::find(images.begin(), images.end(), selected[0]);
+
+	if( it == images.end()) return;
+	const auto next = it == images.begin() ? images.end() -1 : it - 1;
+	setImages(*next);
+
+}
+
+void InfoPopup :: scale_in_hell (void)
+{
+
+		if(lastSize)
+		{
+			infoImage.hide();
+			window->resize( window->get_width() - 5, window->get_height() - 5);
+			window->resize( window->get_width() + 1, window->get_height() + 1);
+			infoImage.show();
+
+		//	leftImage.scrollView->signal_size_allocate().connect(sigc::mem_fun(&leftImage, &Window::ScalingImage::scaleImage));
+		//	rightImage.scrollView->signal_size_allocate().connect(sigc::mem_fun(&rightImage, &Window::ScalingImage::scaleImage));
+
+
+			window->resize( window->get_width() - 5, window->get_height() - 5);
+			window->resize( window->get_width() + 5, window->get_height() + 5);
+		}
+		else 
+		{
+
+		//	leftImage.scrollView->signal_size_allocate().connect(sigc::mem_fun(&leftImage, &Window::ScalingImage::scaleImage));
+		//	rightImage.scrollView->signal_size_allocate().connect(sigc::mem_fun(&rightImage, &Window::ScalingImage::scaleImage));
+
+			infoImage.hide();
+			window->resize( window->get_width() + 5, window->get_height() + 5);
+			window->resize( window->get_width() - 5, window->get_height() - 5);
+			infoImage.show();
+		}
+
+
+		lastSize = !lastSize;
+}
+
+bool InfoPopup :: onKeyPress (GdkEventKey *event)
+{
+	if( event->hardware_keycode == 113) 
+	{
+		//left key 
+		upScroll();	
+		return true; 
+	}
+
+	if( event->hardware_keycode == 111)
+	{
+		//up key
+
+		scale_in_hell();
+		return true;
+	}
+
+
+	if( event->hardware_keycode == 114) 
+	{
+	
+		//right key 
+	
+		downScroll();
+		return true; 
+	}
+
+
+	if( event->hardware_keycode == 116) 
+	{
+		//downkey
+
+		scale_in_hell();
+		return true;
+	}
+
+	std::cout << event->hardware_keycode << '\n';
+
+	return false;
+}
 	
 BrowseWindow :: BrowseWindow 
 ( const Glib::RefPtr<Gtk::Builder> b , cute::CollectionMan& c, cute::HashDB& h)
@@ -363,9 +463,13 @@ void BrowseWindow :: addMember (const std::shared_ptr<cute::Image> i)
 	const std::string loc = i->location.filename().string();
 	const std::string cut = loc.size() > 25 ? loc.substr(0,24) : loc;
 
+	const auto it = pixCache.find(i);
+	const auto buf = it == pixCache.end() ? Gdk::Pixbuf::create_from_file( thumbnails.getThumbPath(*i).c_str()) : it->second;
+
+	if(it == pixCache.end()) pixCache[i] = buf;
 	//basic treeModel column stuff we do all the time
 	r[m_Columns.m_col_name] = cut;
-	r[m_Columns.m_col_pixbuf] = Gdk::Pixbuf::create_from_file( thumbnails.getThumbPath(*i).c_str());
+	r[m_Columns.m_col_pixbuf] = buf;
 	r[m_Columns.m_col_image] = i;
 }	
 
@@ -469,7 +573,7 @@ void BrowseWindow :: import_folder (void)
 			  << std::endl;
 		  hash.scanDirectory(dialog.get_filename());
 
-		  auto i = collection.getImages();
+		  std::vector<cute::SharedImage> i = collection.getImages();
 
 
 
@@ -526,7 +630,7 @@ void BrowseWindow :: import_folder_recursive (void)
 			  << std::endl;
 		  hash.scanDirectoryRecursive(dialog.get_filename());
 
-		  auto i = collection.getImages();
+		  std::vector<cute::SharedImage> i = collection.getImages();
 
 
 
@@ -695,7 +799,7 @@ void BrowseWindow :: refresh (void)
 	collection.filter();
 
 	m_refTreeModel->clear();
-	auto images = collection.getImages();
+	std::vector<cute::SharedImage> images = collection.getImages();
 	comboSort(images);
 	for(auto &i : images) addMember(i);
 	refreshTagTree();
