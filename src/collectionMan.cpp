@@ -57,7 +57,7 @@ void CollectionMan :: freshImages (void)
 	std::uniform_int_distribution<int> sizeMatch (0, filtered.size() - 1);
 	std::cout << "sample choice: " << sizeMatch(gen) << std::endl;
 	firstImage  = newImage ? *(filtered.begin()) : *(filtered.begin() + sizeMatch(gen));
-	secondImage = matchingELO(leftImage);
+	secondImage = matchingELO(firstImage);
 
 	//randomize side here please!
 	runningFresh = newImage; 
