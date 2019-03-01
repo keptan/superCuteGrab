@@ -8,7 +8,7 @@ CompMan :: ~CompMan (void) {}
 
 	
 IdentityRank :: IdentityRank (void) 
-	: scores("data/idScores.csv")
+	: scores("data/idScores.csv", 0)
 {}
 
 void IdentityRank :: runImages (const Image& p1, const Image& p2, int winner)

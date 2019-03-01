@@ -4,8 +4,8 @@
 
 namespace cute		{
 
-ScoreDB :: ScoreDB (std::filesystem::path p)
-	:dbFile(p)
+ScoreDB :: ScoreDB (std::filesystem::path p, const double d)
+	:dbFile(p), decay(d)
 {
 	readCSV();
 }
@@ -31,7 +31,7 @@ void ScoreDB :: readCSV (void)
 		is >> std::quoted(t) >> mu >> sigma; 
 
 		//decay sigma every boot 
-		if(sigma < 15) sigma = std::min<double>( sigma + 1, 15.0);
+		if(sigma < 15) sigma = std::min<double>( sigma + decay, 15.0);
 
 		scoreMap.insert( std::make_pair( 
 				Tag(t), SkillDatum(mu, sigma)));

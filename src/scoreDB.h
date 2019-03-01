@@ -17,10 +17,11 @@ class ScoreDB
 
 	const std::filesystem::path dbFile;
 	std::map< Tag, SkillDatum> scoreMap;
+	const double decay;
 
 
 	public:
-	ScoreDB (std::filesystem::path);
+	ScoreDB (std::filesystem::path, const double d = 0.1);
 	~ScoreDB ();
 
 	void readCSV (void);
