@@ -4,6 +4,8 @@
 #include <map>
 #include <fstream> 
 #include <string>
+#include <shared_mutex>
+#include <mutex>
 #include "image.h"
 #include "tagSet.h" 
 
@@ -15,6 +17,8 @@ class TagDB
 
 	const std::filesystem::path dbFile;
 	std::map< Hash, TagSet> tagMap; 
+	mutable std::shared_mutex entryMutex;
+	mutable std::mutex		  fileMutex;
 
 public: 
 	TagDB (std::filesystem::path); 
@@ -23,8 +27,8 @@ public:
 	void readCSV  (void); 
 	void writeCSV (void);
 //	bool contains (const Hash&); 
-	TagSet retrieveData (const Hash&);
-	TagSet retrieveData (void);
+	TagSet retrieveData (const Hash&) const;
+	TagSet retrieveData (void) const;
 	void insertTags (const Hash&, const TagSet&);
 	void clearTags  (const Hash&);
 };

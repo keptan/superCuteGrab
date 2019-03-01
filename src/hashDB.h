@@ -8,6 +8,8 @@
 #include <string>
 #include "image.h"
 #include "filetypes.h"
+#include <mutex>
+#include <shared_mutex>
 
 
 namespace cute {
@@ -21,20 +23,24 @@ class HashDB
 
 	std::filesystem::path dbFile;
 	std::map<std::filesystem::path, PathMetaData> pathMap;
-
 	std::map<std::filesystem::path, PathMetaData> localPathMap;
+
+	mutable std::shared_mutex entryMutex;
+	mutable std::mutex		  fileMutex;
+
+	void writeCSV (void);
 
 public:
 	HashDB (std::filesystem::path );
+	~HashDB (void);
 
 	void readCSV (void);
-	void writeCSV (void);
 	
 	void scanDirectory (std::filesystem::path p);
 	void scanDirectoryRecursive (std::filesystem::path p);
 
-	bool contains (const std::filesystem::path p);
-	PathMetaData retrieveData (const std::filesystem::path p);
+	bool contains (const std::filesystem::path p) const;
+	PathMetaData retrieveData (const std::filesystem::path p) const;
 
 	std::map<std::filesystem::path, PathMetaData>::const_iterator  begin (void) const;
 	std::map<std::filesystem::path, PathMetaData>::const_iterator  end   (void) const;

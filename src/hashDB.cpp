@@ -13,8 +13,14 @@ HashDB :: HashDB (std::filesystem::path p)
 {
 		readCSV();
 }
+
+HashDB :: ~HashDB (void)
+{
+}
 void HashDB :: readCSV (void)
 {
+	std::scoped_lock lk (entryMutex, fileMutex);
+
 	std::fstream fs;
 	fs.open(dbFile);
 	fs.seekg(0, std::ios::beg);
@@ -33,6 +39,7 @@ void HashDB :: readCSV (void)
 	}
 
 	fs.close();
+
 }
 
 void HashDB :: writeCSV (void)
@@ -40,7 +47,7 @@ void HashDB :: writeCSV (void)
 	std::ofstream fs;
 	fs.open(dbFile);
 
-	for(auto pair : pathMap)
+	for(const auto& pair : pathMap)
 	{
 		fs << pair.first << '	' << pair.second.file_size << '	' << pair.second.write_time << '	' << pair.second.hash << '\n';
 	}
@@ -51,7 +58,9 @@ void HashDB :: writeCSV (void)
 
 void HashDB :: scanDirectory (std::filesystem::path p)
 {
-	for(auto& f : std::filesystem::directory_iterator(p))
+	std::scoped_lock lk (entryMutex, fileMutex);
+
+	for(const auto& f : std::filesystem::directory_iterator(p))
 	{
 
 		if(!conformingFileType(f.path())) continue;
@@ -92,7 +101,9 @@ void HashDB :: scanDirectory (std::filesystem::path p)
 
 void HashDB :: scanDirectoryRecursive (std::filesystem::path p)
 {
-	for(auto& f : std::filesystem::recursive_directory_iterator(p, std::filesystem::directory_options::follow_directory_symlink))
+	std::scoped_lock lk (entryMutex, fileMutex);
+
+	for(const auto& f : std::filesystem::recursive_directory_iterator(p, std::filesystem::directory_options::follow_directory_symlink))
 	{
 
 		if(!conformingFileType(f.path())) continue;
@@ -128,32 +139,37 @@ void HashDB :: scanDirectoryRecursive (std::filesystem::path p)
 		localPathMap.insert_or_assign(absolute, PathMetaData(size, time, hash));
 	}
 
+
 	writeCSV();
 }
 
-bool HashDB :: contains (const std::filesystem::path p)
+bool HashDB :: contains (const std::filesystem::path p) const
 {
+	std::shared_lock lk (entryMutex);
 	const auto absolute = std::filesystem::absolute(p);
 
 	return localPathMap.find(absolute) != localPathMap.end();
 }
 
-PathMetaData HashDB :: retrieveData (const std::filesystem::path p)
+PathMetaData HashDB :: retrieveData (const std::filesystem::path p) const
 {
+	std::shared_lock lk (entryMutex);
 	const auto absolute = std::filesystem::absolute(p);
 
-	assert (contains(absolute));
+	assert (localPathMap.find(absolute) != localPathMap.end());
 	return localPathMap.find(absolute)->second;
 }
 
 std::map<std::filesystem::path, PathMetaData>::const_iterator HashDB :: begin (void) const
 {
+	std::shared_lock lk (entryMutex);
 	return localPathMap.begin();
 }
 
 
 std::map<std::filesystem::path, PathMetaData>::const_iterator HashDB :: end   (void) const
 {
+	std::shared_lock lk (entryMutex);
 	return localPathMap.end();
 }
 

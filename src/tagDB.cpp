@@ -17,6 +17,8 @@ TagDB :: ~TagDB (void)
 
 void TagDB :: readCSV (void)
 {
+	std::scoped_lock lk (fileMutex, entryMutex);
+
 	std::fstream fs(dbFile); 
 	fs.seekg(0, std::ios::beg);
 
@@ -64,16 +66,18 @@ void TagDB :: readCSV (void)
 
 void TagDB :: writeCSV (void)
 {
+	std::shared_lock sl (entryMutex);
+	std::scoped_lock lk (fileMutex);
 	std::ofstream fs(dbFile);
 
-	for( auto& pair : tagMap)
+	for( const auto& pair : tagMap)
 	{
 		if(!pair.second.size()) continue;
 		std::ostringstream tagString; 
 		tagString << pair.first;
 
 
-		for(auto& t : pair.second)
+		for(const auto& t : pair.second)
 		{
 			std::string acc = t.tag;
 			acc.erase(std::remove_if(acc.begin(), acc.end(), 
@@ -90,6 +94,7 @@ void TagDB :: writeCSV (void)
 
 void TagDB :: insertTags (const Hash& h, const TagSet& t)
 {
+	std::scoped_lock lk (entryMutex);
 	const auto it = tagMap.find(h);
 
 	if(it == tagMap.end())
@@ -104,6 +109,7 @@ void TagDB :: insertTags (const Hash& h, const TagSet& t)
 
 void TagDB :: clearTags (const Hash& h)
 {	
+	std::scoped_lock lk (entryMutex);
 	const auto it = tagMap.find(h);
 	if(it == tagMap.end())
 	{
@@ -114,8 +120,9 @@ void TagDB :: clearTags (const Hash& h)
 }
 	
 
-TagSet TagDB :: retrieveData (const Hash& h)
+TagSet TagDB :: retrieveData (const Hash& h) const
 {
+	std::shared_lock lk (entryMutex);
 	const auto f = tagMap.find(h);
 
 	if(f == tagMap.end()) return TagSet();
@@ -123,8 +130,9 @@ TagSet TagDB :: retrieveData (const Hash& h)
 	return f->second; 
 }
 
-TagSet TagDB :: retrieveData (void)
+TagSet TagDB :: retrieveData (void) const
 {
+	std::shared_lock lk (entryMutex);
 	TagSet tags; 
 
 	for(const auto t: tagMap)
