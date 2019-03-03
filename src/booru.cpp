@@ -232,8 +232,8 @@ void Gelbooru :: clear (void)
 	doc = "";
 }
 
-SauceArbiter :: SauceArbiter (std::string key)
-	: sm(key), thumbs("thumbnails")
+SauceArbiter :: SauceArbiter (const std::string& key, ThumbDB& t)
+	: sm(key), thumbs(t)
 {}
 
 int SauceArbiter :: search (const std::filesystem::path& p, const Hash& h)
@@ -253,11 +253,7 @@ int SauceArbiter :: search (const std::filesystem::path& p, const Hash& h)
 		{
 			if(y.danbooru_id == "0") return -1;
 			if(y.similarity < 80) continue;
-
-			booru.idQ(y.danbooru_id);
-			artists = booru.artists;
-			characters = booru.characters;
-			general = booru.general;
+			dbooruID = y.danbooru_id;
 
 			return 0;
 		}
@@ -265,11 +261,7 @@ int SauceArbiter :: search (const std::filesystem::path& p, const Hash& h)
 		{
 			if(y.gelbooru_id == "0") return -1;
 			if(y.similarity < 80) continue;
-
-			gbooru.idQ(y.gelbooru_id);
-			artists = gbooru.artists;
-			characters = gbooru.characters;
-			general = gbooru.general;
+			gbooruID = y.gelbooru_id;
 
 			return 0;
 		}
@@ -278,14 +270,124 @@ int SauceArbiter :: search (const std::filesystem::path& p, const Hash& h)
 	return -1;
 }
 
-void SauceArbiter :: clear (void)
+std::optional< std::string> SauceArbiter :: getDanbooru (void)
 {
-	artists = TagSet();
-	characters = TagSet();
-	general = TagSet();
-	booru.clear();
-	gbooru.clear();
+
+	return dbooruID.length()  ? std::optional<std::string>(dbooruID) : std::nullopt;
 }
+std::optional< std::string> SauceArbiter :: getGelbooru (void)
+{
+	return gbooruID.length()  ? std::optional<std::string>(gbooruID) : std::nullopt;
+}
+
+AsyncScanner :: AsyncScanner
+(const std::filesystem::path p, HashDB& h, ThumbDB& t, TagDB& g, TagDB& c, TagDB& a)
+: path(p), sauceLimit(25, 30000), syncro(1), ioPool(25), cpuPool(8)
+, hash(h), thumbs(t), general(g), characters(c), artists(a)
+{
+	std::ifstream file("saucenao_key");
+	file >> key;
+}
+
+AsyncScanner :: ~AsyncScanner (void)
+{
+	ioPool.join_finish();
+	cpuPool.join_finish();
+	syncro.join_finish();
+}
+
+void AsyncScanner :: perFile (const std::filesystem::path p, const std::string h)
+{
+	DanBooru db;
+	Gelbooru gb;
+	SauceArbiter sa(key, thumbs);
+
+
+	const auto dscan = db.hashQ(h);
+	if(!dscan)
+	{
+		syncro.addTask([=](){ std::cout << "found danbooru for:" << p.filename().string() << '\n';});
+		std::scoped_lock lk (m);
+
+		general.insertTags(h, db.general);
+		artists.insertTags(h, db.artists);
+		characters.insertTags(h, db.characters);
+		return;
+	}
+
+	const auto gscan = gb.hashQ(h);
+	if(!gscan)
+	{
+		syncro.addTask([=](){ std::cout << "found gelbooru for:" << p.filename().string() << '\n';});
+		std::scoped_lock lk (m);
+
+		general.insertTags(h, gb.general);
+		artists.insertTags(h, gb.artists);
+		characters.insertTags(h, gb.characters);
+		return;
+	}
+
+	sauceLimit.waitAndUse();
+
+	sa.search(p, h);
+	const auto dSauce = sa.getDanbooru();
+	const auto gSauce = sa.getGelbooru();
+
+	if(dSauce != std::nullopt)
+	{
+		db.clear();
+		const auto discan = db.idQ(*dSauce);
+		syncro.addTask([=](){ std::cout << "sacenao found danbooru for:" << p.filename().string() << '\n';});
+		std::scoped_lock lk (m);
+
+		general.insertTags(h, db.general);
+		artists.insertTags(h, db.artists);
+		characters.insertTags(h, db.characters);
+		return;
+	}
+
+	if(gSauce != std::nullopt)
+	{
+		gb.clear();
+		const auto discan = gb.idQ(*gSauce);
+		syncro.addTask([=](){ std::cout << "saucenao found gelbooru for:" << p.filename().string() << '\n';});
+		std::scoped_lock lk (m);
+
+		general.insertTags(h, gb.general);
+		artists.insertTags(h, gb.artists);
+		characters.insertTags(h, gb.characters);
+		return;
+	}
+
+	return;
+}
+
+
+
+
+
+
+	
+
+	
+	
+
+void AsyncScanner :: scan (void)
+{
+	hash.scanDirectoryRecursive(path);
+	for(const auto it : hash)
+	{
+		const auto f = [=](){ perFile(it.first, it.second.hash);};
+		ioPool.addTask(f);
+	}
+	return;
+}
+
+
+
+
+
+
 
 int booruClean (const std::filesystem::path loc, HashDB& hash, TagDB& general, TagDB& artists, TagDB& characters)
 {
@@ -310,15 +412,13 @@ int booruClean (const std::filesystem::path loc, HashDB& hash, TagDB& general, T
 
 int booruScan (const std::filesystem::path loc, HashDB& hash, TagDB& general, TagDB& artists, TagDB& characters)
 {
+	/*
 	hash.scanDirectoryRecursive(loc);
-	int tagged = 0;
-	int files = 0;
-	int alreadyTagged = 0;
 
+	//retrieve sauceNao key
 	std::ifstream t("saucenao_key");
 	std::string key;
 	t >> key;
-
 
 	DanBooru booru;
 	Gelbooru gbooru;
@@ -419,6 +519,9 @@ int booruScan (const std::filesystem::path loc, HashDB& hash, TagDB& general, Ta
 	std::cout << alreadyTagged << " were already tagged\n";
 	std::cout << tagged << " added tags\n";
 
+	return 0;
+	return 0;
+	*/
 	return 0;
 
 }
