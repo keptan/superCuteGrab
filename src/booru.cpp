@@ -315,6 +315,7 @@ void AsyncScanner :: perFile (const std::filesystem::path p, const std::string h
 		return;
 	}
 
+	/*
 	const auto gscan = gb.hashQ(h);
 	if(!gscan)
 	{
@@ -326,6 +327,7 @@ void AsyncScanner :: perFile (const std::filesystem::path p, const std::string h
 		characters.insertTags(h, gb.characters);
 		return;
 	}
+	*/
 
 	sauceLimit.waitAndUse();
 
@@ -358,6 +360,8 @@ void AsyncScanner :: perFile (const std::filesystem::path p, const std::string h
 		characters.insertTags(h, gb.characters);
 		return;
 	}
+
+	syncro.addTask([=](){ std::cout << "saucenao couldn't find:" << p.filename().string() << '\n';});
 
 	return;
 }
