@@ -32,8 +32,9 @@ int main(int argc, char *const argv[])
 
 	const auto scan = std::find(args.begin(), args.end(), "-scan");
 	const auto gui  = std::find(args.begin(), args.end(), "-gui");
+	const auto clean = std::find(args.begin(), args.end(), "-clean");
 
-	if(scan == args.end() && gui == args.end()) return -1;
+	if(scan == args.end() && gui == args.end() && clean == args.end()) return -1;
 
 	auto app = Gtk::Application::create();
 	auto builder = Gtk::Builder::create_from_file("window.glade");
@@ -50,7 +51,18 @@ int main(int argc, char *const argv[])
 
 	if(scan < args.end() - 1) 
 	{
-		return cute::booruScan(*(scan + 1), hashDb, booruTags.tags, artists.tags, characters.tags);
+		cute::AsyncScanner scanner
+		(*(scan +1), hashDb, thumbDb, booruTags.tags, artists.tags, characters.tags);
+
+		scanner.scan();
+		return 0;
+
+	}
+
+	if(clean < args.end() - 1) 
+	{
+
+		return cute::booruClean(*(clean + 1), hashDb, booruTags.tags, artists.tags, characters.tags);
 	}
 
 	if(gui == args.end()) return -1;
