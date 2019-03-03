@@ -5,6 +5,8 @@
 #include <gtkmm.h>
 #include <set>
 #include <cassert>
+#include <mutex>
+
 #include "hashDB.h"
 #include "thumbDB.h"
 
@@ -21,6 +23,8 @@ namespace cute
 
 
 		private:
+		mutable std::mutex mutex;
+
 		const std::filesystem::path thumbDir;
 		std::map<Hash, std::filesystem::path> items; 
 

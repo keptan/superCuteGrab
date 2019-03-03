@@ -21,6 +21,7 @@ std::filesystem::path ThumbDB :: getThumbPath (const Image& image)
 std::filesystem::path ThumbDB :: getThumbPath (const Hash& hash, const std::filesystem::path& path)
 {
 
+	std::scoped_lock (mutex);
 	const auto it = items.find(hash);
 
 	if(it != items.end()) return it->second;
