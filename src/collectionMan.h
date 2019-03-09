@@ -54,6 +54,8 @@ class CollectionMan
 	void setRightImage ( SharedImage); //override left or right image
 	void setLeftImage  ( SharedImage);
 
+	void remove (const SharedImage);
+
 	//run image scores
 	void leftVictory  (void);
 	void rightVictory (void);

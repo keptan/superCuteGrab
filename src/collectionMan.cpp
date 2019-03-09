@@ -142,6 +142,15 @@ void CollectionMan :: setLeftImage ( SharedImage i)
 	rightImage = matchingELO(i);
 }
 
+void CollectionMan :: remove ( const SharedImage i)
+{
+	collection.erase( std::remove_if( collection.begin(), collection.end(), 
+					[&](const auto a){ return a->location == i->location;}));
+
+	filtered.erase( std::remove_if( filtered.begin(), filtered.end(), 
+					[&](const auto a){ return a->location == i->location;}));
+}
+
 
 SharedImage CollectionMan :: getRightImage (void)
 {
