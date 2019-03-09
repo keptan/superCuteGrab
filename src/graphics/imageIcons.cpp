@@ -9,6 +9,12 @@ ImageIcons :: ImageIcons (void)
 
 	m_Menu_Popup.append(*item);
 
+	item = Gtk::manage( new Gtk::MenuItem("_Exile", true));
+	item->signal_activate().connect(
+			sigc::mem_fun(*this, &ImageIcons::exile_item) );
+
+	m_Menu_Popup.append(*item);
+
 	//enable multiple selected
 	set_selection_mode(Gtk::SELECTION_MULTIPLE);	
 	/*
@@ -49,11 +55,24 @@ void ImageIcons :: info_item (void)
 
 	m_signal_image.emit(ref);
 }
+
+void ImageIcons :: exile_item (void)
+{
+	std::cout << "item selected for EXILE" << std::endl;
+	const auto ref = get_selected_items();
+
+	m_signal_exile.emit(ref);
+}
 	
+ImageIcons::type_imageSig ImageIcons :: signal_exile (void)
+{
+	return m_signal_exile;
+}
+
+
 ImageIcons::type_imageSig ImageIcons :: signal_image (void)
 {
 	return m_signal_image;
 }
-
 
 
