@@ -52,7 +52,7 @@ int main(int argc, char *const argv[])
 	if(scan < args.end() - 1) 
 	{
 		cute::AsyncScanner scanner
-		(*(scan +1), hashDb, thumbDb, booruTags.tags, artists.tags, characters.tags);
+		(*(scan +1), hashDb, thumbDb, booruTags.tags, characters.tags, artists.tags);
 
 		scanner.scan();
 		return 0;

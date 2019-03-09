@@ -120,7 +120,6 @@ namespace cute
 		void scan (void);
 	};
 
-	int booruScan (const std::filesystem::path, HashDB&, TagDB&, TagDB&, TagDB&);
 	int booruClean (const std::filesystem::path, HashDB&, TagDB&, TagDB&, TagDB&);
 }
 

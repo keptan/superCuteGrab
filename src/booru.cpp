@@ -303,6 +303,7 @@ void AsyncScanner :: perFile (const std::filesystem::path p, const std::string h
 	SauceArbiter sa(key, thumbs);
 
 
+
 	const auto dscan = db.hashQ(h);
 	if(!dscan)
 	{
@@ -314,20 +315,6 @@ void AsyncScanner :: perFile (const std::filesystem::path p, const std::string h
 		characters.insertTags(h, db.characters);
 		return;
 	}
-
-	/*
-	const auto gscan = gb.hashQ(h);
-	if(!gscan)
-	{
-		syncro.addTask([=](){ std::cout << "found gelbooru for:" << p.filename().string() << '\n';});
-		std::scoped_lock lk (m);
-
-		general.insertTags(h, gb.general);
-		artists.insertTags(h, gb.artists);
-		characters.insertTags(h, gb.characters);
-		return;
-	}
-	*/
 
 	sauceLimit.waitAndUse();
 
@@ -361,26 +348,24 @@ void AsyncScanner :: perFile (const std::filesystem::path p, const std::string h
 		return;
 	}
 
-	syncro.addTask([=](){ std::cout << "saucenao couldn't find:" << p.filename().string() << '\n';});
+	syncro.addTask([=](){ std::cout << "saucenao couldn't find" << p.filename().string() << '\n';});
+	std::scoped_lock lk(m);
+	general.insertTags(h, TagSet(Tag("no_sauce")));
 
 	return;
 }
-
-
-
-
-
-
-	
-
-	
-	
 
 void AsyncScanner :: scan (void)
 {
 	hash.scanDirectoryRecursive(path);
 	for(const auto it : hash)
 	{
+		const auto set = general.retrieveData(it.second.hash);
+		const auto checkedS = set.contains(Tag("no_sauce"));
+		const auto hasD		= set.contains(Tag("danbooru"));
+		const auto hasG		= set.contains(Tag("gelbooru"));
+		if(checkedS || hasD || hasG) continue;
+
 		const auto f = [=](){ perFile(it.first, it.second.hash);};
 		ioPool.addTask(f);
 	}
@@ -412,122 +397,5 @@ int booruClean (const std::filesystem::path loc, HashDB& hash, TagDB& general, T
 	return 0;
 }
 
-
-
-int booruScan (const std::filesystem::path loc, HashDB& hash, TagDB& general, TagDB& artists, TagDB& characters)
-{
-	/*
-	hash.scanDirectoryRecursive(loc);
-
-	//retrieve sauceNao key
-	std::ifstream t("saucenao_key");
-	std::string key;
-	t >> key;
-
-	DanBooru booru;
-	Gelbooru gbooru;
-	SauceArbiter arbiter(key);
-
-	for(const auto it : hash)
-	{
-		booru.clear();
-		gbooru.clear();
-		arbiter.clear();
-
-		files++;
-		const auto h = it.second.hash;
-		const auto set = general.retrieveData(h);
-
-		const auto checkedG = set.contains(Tag("no_gelbooru"));
-		const auto hasG		= set.contains(Tag("gelbooru"));
-		const auto checkedD = set.contains(Tag("no_danbooru"));
-		const auto hasD		= set.contains(Tag("danbooru"));
-		const auto checkedS = set.contains(Tag("no_sauce"));
-		const auto checkedAll = (checkedG && checkedD) || checkedS;
-
-
-		if(hasG || hasD || checkedAll)
-		{
-
-			std::cout << "already tagged: " << it.first.filename().string() << '\n';
-			alreadyTagged++;
-			continue;
-		}
-
-		const auto gotDanbooru = checkedD ? -1 : booru.hashQ(h);
-
-		if(!checkedD && !gotDanbooru)
-		{
-
-			const TagSet t( Tag("no_danbooru"));
-			general.insertTags(h, t);
-		}
-
-		if(!gotDanbooru)
-		{
-			std::cout << "found danbooru for: " << it.first.filename().string() << '\n';
-			general.insertTags(h, booru.general);
-			artists.insertTags(h, booru.artists);
-			characters.insertTags(h, booru.characters);
-			tagged++;
-			continue;
-		}
-
-		const auto gotGelbooru = checkedG ? -1 : gbooru.hashQ(h);
-
-		if(!checkedG && gotGelbooru)
-		{
-			const TagSet t( Tag("no_gelbooru"));
-			general.insertTags(h, t);
-		}
-
-		if(!gotGelbooru)
-		{
-			std::cout << "found gelbooru for: " << it.first.filename().string() << '\n';
-			general.insertTags(h, gbooru.general);
-			artists.insertTags(h, gbooru.artists);
-			characters.insertTags(h, gbooru.characters);
-			tagged++;
-			continue;
-		}
-
-		try
-		{
-			const auto gotSauce = arbiter.search(it.first, h);
-			if(!gotSauce)
-			{
-				std::cout << "found saucenao for: " << it.first.filename().string() << '\n';
-				general.insertTags(h, arbiter.general);
-				artists.insertTags(h, arbiter.artists);
-				characters.insertTags(h, arbiter.characters);
-				tagged++;
-				continue;
-			}
-			if(gotSauce)
-			{
-				const TagSet t( Tag("no_sauce"));
-				general.insertTags(h, t);
-			}
-		}
-		catch(const Gdk::PixbufError& e)
-		{
-			std::cout << "broken image: " << it.first.filename() << '\n';
-			continue;
-		}
-
-
-
-	}
-
-	std::cout << "scanned: " << files << " files\n";
-	std::cout << alreadyTagged << " were already tagged\n";
-	std::cout << tagged << " added tags\n";
-
-	return 0;
-	return 0;
-	*/
-	return 0;
-
-}
 
 							}
