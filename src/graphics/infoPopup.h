@@ -8,6 +8,7 @@
 #include "../compMan.h"
 #include "../hashDB.h"
 #include "../collectionMan.h"
+#include "../../lib/nfun/future_pool.h"
 #include "window.h"
 #include <sigc++/sigc++.h>
 #include "scalingImage.h"
@@ -26,12 +27,14 @@ class IconColumns : public Gtk::TreeModel::ColumnRecord
 		add(m_col_name);
 		add(m_col_pixbuf);
 		add(m_col_image);
+		add(m_col_hasPixbuf);
 	}
 
 
 	Gtk::TreeModelColumn<Glib::ustring> m_col_name; 
 	Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf>> m_col_pixbuf;
 	Gtk::TreeModelColumn< std::shared_ptr<cute::Image>> m_col_image;
+	Gtk::TreeModelColumn<bool> m_col_hasPixbuf;
 };
 
 class TagColumns : public Gtk::TreeModel::ColumnRecord 
@@ -84,6 +87,7 @@ class InfoPopup
 	//icon viewer
 	ImageIcons icons;
 	bool lastSize;
+
 
 	public: 
 	InfoPopup ( const Glib::RefPtr<Gtk::Builder>, cute::ThumbDB&, cute::CollectionMan&);
@@ -151,17 +155,31 @@ class BrowseWindow : public sigc::trackable
 
 	std::map<cute::SharedImage, Glib::RefPtr<Gdk::Pixbuf>> pixCache;
 
+	//threadpools
+	Glib::RefPtr<Gdk::Pixbuf> defaultIcon;
+	void addThumbs(void);
+	void generateIcons (void);
+	int iconContext_;
+
+	std::mutex m;
+	FutureDad cpuPool;
+	FutureDad syncro;
+	std::optional<std::future<void>> get;
+	void importCollection (void);
+	void importCollection (const std::vector<cute::SharedImage>&);
+
 
 	public:
 	BrowseWindow( const Glib::RefPtr<Gtk::Builder>, cute::CollectionMan&, cute::HashDB&);
+	~BrowseWindow (void);
 	Gtk::Window* getWindow (void);
 
 	protected:
-	void selected (const Gtk::TreeModel::Path&);
+	void openFightWindow (const Gtk::TreeModel::Path&);
 	void addMember (const std::shared_ptr<cute::Image> i);
 	void import_folder (void);
 	void import_folder_recursive (void);
-	void filter (void);
+	void filterByEntry (void);
 	void refreshTagTree (void);
 	void filterTagTree (void);
 	void refresh (void);
@@ -174,7 +192,8 @@ class BrowseWindow : public sigc::trackable
 		   const Glib::RefPtr<Gdk::DragContext>& context, 
 			Gtk::SelectionData& selection_data, guint info, guint time);	   
 
-	void callback (const std::vector<Gtk::TreeModel::Path>);
+	void rightClick (const std::vector<Gtk::TreeModel::Path>);
+	void exileClick (const std::vector<Gtk::TreeModel::Path>);
 
 
 	Glib::RefPtr<Gtk::ListStore> m_refTreeModel;
