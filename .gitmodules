@@ -4,3 +4,6 @@
 [submodule "sauce"]
 	path = sauce
 	url = https://github.com/keptan/sauce
+[submodule "lib/nfun"]
+	path = lib/nfun
+	url = https://github.com/keptan/nfun
