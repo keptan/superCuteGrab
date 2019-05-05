@@ -1,0 +1,42 @@
+sorry for all thet hassle, you might want to just wait for a release version to eventually appear because this shit is pretty retarded lol 
+
+
+git clone --recursive-submodules https://github.com/keptan/superCuteGrab
+cd superCuteGrab
+make a saucenao account https://saucenao.com
+touch saucenao_key
+echo 'your_saucenao_api_key' >> saucenao_key
+
+if you buy a upgraded 30 day pass or whatever you can leave the code as it is
+otherwise you have to go to src/booru.cpp and change the ratelimit on line 285
+right now its 25 3000 which means 25 requests per 30000 milliseconds
+i dont even remember what the default is, so youll have to go check on https://saucenao.com/user.php?page=search-usage here and find out
+
+make
+mkdir thumbnails
+mkdir data
+mkdir db
+
+./cutegrab -scan directory
+recursively scans the directory for images, reverse imagae searches them on danbooru, saucenao, and gelbooru
+adds tags to a csv
+
+./cutegrab -gui
+opens the gui
+use 'import recurse' to import images from a folder that you've previously tagged
+double click on a thumbnail to open the ranking window
+itll show you two images
+
+left arrow - left image is cuter
+right arrow - right image is cuter
+up arrow - equally cute
+down arrow - fix the image scales (LOL) (youll see why)
+
+you can right click on a thumbnail and view the info 
+or delete an image from your filesystem
+
+search for tags in the searchbar thing or click on a tag and click 'filter by selected'
+you can sort the images with the sorting thing at the bottom
+
+
+
