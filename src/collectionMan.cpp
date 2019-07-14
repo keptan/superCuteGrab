@@ -65,13 +65,15 @@ void CollectionMan :: freshImages (void)
 	
 void CollectionMan :: leftVictory (void)
 {
+	std::cout << "left image, mu: " <<  identityRanker.getSkill(*(leftImage)).mu << " sigma: " << identityRanker.getSkill(*(leftImage)).sigma << std::endl;
+	std::cout << "right image, mu: " << identityRanker.getSkill(*(rightImage)).mu << " sigma: " << identityRanker.getSkill(*(rightImage)).sigma << std::endl;
 	runImages(1);
 	leftStreak++;
 
 	const bool leftUncertain  = identityRanker.getSkill(*leftImage).sigma  > 11; 
 	const bool rightUncertain = identityRanker.getSkill(*rightImage).sigma > 11; 
 
-	if(rightStreak > 5 || leftStreak > 5) return freshImages();
+	if(rightStreak > 11 || leftStreak > 11) return freshImages();
 
 	std::uniform_int_distribution<int> dist (0, 1);
 	const bool side = dist(gen);
@@ -86,13 +88,15 @@ void CollectionMan :: leftVictory (void)
 
 void CollectionMan :: rightVictory (void)
 {
+	std::cout << "left image, mu: " <<  identityRanker.getSkill(*(leftImage)).mu << " sigma: " << identityRanker.getSkill(*(leftImage)).sigma << std::endl;
+	std::cout << "right image, mu: " << identityRanker.getSkill(*(rightImage)).mu << " sigma: " << identityRanker.getSkill(*(rightImage)).sigma << std::endl;
 	runImages(2);
 	rightStreak++;
 
 	const bool leftUncertain  = identityRanker.getSkill(*leftImage).sigma  > 11; 
 	const bool rightUncertain = identityRanker.getSkill(*rightImage).sigma > 11; 
 
-	if(rightStreak > 5 || leftStreak > 5) return freshImages();
+	if(rightStreak > 11 || leftStreak > 11) return freshImages();
 
 	std::uniform_int_distribution<int> dist (0, 1);
 	const bool side = dist(gen);
@@ -107,6 +111,8 @@ void CollectionMan :: rightVictory (void)
 
 void CollectionMan :: tieVictory (void)
 {
+	std::cout << "left image, mu: " <<  identityRanker.getSkill(*(leftImage)).mu << " sigma: " << identityRanker.getSkill(*(leftImage)).sigma << std::endl;
+	std::cout << "right image, mu: " << identityRanker.getSkill(*(rightImage)).mu << " sigma: " << identityRanker.getSkill(*(rightImage)).sigma << std::endl;
 	runImages(3);
 
 	const bool leftUncertain  = identityRanker.getSkill(*leftImage).sigma  > 15; 
@@ -168,16 +174,17 @@ SharedImage CollectionMan :: matchingImage (SharedImage i, int winStreak)
 	std::cout << "finding matching image" << std::endl;
 	SharedImage out = nullptr;
 
-
+/*
 	std::sort (filtered.begin(), filtered.end(), 
 				[&](const auto a, const auto b) {
 					return identityRanker.getSkill(*a).skill() < identityRanker.getSkill(*b).skill();
 				});
+*/
 
-	const int tenPercent = (filtered.size() - 1) / 10;
+	const float tenPercent = (filtered.size() - 1) / 10;
 
 	auto climbBottom = std::find( filtered.begin(), filtered.end(), i);
-	auto climbTop = climbBottom + tenPercent + (winStreak * (tenPercent / 2));
+	auto climbTop = climbBottom + tenPercent + (winStreak * (tenPercent / 1.5f));
 
 	if(climbBottom - tenPercent > filtered.begin()) climbBottom = climbBottom - (tenPercent / 2);
 	if(climbTop >= filtered.end()) climbTop = filtered.end() - 1;
@@ -208,22 +215,37 @@ SharedImage CollectionMan :: matchingELO (SharedImage i, int streak )
 
 	const int twoPercent = std::max<int>( ((filtered.size() - 1  ) / 50), 5);
 
-	auto climbBottom = std::find( filtered.begin(), filtered.end(), i) - twoPercent;
-	auto climbTop = climbBottom + (twoPercent * 2);
+	const int lowRange	 = identityRanker.getSkill(*filtered[0]).skill();
+	const int highRange	 = identityRanker.getSkill(*filtered[ filtered.size() - 1]).skill();
+
+	const int twoDiff	 = (highRange - lowRange) / 11;
+	const int curr		 = identityRanker.getSkill(*i).skill();
 
 
-	//if(!runningFresh) climbBottom += (twoPercent * (streak / 3 + 1));
-	//if(!runningFresh) climbTop += (twoPercent * (streak / 2));
+	auto climbBottom = std::upper_bound(filtered.begin(), filtered.end(), (curr - twoDiff) + (((streak - 1) * twoDiff) / 3), 
+				[&](const auto a, const auto b) {
+					return identityRanker.getSkill(*b).skill() > a;
+				});
+
+	auto climbTop = std::upper_bound(filtered.begin(), filtered.end(), (curr + twoDiff) + (((streak - 1) * twoDiff) / 3), 
+				[&](const auto a, const auto b) {
+					return identityRanker.getSkill(*b).skill() > a;
+				});
+
+
+//	climbBottom += (twoDiff * ( (streak - 1) / 3));
+//	climbTop	+= (twoDiff * ( (streak - 1) / 3 + 1));
+
 	if(climbTop >= filtered.end()) climbTop = filtered.end() - 1;
 	if(climbBottom < filtered.begin()) climbBottom = filtered.begin(); 
 
-	if(climbBottom >= filtered.end() - 15) climbBottom = std::max(filtered.begin(), filtered.end() - 15);
+	if(climbBottom >= filtered.end() - 25) climbBottom = std::max(filtered.begin(), filtered.end() - 25);
 
 
 	std::cout << "matching image between ";
 	std::cout << identityRanker.getSkill(**(climbBottom)).skill() << " and ";
 	std::cout << identityRanker.getSkill(**(climbTop)).skill() << "range of: " << (climbTop - climbBottom) << std::endl;
-	std::cout << "left image, mu: " << identityRanker.getSkill(*(leftImage)).mu << " sigma: " << identityRanker.getSkill(*(leftImage)).sigma << std::endl;
+
 
 
 
