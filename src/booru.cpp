@@ -282,7 +282,7 @@ std::optional< std::string> SauceArbiter :: getGelbooru (void)
 
 AsyncScanner :: AsyncScanner
 (const std::filesystem::path p, HashDB& h, ThumbDB& t, TagDB& g, TagDB& c, TagDB& a)
-: path(p), sauceLimit(25, 30000), syncro(1), ioPool(25), cpuPool(8)
+: path(p), sauceLimit(15, 30000), syncro(1), ioPool(25), cpuPool(8)
 , hash(h), thumbs(t), general(g), characters(c), artists(a)
 {
 	std::ifstream file("saucenao_key");
