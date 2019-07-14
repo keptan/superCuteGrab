@@ -550,8 +550,15 @@ void BrowseWindow :: comboSort (std::vector<cute::SharedImage>& images)
 
 	lamMap["#Characters"]  = [&](const auto a, const auto b)
 						   {
-								return collection.charTags.getTags(*a).size() < 
-									   collection.charTags.getTags(*b).size();
+								const auto aSize = collection.charTags.getTags(*a).size();
+								const auto bSize = collection.charTags.getTags(*b).size();
+
+								if (aSize !=  bSize) return aSize < bSize;
+
+								const auto aTime = std::filesystem::last_write_time(a->location); 
+								const auto bTime = std::filesystem::last_write_time(b->location);
+
+								return aTime > bTime;
 						   };
 
 	lamMap["Date"]		    = [&](const auto a, const auto b)
@@ -717,12 +724,18 @@ void BrowseWindow :: import_folder_recursive (void)
 
 
 
+		  double num = 0;
+		  double acc = 0;
+
 			for(auto &f : std::filesystem::recursive_directory_iterator(dialog.get_filename(), std::filesystem::directory_options::follow_directory_symlink))
 			{
 				if(!cute::conformingFileType(f.path())) continue;
 				i.push_back( std::make_shared<cute::Image> (f.path(), hash.retrieveData(f.path())));
+				acc += collection.identityRanker.getSkill(*i.back()).sigma;
+				num++;
 			}
 
+			std::cout << "average sigma" << acc / num << std::endl;
 			collection.setImages(i);
 		//	importCollection();
 
@@ -881,6 +894,7 @@ void BrowseWindow :: refresh (void)
 	collection.setImages(images);
 	importCollection(images);
 	refreshTagTree();
+
 }
 
 
