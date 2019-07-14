@@ -5,6 +5,9 @@
 #include <iostream>
 #include <set>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+
 namespace cute {
 
 
@@ -65,11 +68,17 @@ void HashDB :: scanDirectory (std::filesystem::path p)
 
 		if(!conformingFileType(f.path())) continue;
 
+		/*
 		const auto rawTime = std::filesystem::last_write_time(f);
 		const auto epoch = rawTime.time_since_epoch();
 		const auto value = std::chrono::duration_cast<std::chrono::seconds>(epoch);
 
 		const unsigned long time = value.count();
+		*/
+		struct stat attrib; 
+		stat(f.path().string().c_str(), &attrib);
+		const unsigned long time = attrib.st_mtime; 
+
 		const unsigned long size = std::filesystem::file_size(f);
 		const auto absolute = std::filesystem::absolute(f.path());
 
@@ -106,13 +115,19 @@ void HashDB :: scanDirectoryRecursive (std::filesystem::path p)
 	for(const auto& f : std::filesystem::recursive_directory_iterator(p, std::filesystem::directory_options::follow_directory_symlink))
 	{
 
-		if(!conformingFileType(f.path())) continue;
 
+		if(!conformingFileType(f.path())) continue;
+		/*
 		const auto rawTime = std::filesystem::last_write_time(f);
 		const auto epoch = rawTime.time_since_epoch();
 		const auto value = std::chrono::duration_cast<std::chrono::seconds>(epoch);
 
 		const unsigned long time = value.count();
+		*/
+		struct stat attrib; 
+		stat(f.path().string().c_str(), &attrib);
+		const unsigned long time = attrib.st_mtime; 
+	
 		const unsigned long size = std::filesystem::file_size(f);
 		const auto absolute = std::filesystem::absolute(f.path());
 
@@ -121,6 +136,7 @@ void HashDB :: scanDirectoryRecursive (std::filesystem::path p)
 		//if our file does contain our path
 		if(it != pathMap.end())
 		{
+
 			//if the store metadata is still accurate, we add it to our localPathMap
 			if(it->second.file_size == size && it->second.write_time == time)
 			{
