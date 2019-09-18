@@ -47,6 +47,7 @@ class CollectionMan
 	void freshImages (void); //set left and right to clean images
 	SharedImage getRightImage (void); 
 	SharedImage getLeftImage  (void);
+	SharedImage getGoodImage  (void);
 
 	const std::vector< SharedImage>& getImages (void); //get the collection
 	void  setImages (const std::vector<SharedImage>); //set the collection
