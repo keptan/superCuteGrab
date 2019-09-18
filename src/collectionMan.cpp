@@ -109,6 +109,38 @@ void CollectionMan :: rightVictory (void)
 	}
 }
 
+SharedImage CollectionMan :: getGoodImage (void)
+{
+	SharedImage out = nullptr; 
+
+	std::sort (filtered.begin(), filtered.end(), 
+				[&](const auto a, const auto b) {
+					return identityRanker.getSkill(*a).skill() < identityRanker.getSkill(*b).skill();
+				});
+
+	const int lowRange	 = identityRanker.getSkill(*filtered[0]).skill();
+	const int highRange	 = identityRanker.getSkill(*filtered[ filtered.size() - 1]).skill();
+
+	const int twoDiff	 = (highRange - lowRange) / 5;
+
+
+	auto climbBottom = std::upper_bound(filtered.begin(), filtered.end(), highRange - twoDiff, 
+				[&](const auto a, const auto b) {
+					return identityRanker.getSkill(*b).skill() > a;
+				});
+	auto climbTop = filtered.end() - 1;
+
+
+	if(climbTop >= filtered.end()) climbTop = filtered.end() - 1;
+	if(climbBottom < filtered.begin()) climbBottom = filtered.begin(); 
+	if(climbBottom >= filtered.end() - 25) climbBottom = std::max(filtered.begin(), filtered.end() - 25);
+
+	std::uniform_int_distribution<int> dist (0, std::abs(climbTop - climbBottom));
+	out = *(climbBottom + dist(gen));
+	return out;
+}
+
+
 void CollectionMan :: tieVictory (void)
 {
 	std::cout << "left image, mu: " <<  identityRanker.getSkill(*(leftImage)).mu << " sigma: " << identityRanker.getSkill(*(leftImage)).sigma << std::endl;
@@ -174,12 +206,10 @@ SharedImage CollectionMan :: matchingImage (SharedImage i, int winStreak)
 	std::cout << "finding matching image" << std::endl;
 	SharedImage out = nullptr;
 
-/*
 	std::sort (filtered.begin(), filtered.end(), 
 				[&](const auto a, const auto b) {
 					return identityRanker.getSkill(*a).skill() < identityRanker.getSkill(*b).skill();
 				});
-*/
 
 	const float tenPercent = (filtered.size() - 1) / 10;
 
