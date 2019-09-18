@@ -1,7 +1,7 @@
 #include "filetypes.h" 
 
 namespace cute {
-std::set<std::string> extensions  = {".jpg", ".jpeg", ".png", ".JPEG"};
+std::set<std::string> extensions  = {".jpg", ".jpeg", ".png", ".JPEG", "jpg_large", "jpg_orig"};
 
 bool conformingFileType (const std::filesystem::path& p)
 {
