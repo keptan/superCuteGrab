@@ -569,10 +569,38 @@ void BrowseWindow :: comboSort (std::vector<cute::SharedImage>& images)
 									   std::filesystem::last_write_time(b->location);
 						   };
 
+
 	lamMap["Average Tag Score"] = [&](const auto a, const auto b)
 							{
-								const auto aTags = collection.tagsWithScores(a);
-								const auto bTags = collection.tagsWithScores(b);
+								const auto aTags = collection.booruTags.getTags(*a);
+								const auto bTags = collection.booruTags.getTags(*b);
+
+								const auto getScores	= [&](const auto& tags)
+								{
+									std::map< cute::Tag, cute::SkillDatum> acc;
+									std::vector< std::tuple<cute::Tag, cute::SkillDatum>> out;
+
+									for(const auto t : tags)
+									{
+										const auto it = acc.find(t); 
+										if(it != acc.end()) continue;
+
+										if(t.tag == "no_sauce") continue;
+										if(t.tag == "no_gelbooru") continue; 
+										if(t.tag == "no_danbooru") continue;
+
+										acc.insert( std::make_pair( t, collection.booruTags.scores.retrieveData(t)));
+									}
+
+
+									for(const auto p : acc)
+									{
+										out.push_back( std::make_tuple( p.first, p.second));
+									}
+
+									return out;
+								};
+
 
 								const auto averageSkill = [&](const auto& pairs)
 								{
@@ -588,11 +616,16 @@ void BrowseWindow :: comboSort (std::vector<cute::SharedImage>& images)
 									return askill / num;
 								};
 
-								const auto aAverage = averageSkill(aTags);
-								const auto bAverage = averageSkill(bTags);
+								const auto aCollect = getScores(aTags);
+								const auto bCollect = getScores(bTags);
+
+								const auto aAverage = averageSkill(aCollect);
+								const auto bAverage = averageSkill(bCollect);
 
 								return aAverage > bAverage; 
 							};
+
+
 
 
 	Gtk::ComboBoxText* combo;
