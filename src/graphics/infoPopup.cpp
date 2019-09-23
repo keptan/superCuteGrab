@@ -622,6 +622,10 @@ void BrowseWindow :: comboSort (std::vector<cute::SharedImage>& images)
 								const auto aAverage = averageSkill(aCollect);
 								const auto bAverage = averageSkill(bCollect);
 
+								if(aAverage == bAverage)
+								return collection.identityRanker.getSkill(*a).skill() > 
+									   collection.identityRanker.getSkill(*b).skill();
+
 								return aAverage > bAverage; 
 							};
 
@@ -671,6 +675,10 @@ void BrowseWindow :: comboSort (std::vector<cute::SharedImage>& images)
 
 								const auto aAverage = averageSkill(aCollect);
 								const auto bAverage = averageSkill(bCollect);
+
+								if(aAverage == bAverage)
+								return collection.identityRanker.getSkill(*a).skill() > 
+									   collection.identityRanker.getSkill(*b).skill();
 
 								return aAverage > bAverage; 
 							};
