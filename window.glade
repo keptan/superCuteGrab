@@ -199,6 +199,7 @@
                   <item translatable="yes">Date</item>
                   <item translatable="yes">#Characters</item>
                   <item translatable="yes">Average Tag Score</item>
+                  <item translatable="yes">Character</item>
                 </items>
               </object>
               <packing>

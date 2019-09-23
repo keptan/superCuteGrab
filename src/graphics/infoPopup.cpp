@@ -625,6 +625,55 @@ void BrowseWindow :: comboSort (std::vector<cute::SharedImage>& images)
 								return aAverage > bAverage; 
 							};
 
+	lamMap["Character"]	= [&](const auto a, const auto b)
+								{
+								const auto aTags = collection.charTags.getTags(*a);
+								const auto bTags = collection.charTags.getTags(*b);
+
+								const auto getScores	= [&](const auto& tags)
+								{
+									std::map< cute::Tag, cute::SkillDatum> acc;
+									std::vector< std::tuple<cute::Tag, cute::SkillDatum>> out;
+
+									for(const auto t : tags)
+									{
+										const auto it = acc.find(t); 
+										if(it != acc.end()) continue;
+										acc.insert( std::make_pair( t, collection.charTags.scores.retrieveData(t)));
+									}
+
+
+									for(const auto p : acc)
+									{
+										out.push_back( std::make_tuple( p.first, p.second));
+									}
+
+									return out;
+								};
+
+
+								const auto averageSkill = [&](const auto& pairs)
+								{
+									int num = 0;
+									int askill = 0;
+									for(const auto [tag, skill] : pairs)
+									{
+										askill += skill.skill();
+										num++;
+									}
+
+									if(num == 0) return 0;
+									return askill / num;
+								};
+
+								const auto aCollect = getScores(aTags);
+								const auto bCollect = getScores(bTags);
+
+								const auto aAverage = averageSkill(aCollect);
+								const auto bAverage = averageSkill(bCollect);
+
+								return aAverage > bAverage; 
+							};
 
 
 
