@@ -542,6 +542,8 @@ void BrowseWindow :: comboSort (std::vector<cute::SharedImage>& images)
 {
 	std::map<std::string, std::function< bool (cute::SharedImage, cute::SharedImage)>> lamMap;
 
+	//memoize these!!!
+
 	lamMap["Score"]        = [&](const auto a, const auto b)
 						   {
 								return collection.identityRanker.getSkill(*a).skill() > 
@@ -566,6 +568,31 @@ void BrowseWindow :: comboSort (std::vector<cute::SharedImage>& images)
 								return std::filesystem::last_write_time(a->location) > 
 									   std::filesystem::last_write_time(b->location);
 						   };
+
+	lamMap["Average Tag Score"] = [&](const auto a, const auto b)
+							{
+								const auto aTags = collection.tagsWithScores(a);
+								const auto bTags = collection.tagsWithScores(b);
+
+								const auto averageSkill = [&](const auto& pairs)
+								{
+									int num = 0;
+									int askill = 0;
+									for(const auto [tag, skill] : pairs)
+									{
+										askill += skill.skill();
+										num++;
+									}
+
+									if(num == 0) return 0;
+									return askill / num;
+								};
+
+								const auto aAverage = averageSkill(aTags);
+								const auto bAverage = averageSkill(bTags);
+
+								return aAverage > bAverage; 
+							};
 
 
 	Gtk::ComboBoxText* combo;
