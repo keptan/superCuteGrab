@@ -1,5 +1,5 @@
 #pragma once 
-#include "cskill/trueskill.h" 
+#include "trueskill.h" 
 #include "image.h" 
 #include "tagSet.h" 
 #include "scoreDB.h"
