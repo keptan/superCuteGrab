@@ -461,6 +461,8 @@ std::vector< std::tuple<Tag, SkillDatum>> CollectionMan :: tagsWithScores (const
 			const auto tags = db->tags.retrieveData( i->pData.hash);
 			for(const auto t : tags)
 			{
+				const auto it = acc.find(t); 
+				if(it != acc.end()) continue;
 				acc.insert( std::make_pair( t, db->scores.retrieveData(t)));
 			}
 		}
