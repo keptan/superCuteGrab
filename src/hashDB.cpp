@@ -142,11 +142,9 @@ void HashDB :: scanDirectoryRecursive (std::filesystem::path p)
 			{
 				localPathMap.insert_or_assign(absolute, it->second);
 
-				std::cout << "using stored metadata for " << f.path().string() << '\n'; 
 				continue;
 			}
 		}
-		std::cout << "stored metadata for " << f.path().string() << " was no longer valid\n"; 
 
 		//if the stored metadata is no longer accurate we replace the store metadata and rehash the file
 		const Hash hash = hashFile(absolute);
