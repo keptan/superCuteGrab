@@ -340,6 +340,7 @@ void BrowseWindow :: rightClick (const std::vector<Gtk::TreeModel::Path> paths)
 //callback for the right click 'info' menu
 void BrowseWindow :: exileClick (const std::vector<Gtk::TreeModel::Path> paths)
 {
+	/*
 	for(const auto p : paths)
 	{
 		auto iter = m_refTreeModel->get_iter(p);
@@ -363,6 +364,7 @@ void BrowseWindow :: exileClick (const std::vector<Gtk::TreeModel::Path> paths)
 		std::cout << "remove path" << std::endl;
 		std::filesystem::remove(path);
 	}
+	*/
 }
 
 //get a pointer to our window
