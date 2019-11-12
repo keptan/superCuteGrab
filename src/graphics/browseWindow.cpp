@@ -1,4 +1,5 @@
 #include "browseWindow.h"
+#include <chrono>
 
 namespace graphics 
 {
@@ -31,7 +32,7 @@ BrowseWindow :: BrowseWindow
 	window->signal_drag_data_received().connect(sigc::mem_fun(*this, &BrowseWindow::on_dropped_file)); 
 
 	//setting up the refTreeModel for the icons 
-	m_refTreeModel = Gtk::ListStore::create(m_Columns);
+	m_refTreeModel   = Gtk::ListStore::create(m_Columns);
 
 	//add our icon view to the scrollbox
 	Gtk::ScrolledWindow* scroll;
@@ -99,7 +100,7 @@ void BrowseWindow :: importCollection (void)
 	m_refTreeModel->clear();
 	for(const auto &i : collection.getImages())
 	{
-		if(d++ > 1000) break;
+		if(d++ > 100) break;
 		addMember(i);
 	}
 }
@@ -108,12 +109,56 @@ void BrowseWindow :: importCollection ( const std::vector<cute::SharedImage>& c)
 
 	int d = 0;
 	m_refTreeModel->clear();
+
+	/*
 	for(const auto &i : c)
 	{
-		if(d++ > 1000) break;
+		if(d++ > 100) break;
 		addMember(i);
 	}
+	*/
 
+	for(int i = 0; i < c.size();)
+	{
+		std::vector<cute::SharedImage> batch;
+		for(int a = i; a < i + 1000; a++)
+		{
+			if(a == c.size()) break;
+			batch.push_back(c[a]);
+		}
+
+		const auto batchIcons  = [&, batch, i](void)
+		{
+			Glib::RefPtr<Gtk::ListStore> store = m_refTreeModel;
+
+			if(i)
+			{
+				using namespace std::chrono_literals;
+				std::this_thread::sleep_for(4s);
+			}
+			
+			for(const auto image : batch)
+			{
+				Gtk::TreeModel::Row r = *(store->append());
+
+				const std::string loc = image->location.filename().string();
+				const std::string cut = loc.size() > 25 ? loc.substr(0,24) : loc;
+
+				const auto buf = Gdk::Pixbuf::create_from_file( thumbnails.getThumbPath(*image).c_str());
+
+				//basic treeModel column stuff we do all the time
+				r[m_Columns.m_col_name] = cut;
+				r[m_Columns.m_col_hasPixbuf] = true;
+				r[m_Columns.m_col_pixbuf] = buf;
+				r[m_Columns.m_col_image] = image;
+			}
+
+			m_refTreeModel = store; 
+		};
+
+		syncro.addTask(batchIcons);
+		i += 1000;
+	}
 }
 
 /*
