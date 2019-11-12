@@ -96,27 +96,14 @@ BrowseWindow :: ~BrowseWindow (void)
 
 void BrowseWindow :: importCollection (void)
 {
-	int d = 0;
-	m_refTreeModel->clear();
-	for(const auto &i : collection.getImages())
-	{
-		if(d++ > 100) break;
-		addMember(i);
-	}
+	importCollection( collection.getImages());
 }
+
 void BrowseWindow :: importCollection ( const std::vector<cute::SharedImage>& c)
 {
 
 	int d = 0;
 	m_refTreeModel->clear();
-
-	/*
-	for(const auto &i : c)
-	{
-		if(d++ > 100) break;
-		addMember(i);
-	}
-	*/
 
 	for(int i = 0; i < c.size();)
 	{
