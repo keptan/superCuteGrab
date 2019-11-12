@@ -95,18 +95,22 @@ BrowseWindow :: ~BrowseWindow (void)
 
 void BrowseWindow :: importCollection (void)
 {
+	int d = 0;
 	m_refTreeModel->clear();
 	for(const auto &i : collection.getImages())
 	{
+		if(d++ > 1000) break;
 		addMember(i);
 	}
 }
 void BrowseWindow :: importCollection ( const std::vector<cute::SharedImage>& c)
 {
 
+	int d = 0;
 	m_refTreeModel->clear();
 	for(const auto &i : c)
 	{
+		if(d++ > 1000) break;
 		addMember(i);
 	}
 
@@ -431,7 +435,6 @@ void BrowseWindow :: import_folder_recursive (void)
 
 			std::cout << "average sigma" << acc / num << std::endl;
 			collection.setImages(i);
-		//	importCollection();
 
 		  break;
 		}
