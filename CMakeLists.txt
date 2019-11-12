@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 project (superCuteGrab)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 find_package(PkgConfig)
@@ -23,6 +24,7 @@ add_executable(cuteGrab
 	src/collectionMan.cpp
 	src/graphics/scalingImage.cpp
 	src/graphics/imageIcons.cpp
+	src/graphics/browseWindow.cpp
 	src/graphics/window.cpp
 	src/graphics/infoPopup.cpp
 )
