@@ -393,52 +393,6 @@ void BrowseWindow :: openFightWindow (const Gtk::TreeModel::Path& path)
 //importing every image in a directory
 void BrowseWindow :: import_folder (void)
 {
-	  Gtk::FileChooserDialog dialog("Please choose a folder", Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
-	  dialog.set_transient_for(*window);
-
-	  dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
-	  dialog.add_button("Select", Gtk::RESPONSE_OK);
-
-	  int result = dialog.run();
-	switch(result)
-	  {
-		case(Gtk::RESPONSE_OK):
-		{
-		  std::cout << "Select clicked." << std::endl;
-		  std::cout << "Folder selected: " << dialog.get_filename()
-			  << std::endl;
-		  hash.scanDirectory(dialog.get_filename());
-
-		  std::vector<cute::SharedImage> i = collection.getImages();
-
-
-
-			for(auto &f : std::filesystem::directory_iterator(dialog.get_filename()))
-			{
-				if(!cute::conformingFileType(f.path())) continue;
-				i.push_back( std::make_shared<cute::Image> (f.path(), hash.retrieveData(f.path())));
-			}
-
-			collection.setImages(i);
-			//importCollection();
-
-
-		  break;
-		}
-		case(Gtk::RESPONSE_CANCEL):
-		{
-		  std::cout << "Cancel clicked." << std::endl;
-		  break;
-		}
-		default:
-		{
-		  std::cout << "Unexpected button clicked." << std::endl;
-		  break;
-		}
-	  }
-
-		refresh();
-
 		return;
 }
 
