@@ -90,6 +90,7 @@ BrowseWindow :: BrowseWindow
 
 BrowseWindow :: ~BrowseWindow (void)
 {
+	syncro.join_abort();
 	cpuPool.join_abort();
 }
 
@@ -101,6 +102,8 @@ void BrowseWindow :: importCollection (void)
 
 void BrowseWindow :: importCollection ( const std::vector<cute::SharedImage>& c)
 {
+	//clear current icon additions 
+	syncro.join_abort();
 	//clear current icons 
 	m_refTreeModel->clear();
 
