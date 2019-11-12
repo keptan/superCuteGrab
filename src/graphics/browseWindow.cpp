@@ -101,12 +101,15 @@ void BrowseWindow :: importCollection (void)
 
 void BrowseWindow :: importCollection ( const std::vector<cute::SharedImage>& c)
 {
-
-	int d = 0;
+	//clear current icons 
 	m_refTreeModel->clear();
 
+	//in batches off 1000, loop through the images
 	for(int i = 0; i < c.size();)
 	{
+		//create a batch of 1000 images
+		//this will be copied into the batch adding lambda
+		//its a vector of pointers so its 'cheap'
 		std::vector<cute::SharedImage> batch;
 		for(int a = i; a < i + 1000; a++)
 		{
@@ -114,10 +117,13 @@ void BrowseWindow :: importCollection ( const std::vector<cute::SharedImage>& c)
 			batch.push_back(c[a]);
 		}
 
+		//lambda that adds the batch of images to a local ListStore
+		//and then swaps in the listtore into our live view 
 		const auto batchIcons  = [&, batch, i](void)
 		{
 			Glib::RefPtr<Gtk::ListStore> store = m_refTreeModel;
 
+			//wait 4s between batches 
 			if(i)
 			{
 				using namespace std::chrono_literals;
@@ -143,6 +149,8 @@ void BrowseWindow :: importCollection ( const std::vector<cute::SharedImage>& c)
 			m_refTreeModel = store; 
 		};
 
+		//send to our sycnropool
+		//only runs one task at a time 
 		syncro.addTask(batchIcons);
 		i += 1000;
 	}
