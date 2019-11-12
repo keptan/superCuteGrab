@@ -8,7 +8,7 @@
 #include "cskill_instance.h"
 #include "collectionMan.h"
 #include "compMan.h"
-#include "graphics/infoPopup.h"
+#include "graphics/browseWindow.h"
 #include "booru.h"
 #include <gtkmm.h>
 #include <memory>
@@ -34,8 +34,9 @@ int main(int argc, char *const argv[])
 	const auto gui  = std::find(args.begin(), args.end(), "-gui");
 	const auto clean = std::find(args.begin(), args.end(), "-clean");
 	const auto twitter = std::find(args.begin(), args.end(), "-twitter");
+	const auto itest	= std::find(args.begin(), args.end(), "-itest");
 
-	if(scan == args.end() && gui == args.end() && clean == args.end() && twitter == args.end()) return -1;
+	if(scan == args.end() && gui == args.end() && clean == args.end() && twitter == args.end() && itest == args.end()) return -1;
 
 	auto app = Gtk::Application::create();
 	auto builder = Gtk::Builder::create_from_file("window.glade");
