@@ -1,13 +1,14 @@
 #include "browseWindow.h"
 #include <chrono>
 
+#include <mutex>
 namespace graphics 
 {
 
 BrowseWindow :: BrowseWindow 
 ( const Glib::RefPtr<Gtk::Builder> b , cute::CollectionMan& c, cute::HashDB& h)
 	: fight(b,c), builder(b),  collection(c), hash(h), thumbnails("thumbnails"),
-	  defaultIcon( Gdk::Pixbuf::create_from_file( "icon.png")), cpuPool(1),syncro(1), iconContext_(1),  iPop(nullptr)
+	  defaultIcon( Gdk::Pixbuf::create_from_file( "icon.png")), cpuPool(1),syncro(1),context(0), iconContext_(1),  iPop(nullptr)
 {
 	//setup a pointer to our own window
 	builder->get_widget("browseWindow", window);
@@ -103,18 +104,20 @@ void BrowseWindow :: importCollection (void)
 void BrowseWindow :: importCollection ( const std::vector<cute::SharedImage>& c)
 {
 	//clear current icon additions 
-	syncro.join_abort();
+	//
+	std::scoped_lock(m);
+	context++;
 	//clear current icons 
 	m_refTreeModel->clear();
 
-	//in batches off 1000, loop through the images
+	//in batches off 500, loop through the images
 	for(int i = 0; i < c.size();)
 	{
-		//create a batch of 1000 images
+		//create a batch of 500 images
 		//this will be copied into the batch adding lambda
 		//its a vector of pointers so its 'cheap'
 		std::vector<cute::SharedImage> batch;
-		for(int a = i; a < i + 1000; a++)
+		for(int a = i; a < i + 500; a++)
 		{
 			if(a == c.size()) break;
 			batch.push_back(c[a]);
@@ -122,8 +125,11 @@ void BrowseWindow :: importCollection ( const std::vector<cute::SharedImage>& c)
 
 		//lambda that adds the batch of images to a local ListStore
 		//and then swaps in the listtore into our live view 
-		const auto batchIcons  = [&, batch, i](void)
+		int current = context;
+		const auto batchIcons  = [&, batch, i, current](void)
 		{
+			std::scoped_lock(m);
+			if(current != context) return; 
 			Glib::RefPtr<Gtk::ListStore> store = m_refTreeModel;
 
 			//wait 4s between batches 
@@ -135,6 +141,7 @@ void BrowseWindow :: importCollection ( const std::vector<cute::SharedImage>& c)
 			
 			for(const auto image : batch)
 			{
+				if(current != context) return; 
 				Gtk::TreeModel::Row r = *(store->append());
 
 				const std::string loc = image->location.filename().string();
@@ -155,7 +162,7 @@ void BrowseWindow :: importCollection ( const std::vector<cute::SharedImage>& c)
 		//send to our sycnropool
 		//only runs one task at a time 
 		syncro.addTask(batchIcons);
-		i += 1000;
+		i += 500;
 	}
 }
 

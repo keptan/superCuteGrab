@@ -32,6 +32,7 @@ class BrowseWindow : public sigc::trackable
 	std::mutex m;
 	FutureDad cpuPool;
 	FutureDad syncro;
+	int context;
 	std::optional<std::future<void>> get;
 	void importCollection (void);
 	void importCollection (const std::vector<cute::SharedImage>&);
