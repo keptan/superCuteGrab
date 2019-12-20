@@ -1,7 +1,7 @@
 sorry for all thet hassle, you might want to just wait for a release version to eventually appear because this shit is pretty retarded lol 
 
 
-git clone --recursive-submodules https://github.com/keptan/superCuteGrab
+git clone --recursive -submodules https://github.com/keptan/superCuteGrab
 cd superCuteGrab
 make a saucenao account https://saucenao.com
 touch saucenao_key
@@ -12,6 +12,7 @@ otherwise you have to go to src/booru.cpp and change the ratelimit on line 285
 right now its 25 3000 which means 25 requests per 30000 milliseconds
 i dont even remember what the default is, so youll have to go check on https://saucenao.com/user.php?page=search-usage here and find out
 
+cmake .
 make
 mkdir thumbnails
 mkdir data
