@@ -104,6 +104,9 @@ namespace cute
 		FutureDad ioPool;
 		FutureDad cpuPool;
 
+		int imagesScanned;
+		int imagesFound;
+
 		HashDB& hash;
 		ThumbDB& thumbs;
 		TagDB&  general;

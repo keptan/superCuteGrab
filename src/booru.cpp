@@ -282,7 +282,7 @@ std::optional< std::string> SauceArbiter :: getGelbooru (void)
 
 AsyncScanner :: AsyncScanner
 (const std::filesystem::path p, HashDB& h, ThumbDB& t, TagDB& g, TagDB& c, TagDB& a)
-: path(p), sauceLimit(15, 30000), syncro(1), ioPool(25), cpuPool(8)
+: path(p), sauceLimit(15, 30000), syncro(1), ioPool(25), cpuPool(8), imagesScanned(0), imagesFound(0)
 , hash(h), thumbs(t), general(g), characters(c), artists(a)
 {
 	std::ifstream file("saucenao_key");
@@ -294,10 +294,14 @@ AsyncScanner :: ~AsyncScanner (void)
 	ioPool.join_finish();
 	cpuPool.join_finish();
 	syncro.join_finish();
+
+	std::cout << "scanned: " << imagesScanned << "images\n";
+	std::cout << "found tags for " << imagesFound << std::endl;
 }
 
 void AsyncScanner :: perFile (const std::filesystem::path p, const std::string h)
 {
+	imagesScanned++;
 	DanBooru db;
 	Gelbooru gb;
 	SauceArbiter sa(key, thumbs);
@@ -310,6 +314,7 @@ void AsyncScanner :: perFile (const std::filesystem::path p, const std::string h
 		syncro.addTask([=](){ std::cout << "found danbooru for:" << p.filename().string() << '\n';});
 		std::scoped_lock lk (m);
 
+		imagesFound++;
 		general.insertTags(h, db.general);
 		artists.insertTags(h, db.artists);
 		characters.insertTags(h, db.characters);
@@ -329,6 +334,7 @@ void AsyncScanner :: perFile (const std::filesystem::path p, const std::string h
 		syncro.addTask([=](){ std::cout << "sacenao found danbooru for:" << p.filename().string() << '\n';});
 		std::scoped_lock lk (m);
 
+		imagesFound++;
 		general.insertTags(h, db.general);
 		artists.insertTags(h, db.artists);
 		characters.insertTags(h, db.characters);
@@ -342,6 +348,7 @@ void AsyncScanner :: perFile (const std::filesystem::path p, const std::string h
 		syncro.addTask([=](){ std::cout << "saucenao found gelbooru for:" << p.filename().string() << '\n';});
 		std::scoped_lock lk (m);
 
+		imagesFound++;
 		general.insertTags(h, gb.general);
 		artists.insertTags(h, gb.artists);
 		characters.insertTags(h, gb.characters);
