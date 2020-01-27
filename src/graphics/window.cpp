@@ -1,25 +1,53 @@
 #include "window.h" 
+#include "gdkmm/pixbuf.h"
 #include <iostream> 
 #include <random>
 #include <cmath>
 
 
 FightWindow :: FightWindow ( const Glib::RefPtr<Gtk::Builder> b, cute::CollectionMan& c)
-	: builder(b), leftImage(builder, "leftAspect", "leftScrollView", "leftImage") 
-				  , rightImage(builder, "rightAspect", "rightScrollView", "rightImage")
-				  , collection(c), lastSize(false)
-
+	: builder(b), collection(c), lastSize(false)
 {
 	builder->get_widget("fightWindow", window);
 	Gtk::IconView* view;
 	window->signal_key_press_event().connect(sigc::mem_fun(*this, &FightWindow::onKeyPress), false);
 
+	builder->get_widget("leftImage",leftImage);
+	builder->get_widget("rightImage", rightImage);
+
 	/*
 	leftImage.setImage( collection.getLeftImage());
 	rightImage.setImage( collection.getRightImage());
 	*/
-
 }
+
+
+void FightWindow :: setImage (const std::shared_ptr<cute::Image> i, Gtk::Image* box)
+{
+	const auto source = Gdk::Pixbuf::create_from_file( i->location);
+
+	const float width = source->get_width();
+	const float height = source->get_height();
+
+	const float bRatio = (float) box->get_allocated_width() / (float) box->get_allocated_height();
+
+	if(height < width)
+	{
+		box->set( source->scale_simple(
+					box->get_allocated_width(),
+					(height / width ) * (float) box->get_allocated_width(),
+					Gdk::INTERP_BILINEAR));
+		return;
+	}
+
+	box->set( source->scale_simple(
+			(width / height ) * (float) box->get_allocated_height(),
+			box->get_allocated_height(),
+			Gdk::INTERP_BILINEAR));
+}
+
+
+	
 
 void FightWindow::on_button_quit (void)
 {
@@ -28,8 +56,8 @@ void FightWindow::on_button_quit (void)
 
 void FightWindow::refresh (void)
 {
-	leftImage.setImage( collection.getLeftImage());
-	rightImage.setImage( collection.getRightImage());
+	setImage(collection.getLeftImage(), leftImage);
+	setImage(collection.getRightImage(), rightImage);
 }
 
 Gtk::Window* FightWindow :: getWindow (void)
@@ -43,9 +71,10 @@ bool FightWindow :: onKeyPress (GdkEventKey *event)
 
 	const auto spamRes = [&](void) 
 	{ 
-		leftImage.scaleImage( leftImage.scrollView->get_allocation());
-		rightImage.scaleImage( rightImage.scrollView->get_allocation());
+		//leftImage.scaleImage( leftImage.scrollView->get_allocation());
+		//rightImage.scaleImage( rightImage.scrollView->get_allocation());
 
+		/*
 
 		if(lastSize)
 		{
@@ -71,6 +100,9 @@ bool FightWindow :: onKeyPress (GdkEventKey *event)
 
 
 		lastSize = !lastSize;
+		*/
+
+
 	};
 
 	
@@ -78,10 +110,7 @@ bool FightWindow :: onKeyPress (GdkEventKey *event)
 	{
 		//left key 
 		collection.leftVictory(); 
-		leftImage.setImage( collection.getLeftImage());
-		rightImage.setImage( collection.getRightImage());
-	
-		spamRes();
+		refresh();
 	
 		return true; 
 	}
@@ -91,9 +120,7 @@ bool FightWindow :: onKeyPress (GdkEventKey *event)
 		//up key
 
 		collection.tieVictory(); 
-		leftImage.setImage( collection.getLeftImage());
-		rightImage.setImage( collection.getRightImage());
-		spamRes();
+		refresh();
 		return true;
 	}
 
@@ -103,11 +130,7 @@ bool FightWindow :: onKeyPress (GdkEventKey *event)
 	
 		//right key 
 		collection.rightVictory(); 
-		leftImage.setImage( collection.getLeftImage());
-		rightImage.setImage( collection.getRightImage());
-
-		spamRes();
-	
+		refresh();
 		return true; 
 	}
 
@@ -115,10 +138,7 @@ bool FightWindow :: onKeyPress (GdkEventKey *event)
 	if( event->hardware_keycode == 116) 
 	{
 		//down key 
-		spamRes();
-
-
-		spamRes();
+		refresh();
 		return true;
 	}
 

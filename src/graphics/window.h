@@ -18,9 +18,12 @@ class FightWindow
 	private:
 	const Glib::RefPtr<Gtk::Builder> builder;
 	Gtk::Window* window;
-	ScalingImage leftImage, rightImage;
+	Gtk::Image* leftImage;
+	Gtk::Image* rightImage; 
 	cute::CollectionMan& collection;
 	bool lastSize;
+
+	void setImage (const std::shared_ptr<cute::Image> i, Gtk::Image*);
 
 	public:
 	FightWindow (const Glib::RefPtr<Gtk::Builder>, cute::CollectionMan&); 
