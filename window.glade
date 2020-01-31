@@ -273,7 +273,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkImage" id="leftImagetjtjj">
+          <object class="GtkImage" id="leftImage">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="stock">gtk-missing-image</property>
