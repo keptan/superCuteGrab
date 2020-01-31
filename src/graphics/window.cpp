@@ -26,24 +26,24 @@ void FightWindow :: setImage (const std::shared_ptr<cute::Image> i, Gtk::Image* 
 {
 	const auto source = Gdk::Pixbuf::create_from_file( i->location);
 
-	const float width = source->get_width();
+	const float width  = source->get_width();
 	const float height = source->get_height();
 
-	const float bRatio = (float) box->get_allocated_width() / (float) box->get_allocated_height();
+	const float bWidth  = box->get_allocated_width();
+	const float bHeight = box->get_allocated_height();
 
-	if(height < width)
+	const float ratio  = (float) height / width; 
+	const float bRatio = bHeight / bWidth;
+
+	if(bRatio > ratio)
 	{
 		box->set( source->scale_simple(
-					box->get_allocated_width(),
-					(height / width ) * (float) box->get_allocated_width(),
-					Gdk::INTERP_BILINEAR));
+					width * (bWidth / width), height * (bWidth / width), Gdk::INTERP_BILINEAR));
 		return;
 	}
 
-	box->set( source->scale_simple(
-			(width / height ) * (float) box->get_allocated_height(),
-			box->get_allocated_height(),
-			Gdk::INTERP_BILINEAR));
+		box->set( source->scale_simple(
+					width * (bHeight / height), height * (bHeight / height), Gdk::INTERP_BILINEAR));
 }
 
 
