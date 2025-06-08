@@ -1,3 +1,5 @@
+Go use [megacute](https://github.com/keptan/megacute) instead, it uses [Hydrus](https://hydrusnetwork.github.io/hydrus/index.html) as the image db and is much better.
+
 # superCuteGrab
 ![](https://raw.githubusercontent.com/keptan/superCuteGrab/master/example.png)
 Booru image tag-fetching and ranking with Microsoft TRUESKILL and ELO.
